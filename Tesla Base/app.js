@@ -1,5 +1,5 @@
 // Replace with YOUR keys from Supabase Dashboard
-const SUPABASE_URL = 'https://your-project.supabase.co';
+const SUPABASE_URL = 'https://ggrvkcxnizchfbzfwvjv.supabase.co';
 const SUPABASE_KEY = 'ggrvkcxnizchfbzfwvjv';
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -34,5 +34,6 @@ async function invest(planName) {
     }
 
 }
+
 
 
