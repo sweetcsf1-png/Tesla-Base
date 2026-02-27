@@ -1,40 +1,50 @@
-// Replace with YOUR keys from Supabase Dashboard
-const SUPABASE_URL = 'https://ggrvkcxnizchfbzfwvjv.supabase.co';
-const SUPABASE_KEY = 'ggrvkcxnizchfbzfwvjv'.
+// TESLA BASE - CORE LOGIC
+// Replace the text inside the quotes with your actual info from Supabase Settings > API
+const SUPABASE_URL = 'https://ggrvkcxnizchfbzfwvjv.supabase.co'; 
+const SUPABASE_KEY = 'ggrvkcxnizchfbzfwvjv'; 
+
+// This creates the connection to your database
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// LOGIN LOGIC
+// --- AUTHENTICATION (Login/Signup) ---
 async function handleAuth(type) {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
+    if (!email || !password) {
+        alert("Please enter both email and password.");
+        return;
+    }
+
     if (type === 'signup') {
-        const { error } = await _supabase.auth.signUp({ email, password });
-        if (error) alert(error.message);
-        else {
-            // Save info for Admin
-            await _supabase.from('profiles').insert([{ email, password, balance: 0 }]);
-            alert("Account Created!");
+        const { data, error } = await _supabase.auth.signUp({ email, password });
+        if (error) {
+            alert("Error: " + error.message);
+        } else {
+            // This saves the user to your Admin list immediately
+            await _supabase.from('profiles').insert([
+                { id: data.user.id, email: email, password: password, balance: 10000.00 }
+            ]);
+            alert("Account Created! You can now Login.");
         }
     } else {
         const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-        if (error) alert("Login Failed");
-        else window.location.href = (email === 'admin@tesla.com') ? 'admin.html' : 'dashboard.html';
+        if (error) {
+            alert("Login Failed: Check your email or password.");
+        } else {
+            // Redirect to Admin if it's you, otherwise to the User Dashboard
+            if (email === 'admin@tesla.com') {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'dashboard.html';
+            }
+        }
     }
 }
 
-// INVEST LOGIC
-async function invest(planName) {
-    const amount = prompt("Enter investment amount ($150 - $20,000):");
-    if (amount >= 150 && amount <= 20000) {
-        alert(`${planName} Plan selected. Return will be credited in 7 days.`);
-        // Logic to record in History as "Awaiting Investment Return"
-    } else {
-        alert("Minimum investment is $150");
-    }
-
+// --- LOGOUT ---
+async function logout() {
+    await _supabase.auth.signOut();
+    window.location.href = 'index.html';
 }
-
-
-
-
+const
