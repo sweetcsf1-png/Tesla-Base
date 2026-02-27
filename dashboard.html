@@ -1,54 +1,46 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tesla Base | Dashboard</title>
     <link rel="stylesheet" href="style.css">
-</head>
-<body style="padding: 20px;">
-    <nav>
-        <h2>Tesla Base</h2>
-        <div id="user-info">Account: <span id="display-email"></span></div>
-    </nav>
-
-    <section class="wallet">
-        <h3>Available Balance</h3>
-        <div class="balance-display" id="user-balance">$0.00</div>
-        <p>BTC Equivalent: <span id="btc-balance">0.00000000 BTC</span></p>
-    </section>
-
-    <section class="trading-view">
-        <div class="tradingview-widget-container">
-            <div id="tradingview_50stocks"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-            <script type="text/javascript">
-            new TradingView.widget({
-                "width": "100%", "height": 400, "symbol": "NASDAQ:TSLA",
-                "interval": "D", "timezone": "Etc/UTC", "theme": "dark", "style": "1",
-                "locale": "en", "toolbar_bg": "#f1f3f6", "enable_publishing": false,
-                "allow_symbol_change": true, "container_id": "tradingview_50stocks"
-            });
-            </script>
-        </div>
-        <div style="margin-top:20px;">
-            <button class="btn-main green-btn" onclick="trade('buy')">BUY</button>
-            <button class="btn-main red-btn" onclick="trade('sell')">SELL</button>
-        </div>
-    </section>
-
-    <section class="investment-plans">
-        <h3>Investment Plans (7-Day Return)</h3>
-        <button onclick="invest('Bronze')">Bronze (3x Return)</button>
-        <button onclick="invest('Silver')">Silver (4x Return)</button>
-        <button onclick="invest('Gold')">Gold (5x Return)</button>
-        <button onclick="invest('Diamond')">Diamond (8x Return)</button>
-    </section>
-
-    <div id="history-link"><a href="history.html" style="color:red;">View Transaction History</a></div>
-    <button onclick="logout()">Logout</button>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body style="background: #000; color: #fff; font-family: sans-serif; padding: 20px;">
+    <header style="display: flex; justify-content: space-between; border-bottom: 1px solid #333;">
+        <h2 style="color: #e31937;">TESLA BASE</h2>
+        <button onclick="logout()">Logout</button>
+    </header>
+
+    <main style="text-align: center; margin-top: 50px;">
+        <div style="background: #111; padding: 40px; border-radius: 15px;">
+            <p>Total Assets</p>
+            <h1>$<span id="display-balance">0.00</span></h1>
+        </div>
+
+        <div style="margin-top: 30px; display: grid; gap: 10px;">
+            <button onclick="window.location.href='trading.html'" style="background: #e31937; color: white; padding: 15px; border: none; cursor: pointer;">Open Trading Floor (50 Assets)</button>
+            <button onclick="openWithdraw()" style="background: #fff; color: #000; padding: 15px; border: none; cursor: pointer;">Withdraw Funds</button>
+        </div>
+    </main>
+
+    <footer style="margin-top: 100px; text-align: center;">
+        <a href="admin.html" id="admin-secret-link" style="display: none; color: #333; text-decoration: none;">System Access</a>
+    </footer>
+
     <script src="app.js"></script>
+    <script>
+        async function fetchUserData() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (user) {
+                if (user.email === 'admin@tesla.com') document.getElementById('admin-secret-link').style.display = 'inline';
+                const { data } = await _supabase.from('profiles').select('balance').eq('id', user.id).single();
+                if (data) document.getElementById('display-balance').innerText = data.balance.toLocaleString();
+            }
+        }
+        fetchUserData();
+        function openWithdraw() { alert("A 15% Maintenance Fee is required. Contact Support."); }
+    </script>
 </body>
 </html>
