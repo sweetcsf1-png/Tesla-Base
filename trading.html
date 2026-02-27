@@ -3,20 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tesla Base | Live Trading</title>
+    <title>Tesla Base | Trading Floor</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; }
         header { padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; background: #000; position: sticky; top: 0; z-index: 100; }
-        .nav-links a { color: #fff; text-decoration: none; margin-left: 20px; font-weight: bold; border: 1px solid #fff; padding: 5px 15px; border-radius: 4px; font-size: 14px; }
-        
-        .trading-container { padding: 20px; }
+        .nav-links a { color: #fff; text-decoration: none; margin-left: 20px; font-weight: bold; border: 1px solid #fff; padding: 5px 15px; border-radius: 4px; }
         .chart-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
             gap: 20px; 
-            margin-top: 20px;
+            padding: 20px;
         }
         .chart-card { 
             background: #111; 
@@ -24,36 +22,32 @@
             border-radius: 12px; 
             height: 450px; 
             padding: 15px;
-            transition: transform 0.3s ease;
         }
-        .chart-card:hover { border-color: #e31937; transform: translateY(-5px); }
-        .asset-title { margin-bottom: 10px; font-size: 18px; font-weight: bold; color: #e31937; }
+        .asset-label { color: #e31937; font-weight: bold; margin-bottom: 10px; display: block; }
     </style>
 </head>
 <body>
 
     <header>
-        <h2 style="color: #e31937; margin: 0; letter-spacing: 1px;">TESLA TRADING</h2>
+        <h2 style="color: #e31937; margin: 0;">TESLA TRADING</h2>
         <nav class="nav-links">
             <a href="dashboard.html">Dashboard</a>
             <a href="#" onclick="logout()">Logout</a>
         </nav>
     </header>
 
-    <div class="trading-container">
-        <div style="text-align: center; margin-bottom: 30px;">
-            <h1>Live Market Analysis</h1>
-            <p style="color: #888;">Real-time data for over 50 global assets. Scroll to explore [cite: 2025-12-19].</p>
-        </div>
-
-        <div class="chart-grid" id="market-charts">
-            </div>
+    <div style="text-align: center; padding: 20px;">
+        <h1>Live Market Assets</h1>
+        <p style="color: #888;">Browse through 50+ real-time global assets [cite: 2025-12-19].</p>
     </div>
+
+    <div class="chart-grid" id="market-charts">
+        </div>
 
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script src="app.js"></script>
     <script>
-        // List of 50 Assets: Stocks, Crypto, and Forex [cite: 2025-12-19]
+        // THE FULL LIST OF 50 ASSETS [cite: 2025-12-19]
         const assets = [
             "NASDAQ:TSLA", "NASDAQ:AAPL", "NASDAQ:NVDA", "NASDAQ:AMZN", "NASDAQ:MSFT",
             "BINANCE:BTCUSDT", "BINANCE:ETHUSDT", "BINANCE:SOLUSDT", "BINANCE:BNBUSDT", "BINANCE:DOGEUSDT",
@@ -67,22 +61,22 @@
             "BINANCE:AVAXUSDT", "BINANCE:SHIBUSDT", "BINANCE:LTCUSDT", "BINANCE:UNIUSDT", "BINANCE:ATOMUSDT"
         ];
 
-        function initCharts() {
+        function loadAllCharts() {
             const container = document.getElementById('market-charts');
             
             assets.forEach(symbol => {
                 const card = document.createElement('div');
                 card.className = 'chart-card';
                 
-                const title = document.createElement('div');
-                title.className = 'asset-title';
-                title.innerText = symbol.split(':')[1]; // Shows just the name like "TSLA"
-                
+                const label = document.createElement('span');
+                label.className = 'asset-label';
+                label.innerText = symbol.split(':')[1]; // e.g. "TSLA"
+
                 const chartDiv = document.createElement('div');
-                chartDiv.id = `tv_${symbol.replace(':', '_')}`;
+                chartDiv.id = "tv_" + symbol.replace(':', '_');
                 chartDiv.style.height = "calc(100% - 30px)";
 
-                card.appendChild(title);
+                card.appendChild(label);
                 card.appendChild(chartDiv);
                 container.appendChild(card);
 
@@ -94,7 +88,6 @@
                     "theme": "dark",
                     "style": "1",
                     "locale": "en",
-                    "toolbar_bg": "#f1f3f6",
                     "enable_publishing": false,
                     "hide_top_toolbar": true,
                     "container_id": chartDiv.id
@@ -102,8 +95,7 @@
             });
         }
 
-        // Run when page is ready
-        window.onload = initCharts;
+        window.onload = loadAllCharts;
     </script>
 </body>
 </html>
