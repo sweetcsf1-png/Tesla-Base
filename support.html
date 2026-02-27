@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tesla Base | Support</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body style="background: #000; color: #fff; padding: 20px;">
+    <h2 style="color: #e31937;">Live Support</h2>
+    <div id="chat-box" style="height: 400px; background: #111; border: 1px solid #222; overflow-y: auto; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+        <p style="color: #555;">Welcome to Tesla Base Support. How can we help you today?</p>
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+        <input type="text" id="msg-input" placeholder="Type your message..." style="flex: 1; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px;">
+        <button onclick="sendMessage()" style="background: #e31937; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;">Send</button>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('msg-input');
+            const { data: { user } } = await _supabase.auth.getUser();
+            
+            if (input.value.trim() === "") return;
+
+            await _supabase.from('messages').insert([{
+                user_id: user.id,
+                email: user.email,
+                text: input.value,
+                sender: 'user'
+            }]);
+            
+            input.value = "";
+            loadMessages();
+        }
+
+        async function loadMessages() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            const { data } = await _supabase.from('messages').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
+            const box = document.getElementById('chat-box');
+            box.innerHTML = "";
+            data.forEach(m => {
+                const align = m.sender === 'user' ? 'right' : 'left';
+                const bg = m.sender === 'user' ? '#e31937' : '#222';
+                box.innerHTML += `<div style="text-align: ${align}; margin-bottom: 10px;"><span style="background: ${bg}; padding: 8px 12px; border-radius: 10px; display: inline-block;">${m.text}</span></div>`;
+            });
+            box.scrollTop = box.scrollHeight;
+        }
+        setInterval(loadMessages, 3000);
+    </script>
+</body>
+</html>
