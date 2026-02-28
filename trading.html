@@ -3,99 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tesla Base | Trading Floor</title>
+    <title>Tesla Base | Live Trading</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://s3.tradingview.com/tv.js"></script>
     <style>
-        body { background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; }
-        header { padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; background: #000; position: sticky; top: 0; z-index: 100; }
-        .nav-links a { color: #fff; text-decoration: none; margin-left: 20px; font-weight: bold; border: 1px solid #fff; padding: 5px 15px; border-radius: 4px; }
-        .chart-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
-            gap: 20px; 
-            padding: 20px;
-        }
-        .chart-card { 
-            background: #111; 
-            border: 1px solid #222; 
-            border-radius: 12px; 
-            height: 450px; 
-            padding: 15px;
-        }
-        .asset-label { color: #e31937; font-weight: bold; margin-bottom: 10px; display: block; }
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding-bottom: 60px; }
+        .trading-header { padding: 15px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        .market-info { display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        
+        /* Order Book Style */
+        .order-book { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #111; font-size: 12px; height: 150px; overflow: hidden; }
+        .book-col { padding: 5px; }
+        .red-price { color: #ff3b30; text-align: right; }
+        .green-price { color: #00c087; text-align: left; }
+
+        .trade-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; background: #080808; }
+        .btn-buy { background: #00c087; color: #fff; padding: 15px; border: none; border-radius: 4px; font-weight: bold; }
+        .btn-sell { background: #ff3b30; color: #fff; padding: 15px; border: none; border-radius: 4px; font-weight: bold; }
+
+        /* Positions List */
+        .positions-head { padding: 10px 15px; border-bottom: 1px solid #222; color: #848e9c; font-size: 13px; }
+        .position-item { padding: 15px; border-bottom: 1px solid #111; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h2 style="color: #e31937; margin: 0;">TESLA TRADING</h2>
-        <nav class="nav-links">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="#" onclick="logout()">Logout</a>
-        </nav>
-    </header>
-
-    <div style="text-align: center; padding: 20px;">
-        <h1>Live Market Assets</h1>
-        <p style="color: #888;">Browse through 50+ real-time global assets [cite: 2025-12-19].</p>
+    <div class="trading-header">
+        <div class="market-info">☰ LTC/USDT <span style="color:#00c087; font-size: 12px;">+4.99%</span></div>
+        <div style="font-size: 12px; color: #848e9c;">Demo Trading</div>
     </div>
 
-    <div class="chart-grid" id="market-charts">
-        </div>
+    <div id="tradingview_chart" style="height: 300px;"></div>
 
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <div class="order-book">
+        <div class="book-col" id="asks"></div> <div class="book-col" id="bids"></div> </div>
+
+    <div class="trade-actions">
+        <button class="btn-buy" onclick="openTrade('Buy')">Buy / Long</button>
+        <button class="btn-sell" onclick="openTrade('Sell')">Sell / Short</button>
+    </div>
+
+    <div class="positions-head">Positions (Live)</div>
+    <div id="active-positions">
+        <p style="text-align: center; color: #444; padding: 20px;">No open positions.</p>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item"><div>🏠</div>Home</a>
+        <a href="trading.html" class="nav-item active"><div>📊</div>Trade</a>
+        <a href="investment.html" class="nav-item"><div>💰</div>Earn</a>
+        <a href="support.html" class="nav-item"><div>💬</div>Chat</a>
+    </nav>
+
     <script src="app.js"></script>
     <script>
-        // THE FULL LIST OF 50 ASSETS [cite: 2025-12-19]
-        const assets = [
-            "NASDAQ:TSLA", "NASDAQ:AAPL", "NASDAQ:NVDA", "NASDAQ:AMZN", "NASDAQ:MSFT",
-            "BINANCE:BTCUSDT", "BINANCE:ETHUSDT", "BINANCE:SOLUSDT", "BINANCE:BNBUSDT", "BINANCE:DOGEUSDT",
-            "FOREXCOM:EURUSD", "FOREXCOM:GBPUSD", "FOREXCOM:USDJPY", "OANDA:XAUUSD", "OANDA:XAGUSD",
-            "NASDAQ:GOOGL", "NASDAQ:META", "NASDAQ:NFLX", "NYSE:BABA", "NYSE:NIO",
-            "NYSE:V", "NYSE:MA", "NASDAQ:AMD", "NASDAQ:INTC", "NASDAQ:PYPL",
-            "BINANCE:ADAUSDT", "BINANCE:XRPUSDT", "BINANCE:DOTUSDT", "BINANCE:MATICUSDT", "BINANCE:LINKUSDT",
-            "NYSE:GME", "NYSE:AMC", "NASDAQ:COIN", "NASDAQ:SQ", "NASDAQ:ROKU",
-            "NYSE:DIS", "NYSE:PFE", "NYSE:JPM", "NYSE:BAC", "NYSE:WMT",
-            "NASDAQ:ADBE", "NASDAQ:CSCO", "NASDAQ:PEP", "NASDAQ:COST", "NASDAQ:AVGO",
-            "BINANCE:AVAXUSDT", "BINANCE:SHIBUSDT", "BINANCE:LTCUSDT", "BINANCE:UNIUSDT", "BINANCE:ATOMUSDT"
-        ];
+        new TradingView.widget({
+            "autosize": true, "symbol": "BINANCE:LTCUSDT", "interval": "1", "timezone": "Etc/UTC",
+            "theme": "dark", "style": "1", "locale": "en", "container_id": "tradingview_chart", "hide_top_toolbar": true
+        });
 
-        function loadAllCharts() {
-            const container = document.getElementById('market-charts');
-            
-            assets.forEach(symbol => {
-                const card = document.createElement('div');
-                card.className = 'chart-card';
-                
-                const label = document.createElement('span');
-                label.className = 'asset-label';
-                label.innerText = symbol.split(':')[1]; // e.g. "TSLA"
-
-                const chartDiv = document.createElement('div');
-                chartDiv.id = "tv_" + symbol.replace(':', '_');
-                chartDiv.style.height = "calc(100% - 30px)";
-
-                card.appendChild(label);
-                card.appendChild(chartDiv);
-                container.appendChild(card);
-
-                new TradingView.widget({
-                    "autosize": true,
-                    "symbol": symbol,
-                    "interval": "D",
-                    "timezone": "Etc/UTC",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "en",
-                    "enable_publishing": false,
-                    "hide_top_toolbar": true,
-                    "container_id": chartDiv.id
-                });
-            });
+        // Fake Order Book Data for Realism
+        function updateBook() {
+            const asks = document.getElementById('asks');
+            const bids = document.getElementById('bids');
+            asks.innerHTML = ''; bids.innerHTML = '';
+            for(let i=0; i<5; i++) {
+                asks.innerHTML += `<div class="red-price">${(64 + Math.random()).toFixed(2)} <span style="color:#444">0.${Math.floor(Math.random()*99)}</span></div>`;
+                bids.innerHTML += `<div class="green-price">${(63 + Math.random()).toFixed(2)} <span style="color:#444">1.${Math.floor(Math.random()*99)}</span></div>`;
+            }
         }
-
-        window.onload = loadAllCharts;
+        setInterval(updateBook, 1000);
     </script>
 </body>
 </html>
