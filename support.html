@@ -2,53 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tesla Base | Support</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body style="background: #000; color: #fff; padding: 20px;">
-    <h2 style="color: #e31937;">Live Support</h2>
-    <div id="chat-box" style="height: 400px; background: #111; border: 1px solid #222; overflow-y: auto; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-        <p style="color: #555;">Welcome to Tesla Base Support. How can we help you today?</p>
+<body style="background:#000; color:#fff; padding:20px; font-family:sans-serif;">
+    <h2 style="color:#e31937;">Tesla Master Support</h2>
+    <div id="chat-box" style="height:450px; background:#111; border:1px solid #222; overflow-y:auto; padding:15px; border-radius:10px; margin-bottom:15px; display:flex; flex-direction:column; gap:10px;">
+        <div style="background:#222; padding:10px; border-radius:8px; align-self:flex-start; max-width:80%;">
+            Hello! How can Tesla Base help you today?
+        </div>
     </div>
 
-    <div style="display: flex; gap: 10px;">
-        <input type="text" id="msg-input" placeholder="Type your message..." style="flex: 1; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px;">
-        <button onclick="sendMessage()" style="background: #e31937; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;">Send</button>
+    <div style="display:flex; gap:10px; position:fixed; bottom:20px; width:calc(100% - 40px);">
+        <input type="text" id="msg" placeholder="Type message..." style="flex:1; padding:15px; background:#000; border:1px solid #333; color:#fff; border-radius:5px;">
+        <button onclick="sendMsg()" style="background:#e31937; color:white; border:none; padding:10px 20px; border-radius:5px; font-weight:bold;">Send</button>
     </div>
 
     <script src="app.js"></script>
     <script>
-        async function sendMessage() {
-            const input = document.getElementById('msg-input');
+        async function sendMsg() {
+            const m = document.getElementById('msg');
             const { data: { user } } = await _supabase.auth.getUser();
-            
-            if (input.value.trim() === "") return;
-
-            await _supabase.from('messages').insert([{
-                user_id: user.id,
-                email: user.email,
-                text: input.value,
-                sender: 'user'
-            }]);
-            
-            input.value = "";
-            loadMessages();
+            if(!m.value) return;
+            await _supabase.from('messages').insert([{ user_id: user.id, email: user.email, text: m.value, sender: 'user' }]);
+            m.value = "";
+            loadChat();
         }
-
-        async function loadMessages() {
+        async function loadChat() {
             const { data: { user } } = await _supabase.auth.getUser();
-            const { data } = await _supabase.from('messages').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
+            const { data } = await _supabase.from('messages').select('*').eq('user_id', user.id).order('created_at', {ascending: true});
             const box = document.getElementById('chat-box');
             box.innerHTML = "";
-            data.forEach(m => {
-                const align = m.sender === 'user' ? 'right' : 'left';
-                const bg = m.sender === 'user' ? '#e31937' : '#222';
-                box.innerHTML += `<div style="text-align: ${align}; margin-bottom: 10px;"><span style="background: ${bg}; padding: 8px 12px; border-radius: 10px; display: inline-block;">${m.text}</span></div>`;
+            data.forEach(msg => {
+                const isUser = msg.sender === 'user';
+                box.innerHTML += `<div style="background:${isUser ? '#e31937' : '#222'}; padding:10px; border-radius:8px; align-self:${isUser ? 'flex-end' : 'flex-start'}; max-width:80%;">${msg.text}</div>`;
             });
             box.scrollTop = box.scrollHeight;
         }
-        setInterval(loadMessages, 3000);
+        setInterval(loadChat, 3000);
+        window.onload = loadChat;
     </script>
 </body>
 </html>
