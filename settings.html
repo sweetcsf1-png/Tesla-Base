@@ -1,27 +1,56 @@
-<div class="settings-container" style="padding: 20px;">
-    <h2>Settings</h2>
-    
-    <div style="display:flex; justify-content:space-between; padding:20px; background:var(--card); border-radius:10px;">
-        <span>Light Mode</span>
-        <input type="checkbox" id="theme-toggle" onclick="toggleTheme()">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tesla Base | Settings</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="settings-group">
+        <h2 style="color: var(--accent);">System Settings</h2>
+        
+        <div class="setting-row">
+            <span>Appearance (Light/Dark)</span>
+            <button onclick="toggleTheme()" class="primary-btn" style="width: 100px; padding: 8px;">Switch</button>
+        </div>
+
+        <div id="auth-ui" style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
+            <h3>Account Access</h3>
+            <input type="email" id="email" placeholder="Email Address">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="handleAuth('login')" class="primary-btn" style="margin-top: 10px;">Login</button>
+            <button onclick="handleAuth('signup')" class="primary-btn" style="background: #333; margin-top: 10px;">Register</button>
+        </div>
+
+        <button onclick="logout()" id="logout-btn" style="display:none; margin-top: 40px;" class="primary-btn">Logout</button>
     </div>
 
-    <div id="auth-section" style="margin-top: 30px; background: var(--card); padding: 20px; border-radius:10px;">
-        <h3>Account Access</h3>
-        <input type="email" id="email" placeholder="Email" style="width:100%; padding:12px; margin:10px 0;">
-        <input type="password" id="password" placeholder="Password" style="width:100%; padding:12px; margin:10px 0;">
-        <button onclick="handleAuth('login')" style="width:100%; padding:15px; background:var(--accent); color:white; border:none;">Login</button>
-    </div>
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item"><img src="assets-icon.png" class="nav-icon">Assets</a>
+        <a href="trading.html" class="nav-item"><img src="trade-icon.png" class="nav-icon">Trade</a>
+        <a href="investment.html" class="nav-item"><img src="earn-icon.png" class="nav-icon">Earn</a>
+        <a href="history.html" class="nav-item"><img src="history-icon.png" class="nav-icon">History</a>
+        <a href="settings.html" class="nav-item active"><img src="settings-icon.png" class="nav-icon">Settings</a>
+    </nav>
 
-    <button onclick="logout()" style="width:100%; margin-top:20px; padding:15px; background:#333; color:white; border:none;">Logout</button>
-</div>
-
-<script>
-function toggleTheme() {
-    document.body.classList.toggle('light-mode');
-    const isLight = document.body.classList.contains('light-mode');
-    localStorage.setItem('theme', isLight ? 'light' : 'dark');
-}
-// On load: check preference
-if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
-</script>
+    <script src="app.js"></script>
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        }
+        // Check login status to hide/show UI
+        async function checkStatus() {
+            const { data } = await _supabase.auth.getSession();
+            if (data.session) {
+                document.getElementById('auth-ui').style.display = 'none';
+                document.getElementById('logout-btn').style.display = 'block';
+            }
+        }
+        window.onload = checkStatus;
+    </script>
+</body>
+</html>
