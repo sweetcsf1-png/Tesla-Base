@@ -2,115 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tesla Base | Professional Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tesla Base | Assets</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root { --okx-green: #00c087; --okx-red: #ff3b30; --okx-gray: #848e9c; }
-        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
-        
-        /* High-End Wallet Header */
-        .wallet-header { padding: 30px 20px; background: linear-gradient(180deg, #111 0%, #000 100%); }
-        .wallet-name { color: var(--okx-gray); font-size: 14px; display: flex; align-items: center; gap: 5px; }
-        .total-balance { font-size: 36px; font-weight: bold; margin: 10px 0; }
-        .profit-text { color: var(--okx-green); font-size: 16px; font-weight: 500; }
-
-        /* Quick Action Icons */
-        .action-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 20px; text-align: center; }
-        .action-item div { background: #1a1a1a; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; color: #fff; border: 1px solid #333; }
-        .action-item p { font-size: 12px; color: var(--okx-gray); margin: 0; }
-
-        /* Asset List Section */
-        .asset-section { padding: 0 20px; }
-        .tabs { display: flex; gap: 20px; border-bottom: 1px solid #222; margin-bottom: 15px; }
-        .tab-active { color: #fff; border-bottom: 2px solid #e31937; padding-bottom: 8px; font-weight: bold; }
-        
-        .asset-card { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #111; }
-        .asset-info { display: flex; align-items: center; gap: 12px; }
-        .asset-logo { width: 35px; height: 35px; border-radius: 50%; }
-        .asset-symbol { font-weight: bold; font-size: 16px; }
-        .asset-price { color: var(--okx-gray); font-size: 12px; }
-        .asset-values { text-align: right; }
-
-        /* Navigation Bar */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #222; }
-        .nav-item { text-align: center; color: var(--okx-gray); text-decoration: none; font-size: 10px; }
-        .nav-item.active { color: #fff; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-
-    <div class="wallet-header">
-        <div class="wallet-name">My Assets <span style="font-size: 10px;">▼</span></div>
-        <div class="total-balance">$<span id="main-bal">10,000.00</span></div>
-        <div class="profit-text">+$100.24 (0.4%) <span style="color:var(--okx-gray); font-size: 12px;">1W ▼</span></div>
+<body style="background:#000; color:#fff; padding:20px;">
+    <div style="padding: 20px 0; border-bottom: 1px solid #222;">
+        <p style="color:#848e9c; margin:0;">Total Assets (USDT)</p>
+        <h1 style="font-size: 40px; margin: 5px 0;">$<span id="main-bal">0.00</span></h1>
+        <p style="color:#00c087;">BTC ≈ <span id="btc-bal">0.000000</span></p>
     </div>
 
-    <div class="action-bar">
-        <div class="action-item" onclick="window.location.href='deposit.html'"><div>↑</div><p>Deposit</p></div>
-        <div class="action-item" onclick="window.location.href='withdraw.html'"><div>↓</div><p>Withdraw</p></div>
-        <div class="action-item" onclick="window.location.href='history.html'"><div>▤</div><p>History</p></div>
-        <div class="action-item"><div>▦</div><p>More</p></div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin: 20px 0;">
+        <button onclick="window.location.href='deposit.html'" class="action-btn">Deposit</button>
+        <button onclick="window.location.href='withdraw.html'" class="action-btn">Withdraw</button>
     </div>
 
-    <div class="asset-section">
-        <div class="tabs">
-            <span class="tab-active">Crypto</span>
-            <span style="color:var(--okx-gray)">NFT</span>
-            <span style="color:var(--okx-gray)">DeFi</span>
-        </div>
-
-        <div id="asset-list">
-            <div class="asset-card">
-                <div class="asset-info">
-                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="asset-logo">
-                    <div>
-                        <div class="asset-symbol">USDT</div>
-                        <div class="asset-price">$1.00 <span style="color:var(--okx-green)">+0.01%</span></div>
-                    </div>
-                </div>
-                <div class="asset-values">
-                    <div id="usdt-val">10,000.00</div>
-                    <div class="asset-price">$10,000.00</div>
-                </div>
-            </div>
-            <div class="asset-card">
-                <div class="asset-info">
-                    <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" class="asset-logo">
-                    <div>
-                        <div class="asset-symbol">BTC</div>
-                        <div class="asset-price">$104,706 <span style="color:var(--okx-green)">+2.28%</span></div>
-                    </div>
-                </div>
-                <div class="asset-values">
-                    <div id="btc-val">0</div>
-                    <div class="asset-price">$0.00</div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <h3>Crypto Markets</h3>
+    <div id="crypto-list"></div>
 
     <nav class="bottom-nav">
-        <a href="dashboard.html" class="nav-item active"><div>🏠</div>Home</a>
-        <a href="trading.html" class="nav-item"><div>📊</div>Trade</a>
-        <a href="investment.html" class="nav-item"><div>💰</div>Earn</a>
-        <a href="support.html" class="nav-item"><div>💬</div>Chat</a>
-        <a href="#" onclick="logout()" class="nav-item"><div>👤</div>Logout</a>
+        <a href="dashboard.html" class="active">Assets</a>
+        <a href="trading.html">Trade</a>
+        <a href="investment.html">Earn</a>
+        <a href="history.html">History</a>
     </nav>
 
     <script src="app.js"></script>
     <script>
-        async function fetchUserAssets() {
+        async function loadAssets() {
             const { data: { user } } = await _supabase.auth.getUser();
             const { data } = await _supabase.from('profiles').select('balance').eq('id', user.id).single();
-            if (data) {
-                const bal = data.balance;
-                document.getElementById('main-bal').innerText = bal.toLocaleString();
-                document.getElementById('usdt-val').innerText = bal.toLocaleString();
-            }
+            document.getElementById('main-bal').innerText = data.balance.toLocaleString();
+            document.getElementById('btc-bal').innerText = (data.balance / 65000).toFixed(6);
+            
+            const coins = ["BTC", "ETH", "SOL", "XRP", "LTC", "ADA", "DOGE", "TRX"];
+            const list = document.getElementById('crypto-list');
+            coins.forEach(c => {
+                list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:15px; border-bottom:1px solid #111;">
+                    <span><b>${c}</b></span> <span style="color:#00c087;">$${(Math.random()*1000).toFixed(2)}</span>
+                </div>`;
+            });
         }
-        window.onload = fetchUserAssets;
+        window.onload = loadAssets;
     </script>
 </body>
 </html>
