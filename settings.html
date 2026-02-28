@@ -1,0 +1,27 @@
+<div class="settings-container" style="padding: 20px;">
+    <h2>Settings</h2>
+    
+    <div style="display:flex; justify-content:space-between; padding:20px; background:var(--card); border-radius:10px;">
+        <span>Light Mode</span>
+        <input type="checkbox" id="theme-toggle" onclick="toggleTheme()">
+    </div>
+
+    <div id="auth-section" style="margin-top: 30px; background: var(--card); padding: 20px; border-radius:10px;">
+        <h3>Account Access</h3>
+        <input type="email" id="email" placeholder="Email" style="width:100%; padding:12px; margin:10px 0;">
+        <input type="password" id="password" placeholder="Password" style="width:100%; padding:12px; margin:10px 0;">
+        <button onclick="handleAuth('login')" style="width:100%; padding:15px; background:var(--accent); color:white; border:none;">Login</button>
+    </div>
+
+    <button onclick="logout()" style="width:100%; margin-top:20px; padding:15px; background:#333; color:white; border:none;">Logout</button>
+</div>
+
+<script>
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    const isLight = document.body.classList.contains('light-mode');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+}
+// On load: check preference
+if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+</script>
