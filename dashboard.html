@@ -3,64 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tesla Base | Full Exchange</title>
+    <title>Tesla Base | Pro Exchange</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --bg: #000; --card: #121212; --tesla-red: #E31937; --text: #fff; --gray: #8e8e8e; --border: #1f1f1f; --green: #00ff88; --red: #ff3b3b; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 90px; }
-        
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 100px; }
         .header { display: flex; justify-content: space-between; padding: 20px; align-items: center; border-bottom: 1px solid var(--border); }
-        .assets-card { padding: 20px; border-bottom: 8px solid #0a0a0a; }
-        .bal-usd { font-size: 36px; font-weight: 700; margin: 5px 0; }
+        .bal-card { padding: 25px 20px; border-bottom: 8px solid #0a0a0a; }
+        .bal-amount { font-size: 38px; font-weight: 800; margin: 5px 0; }
         
-        /* RESTORED QUICK ACTION BUTTONS */
-        .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; text-align: center; }
-        .act-item { background: #1c1c1c; padding: 15px 5px; border-radius: 12px; font-size: 12px; cursor: pointer; border: 1px solid #222; }
-        .act-item i { display: block; font-size: 22px; margin-bottom: 8px; color: var(--tesla-red); }
+        /* Actions */
+        .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; }
+        .act-item { background: #111; padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; border: 1px solid #222; font-size: 12px; }
+        .act-item i { display: block; font-size: 20px; margin-bottom: 8px; color: var(--tesla-red); }
 
-        .asset-row { display: flex; justify-content: space-between; padding: 15px 20px; border-bottom: 1px solid var(--border); align-items: center; cursor: pointer; }
-        .coin-info { display: flex; gap: 12px; align-items: center; }
-        .coin-info img { width: 35px; height: 35px; border-radius: 50%; background: #fff; padding: 2px; }
-
-        /* Trade Screen Modal */
+        /* Trade Modal & Chart */
         #trade-screen { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index:5000; overflow-y: auto; }
-        .chart-container { width: 100%; height: 400px; background: #000; }
-        .trade-form { padding: 20px; background: var(--card); border-top: 1px solid var(--border); }
-        .trade-input { width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; margin-bottom: 15px; font-size: 18px; box-sizing: border-box;}
-        
-        /* Deposit Warning Modal */
-        #dep-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:6000; padding:20px; }
-        .warn-box { background:var(--card); border: 2px solid var(--tesla-red); border-radius:15px; padding:25px; margin-top:40px; text-align:center; }
+        .chart-box { width: 100%; height: 450px; background: #000; }
+        .trade-controls { padding: 20px; background: var(--card); border-top: 1px solid var(--border); }
+        .t-input { width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; margin-bottom: 15px; font-size: 18px; box-sizing: border-box; }
 
-        .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: var(--bg); border-top: 1px solid var(--border); padding: 12px 0; z-index: 100; }
-        .nav-item { flex: 1; text-align: center; font-size: 10px; color: var(--gray); text-decoration: none; }
+        /* Position Tracker */
+        .pos-card { margin: 10px 20px; padding: 15px; background: #161616; border-radius: 12px; border-left: 4px solid var(--tesla-red); }
+        .p-profit { color: var(--green); font-weight: bold; }
+        .p-loss { color: var(--red); font-weight: bold; }
+
+        /* Converter Modal */
+        #conv-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:7000; padding:20px; }
+        .conv-box { background: var(--card); padding: 25px; border-radius: 15px; border: 1px solid var(--tesla-red); }
+        .conv-row { display: flex; align-items: center; gap: 10px; background: #000; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
+        .conv-row img { width: 25px; height: 25px; }
+        .conv-row select { background: transparent; color: #fff; border: none; font-size: 16px; width: 100%; }
+
+        .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: var(--bg); border-top: 1px solid var(--border); padding: 15px 0; z-index: 100; }
+        .nav-item { flex: 1; text-align: center; font-size: 11px; color: var(--gray); text-decoration: none; }
         .nav-item.active { color: #fff; }
     </style>
 </head>
 <body>
 
-    <div id="dep-modal">
-        <div class="warn-box">
-            <i class="fa-solid fa-triangle-exclamation" style="color:var(--tesla-red); font-size:40px;"></i>
-            <h2 style="margin:15px 0;">IMPORTANT</h2>
-            <p style="color:var(--gray); font-size:14px;">ONLY SEND <b style="color:#fff;">BITCOIN (BTC)</b> TO THIS ADDRESS. ANY OTHER COIN WILL BE LOST.</p>
-            <div id="wallet-addr" style="background:#000; padding:15px; margin:20px 0; border:1px dashed #555; word-break:break-all; font-family:monospace; color:var(--tesla-red);"></div>
-            <button onclick="closeDep()" style="width:100%; background:var(--tesla-red); color:#fff; border:none; padding:15px; border-radius:8px; font-weight:bold;">COPY & CLOSE</button>
+    <div id="conv-modal">
+        <div class="conv-box">
+            <h3 style="margin-top:0;">Crypto Converter</h3>
+            <div class="conv-row">
+                <img id="from-logo" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png">
+                <select id="from-coin" onchange="updateLogo('from')">
+                    <option value="bitcoin" data-symbol="btc">Bitcoin (BTC)</option>
+                    <option value="ethereum" data-symbol="eth">Ethereum (ETH)</option>
+                    <option value="tether" data-symbol="usdt">Tether (USDT)</option>
+                    <option value="solana" data-symbol="sol">Solana (SOL)</option>
+                </select>
+            </div>
+            <input type="number" id="conv-amount" class="t-input" placeholder="Amount to Convert" oninput="calcConv()">
+            <div style="text-align:center; margin: 10px 0;"><i class="fa-solid fa-arrow-down"></i></div>
+            <div class="conv-row">
+                <img id="to-logo" src="https://cryptologos.cc/logos/ethereum-eth-logo.png">
+                <select id="to-coin" onchange="updateLogo('to')">
+                    <option value="ethereum" data-symbol="eth">Ethereum (ETH)</option>
+                    <option value="bitcoin" data-symbol="btc">Bitcoin (BTC)</option>
+                    <option value="tether" data-symbol="usdt">Tether (USDT)</option>
+                </select>
+            </div>
+            <div id="conv-result" style="text-align:center; font-weight:bold; margin-bottom:20px; color:var(--green);">0.00</div>
+            <button onclick="executeConv()" style="width:100%; background:var(--tesla-red); color:#fff; border:none; padding:15px; border-radius:8px; font-weight:bold;">CONFIRM SWAP</button>
+            <button onclick="document.getElementById('conv-modal').style.display='none'" style="width:100%; background:transparent; color:var(--gray); border:none; margin-top:10px;">Cancel</button>
         </div>
     </div>
 
     <div id="trade-screen">
         <div class="header">
             <i class="fa-solid fa-chevron-left" onclick="closeTrade()"></i>
-            <div id="t-title" style="font-weight:bold;">BTC/USD</div>
-            <i class="fa-solid fa-headset"></i>
+            <div id="t-title" style="font-weight:bold;">BTC/USDT</div>
+            <div></div>
         </div>
-        <div id="tradingview_chart" class="chart-container"></div>
-        <div class="trade-form">
-            <input type="number" id="trade-amount" class="trade-input" placeholder="Enter Amount ($)">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <button onclick="executeTrade('BUY')" style="background:var(--green); color:#000; padding:15px; border-radius:8px; border:none; font-weight:900;">BUY</button>
-                <button onclick="executeTrade('SELL')" style="background:var(--red); color:#fff; padding:15px; border-radius:8px; border:none; font-weight:900;">SELL</button>
+        <div id="tradingview_chart" class="chart-box"></div>
+        <div class="trade-controls">
+            <div style="color:var(--gray); font-size:12px; margin-bottom:10px;">Balance: <span id="t-bal" style="color:#fff;">$0.00</span></div>
+            <input type="number" id="t-amt" class="t-input" placeholder="Enter Amount ($)">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <button onclick="executeTrade('BUY')" style="background:var(--green); color:#000; padding:18px; border-radius:8px; border:none; font-weight:900;">BUY / LONG</button>
+                <button onclick="executeTrade('SELL')" style="background:var(--red); color:#fff; padding:18px; border-radius:8px; border:none; font-weight:900;">SELL / SHORT</button>
             </div>
         </div>
     </div>
@@ -70,17 +92,22 @@
         <i class="fa-solid fa-bell"></i>
     </div>
 
-    <div class="assets-card">
-        <div style="color:var(--gray); font-size:13px;">Total Assets</div>
-        <div class="bal-usd" id="u-usd">$0.00</div>
+    <div class="bal-card">
+        <div style="color:var(--gray); font-size:13px;">Portfolio Balance</div>
+        <div class="bal-amount" id="u-usd">$0.00</div>
+        <div id="active-pnl" style="font-size:14px;">Live P/L: <span class="p-profit">+$0.00</span></div>
     </div>
 
     <div class="actions">
-        <div class="act-item" onclick="openDep()"><i class="fa-solid fa-wallet"></i>Deposit</div>
-        <div class="act-item" onclick="alert('Withdrawal verification needed.')"><i class="fa-solid fa-arrow-up-from-bracket"></i>Withdraw</div>
-        <div class="act-item" onclick="alert('Swap system active.')"><i class="fa-solid fa-rotate"></i>Convert</div>
+        <div class="act-item" onclick="alert('Deposit Address Loaded')"><i class="fa-solid fa-wallet"></i>Deposit</div>
+        <div class="act-item" onclick="alert('Withdrawal Request Sent')"><i class="fa-solid fa-arrow-up-from-bracket"></i>Withdraw</div>
+        <div class="act-item" onclick="document.getElementById('conv-modal').style.display='block'"><i class="fa-solid fa-rotate"></i>Convert</div>
     </div>
 
+    <div style="padding: 10px 20px; font-weight:bold; color:var(--tesla-red);">ACTIVE POSITIONS</div>
+    <div id="pos-list"></div>
+
+    <div style="padding: 10px 20px; font-weight:bold;">MARKET ASSETS</div>
     <div id="asset-list"></div>
 
     <nav class="nav">
@@ -91,20 +118,25 @@
 
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
+        let activePos = JSON.parse(localStorage.getItem('trades')) || [];
         const assets = [
-            { s: 'TSLA', n: 'Tesla Inc.', p: 202.45, i: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png' },
             { s: 'BTC', n: 'Bitcoin', p: 68420.00, i: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png' },
-            { s: 'ETH', n: 'Ethereum', p: 3510.12, i: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' }
+            { s: 'ETH', n: 'Ethereum', p: 3510.12, i: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
+            { s: 'TSLA', n: 'Tesla Inc.', p: 202.45, i: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png' }
         ];
 
         function render() {
             const b = parseFloat(localStorage.getItem('userBalance')) || 0;
             document.getElementById('u-usd').innerText = "$" + b.toLocaleString();
+            document.getElementById('t-bal').innerText = "$" + b.toLocaleString();
+
             document.getElementById('asset-list').innerHTML = assets.map(a => `
-                <div class="asset-row" onclick="openTrade('${a.s}')">
-                    <div class="coin-info"><img src="${a.i}"><div><b>${a.s}</b><br><small>${a.n}</small></div></div>
+                <div style="display:flex; justify-content:space-between; padding:15px 20px; border-bottom:1px solid #111; align-items:center;" onclick="openTrade('${a.s}')">
+                    <div style="display:flex; align-items:center; gap:10px;"><img src="${a.i}" width="30"><div><b>${a.s}</b><br><small style="color:#8e8e8e">${a.n}</small></div></div>
                     <b>$${a.p.toFixed(2)}</b>
                 </div>`).join('');
+            
+            updatePositions();
         }
 
         function openTrade(s) {
@@ -112,22 +144,60 @@
             new TradingView.widget({ "autosize": true, "symbol": "BINANCE:"+s+"USDT", "theme": "dark", "container_id": "tradingview_chart" });
         }
         function closeTrade() { document.getElementById('trade-screen').style.display = 'none'; }
-        
-        function openDep() { 
-            document.getElementById('wallet-addr').innerText = localStorage.getItem('dep_info') || "Contact Admin";
-            document.getElementById('dep-modal').style.display = 'block'; 
-        }
-        function closeDep() { document.getElementById('dep-modal').style.display = 'none'; }
 
-        function executeTrade(t) {
-            const amt = parseFloat(document.getElementById('trade-amount').value);
+        function executeTrade(type) {
+            const amt = parseFloat(document.getElementById('t-amt').value);
             let b = parseFloat(localStorage.getItem('userBalance')) || 0;
-            if(amt > b) return alert("Insufficient Balance");
+            if(amt > b || isNaN(amt)) return alert("Invalid Balance");
+            
             localStorage.setItem('userBalance', (b - amt).toFixed(2));
-            alert(t + " successful. $" + amt + " invested.");
+            activePos.push({ id: Date.now(), asset: 'BTC', type, amount: amt, entry: 68000 });
+            localStorage.setItem('trades', JSON.stringify(activePos));
             render(); closeTrade();
         }
 
+        function updatePositions() {
+            const list = document.getElementById('pos-list');
+            let totalPL = 0;
+            list.innerHTML = activePos.map(p => {
+                const pl = (Math.random() - 0.45) * 20; // Simulated Live P/L
+                totalPL += pl;
+                return `<div class="pos-card">
+                    <div style="display:flex; justify-content:space-between;"><b>${p.asset} ${p.type}</b> <span class="${pl>=0?'p-profit':'p-loss'}">${pl>=0?'+':''}$${pl.toFixed(2)}</span></div>
+                    <div style="font-size:11px; color:#888; margin-top:5px;">Invested: $${p.amount} | <span onclick="closePos(${p.id}, ${pl})" style="color:var(--tesla-red);">CLOSE</span></div>
+                </div>`;
+            }).join('');
+            document.getElementById('active-pnl').innerHTML = `Live P/L: <span class="${totalPL>=0?'p-profit':'p-loss'}">${totalPL>=0?'+':''}$${totalPL.toFixed(2)}</span>`;
+        }
+
+        function closePos(id, pl) {
+            let b = parseFloat(localStorage.getItem('userBalance')) || 0;
+            const trade = activePos.find(t => t.id === id);
+            localStorage.setItem('userBalance', (b + trade.amount + pl).toFixed(2));
+            activePos = activePos.filter(t => t.id !== id);
+            localStorage.setItem('trades', JSON.stringify(activePos));
+            render();
+        }
+
+        // CONVERTER LOGIC
+        async function calcConv() {
+            const from = document.getElementById('from-coin').value;
+            const to = document.getElementById('to-coin').value;
+            const amt = document.getElementById('conv-amount').value;
+            if(!amt) return;
+            const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${from},${to}&vs_currencies=usd`);
+            const data = await res.json();
+            const rate = data[from].usd / data[to].usd;
+            document.getElementById('conv-result').innerText = (amt * rate).toFixed(6) + " " + to.toUpperCase();
+        }
+
+        function updateLogo(type) {
+            const coin = document.getElementById(type + '-coin').value;
+            document.getElementById(type + '-logo').src = `https://assets.coingecko.com/coins/images/1/small/bitcoin.png`; // Fallback or dynamic URL
+            calcConv();
+        }
+
+        setInterval(updatePositions, 3000); // Live P/L updates every 3 seconds
         window.onload = render;
     </script>
 </body>
