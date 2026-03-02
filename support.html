@@ -2,47 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tesla Base | Support</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body style="background:#000; color:#fff; padding:20px; font-family:sans-serif;">
-    <h2 style="color:#e31937;">Tesla Master Support</h2>
-    <div id="chat-box" style="height:450px; background:#111; border:1px solid #222; overflow-y:auto; padding:15px; border-radius:10px; margin-bottom:15px; display:flex; flex-direction:column; gap:10px;">
-        <div style="background:#222; padding:10px; border-radius:8px; align-self:flex-start; max-width:80%;">
-            Hello! How can Tesla Base help you today?
+<body style="display:flex; flex-direction:column; height:100vh;">
+    <header style="padding:15px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
+        <i class="fa-solid fa-chevron-left" onclick="history.back()"></i>
+        <div style="font-weight:bold;">24/7 Live Support</div>
+    </header>
+
+    <div id="chat-box" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px;">
+        <div style="background:var(--card); padding:10px; border-radius:8px; align-self:flex-start; max-width:80%;">
+            Hello! How can we help you today?
         </div>
+        </div>
+
+    <div style="padding:15px; border-top:1px solid var(--border); display:flex; gap:10px;">
+        <input type="text" id="msg-input" placeholder="Type a message..." style="margin:0;">
+        <button onclick="sendToAdmin()" class="primary-btn" style="width:80px; padding:10px;">Send</button>
     </div>
 
-    <div style="display:flex; gap:10px; position:fixed; bottom:20px; width:calc(100% - 40px);">
-        <input type="text" id="msg" placeholder="Type message..." style="flex:1; padding:15px; background:#000; border:1px solid #333; color:#fff; border-radius:5px;">
-        <button onclick="sendMsg()" style="background:#e31937; color:white; border:none; padding:10px 20px; border-radius:5px; font-weight:bold;">Send</button>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
     <script>
-        async function sendMsg() {
-            const m = document.getElementById('msg');
+        async function sendToAdmin() {
+            const text = document.getElementById('msg-input').value;
             const { data: { user } } = await _supabase.auth.getUser();
-            if(!m.value) return;
-            await _supabase.from('messages').insert([{ user_id: user.id, email: user.email, text: m.value, sender: 'user' }]);
-            m.value = "";
+            
+            await _supabase.from('messages').insert([{ 
+                sender_id: user.id, 
+                text: text, 
+                is_admin_reply: false 
+            }]);
+            document.getElementById('msg-input').value = '';
             loadChat();
         }
+
         async function loadChat() {
             const { data: { user } } = await _supabase.auth.getUser();
-            const { data } = await _supabase.from('messages').select('*').eq('user_id', user.id).order('created_at', {ascending: true});
+            const { data: msgs } = await _supabase.from('messages')
+                .select('*')
+                .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+                .order('created_at', {ascending: true});
+            
             const box = document.getElementById('chat-box');
-            box.innerHTML = "";
-            data.forEach(msg => {
-                const isUser = msg.sender === 'user';
-                box.innerHTML += `<div style="background:${isUser ? '#e31937' : '#222'}; padding:10px; border-radius:8px; align-self:${isUser ? 'flex-end' : 'flex-start'}; max-width:80%;">${msg.text}</div>`;
+            box.innerHTML = '';
+            msgs.forEach(m => {
+                const isMe = !m.is_admin_reply;
+                box.innerHTML += `
+                <div style="background:${isMe ? 'var(--accent)' : 'var(--card)'}; 
+                            padding:10px; border-radius:8px; 
+                            align-self:${isMe ? 'flex-end' : 'flex-start'}; max-width:80%;">
+                    ${m.text}
+                </div>`;
             });
             box.scrollTop = box.scrollHeight;
         }
-        setInterval(loadChat, 3000);
-        window.onload = loadChat;
+        setInterval(loadChat, 3000); // Auto-refresh every 3 seconds
     </script>
 </body>
 </html>
