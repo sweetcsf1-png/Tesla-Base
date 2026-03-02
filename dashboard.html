@@ -3,49 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tesla Base | Funding Account</title>
+    <title>Tesla Base | Assets</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --bg: #000000; --card: #121212; --text: #ffffff; --gray: #8e8e8e; --tesla-red: #E31937; --border: #1f1f1f; }
-        body { background-color: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 80px; }
-        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; padding-bottom: 90px; }
+
         /* Header */
-        .tesla-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; }
-        .tesla-title { font-size: 16px; letter-spacing: 2px; color: var(--tesla-red); font-weight: 900; margin: 0; }
-        .header-icons { display: flex; gap: 20px; font-size: 18px; }
+        .tesla-header { position: sticky; top: 0; background: var(--bg); z-index: 1001; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); }
+        .tesla-title { font-size: 16px; letter-spacing: 2px; color: var(--tesla-red); font-weight: 900; }
 
-        /* Asset Card */
+        /* Assets Card */
         .assets-card { padding: 20px; background: var(--bg); }
-        .assets-label { display: flex; align-items: center; gap: 8px; color: var(--gray); font-size: 14px; margin-bottom: 10px; }
-        .balance-row { display: flex; align-items: baseline; gap: 8px; }
-        .balance-row h1 { font-size: 32px; margin: 0; }
-        .btc-equiv { font-size: 13px; color: var(--gray); margin: 8px 0 20px; }
-        .available-box { border-top: 1px solid var(--border); padding-top: 15px; font-size: 13px; }
+        .balance-row { display: flex; align-items: baseline; gap: 8px; margin: 5px 0; }
+        .balance-row h1 { font-size: 34px; }
+        .btc-equiv { font-size: 13px; color: var(--gray); margin-bottom: 15px; }
 
-        /* Quick Actions - The 4-column Grid from Image 1 */
-        .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); padding: 10px 20px; gap: 10px; text-align: center; }
-        .icon-box { background: #1c1c1c; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-size: 20px; }
-        .action-item span { font-size: 11px; color: var(--text); }
+        /* Quick Actions */
+        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); padding: 10px 20px; gap: 15px; text-align: center; }
+        .icon-box { background: #1c1c1c; width: 55px; height: 55px; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-size: 22px; }
 
-        /* Asset Tabs */
-        .asset-tabs { display: flex; margin: 20px 15px 0; border-bottom: 1px solid var(--border); }
-        .tab { padding: 12px 15px; font-size: 14px; color: var(--gray); cursor: pointer; }
-        .tab.active { color: var(--text); border-bottom: 2px solid var(--tesla-red); font-weight: bold; }
+        /* Search Bar Styling */
+        .search-container { padding: 15px 20px; position: sticky; top: 60px; background: var(--bg); z-index: 1000; }
+        .search-box { width: 100%; background: #1c1c1c; border: none; padding: 12px 15px; border-radius: 8px; color: #fff; font-size: 14px; outline: none; }
+        .search-box::placeholder { color: var(--gray); }
 
-        /* List Rows */
-        .asset-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid var(--border); }
-        .coin-meta { display: flex; align-items: center; gap: 12px; }
-        .coin-meta img { width: 30px; height: 30px; border-radius: 50%; }
-        .coin-names { display: flex; flex-direction: column; }
-        .symbol { font-weight: bold; font-size: 15px; }
-        .full-name { font-size: 11px; color: var(--gray); }
-        .coin-balance { text-align: right; }
+        /* Asset List */
+        .tab-header { margin: 10px 20px 0; font-weight: bold; font-size: 16px; border-bottom: 2px solid var(--tesla-red); width: fit-content; padding-bottom: 5px; }
+        .asset-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); }
+        .coin-info { display: flex; align-items: center; gap: 14px; }
+        .coin-info img { width: 35px; height: 35px; border-radius: 50%; background: #fff; padding: 2px; }
+        .symbol { font-weight: bold; font-size: 16px; }
+        .name { font-size: 12px; color: var(--gray); display: block; }
+        .coin-vals { text-align: right; }
+        .val-usd { font-weight: bold; }
+        .val-sub { font-size: 12px; color: var(--gray); }
 
         /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: var(--bg); border-top: 1px solid var(--border); padding: 10px 0; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: var(--bg); border-top: 1px solid var(--border); padding: 12px 0; z-index: 1001; }
         .nav-item { flex: 1; text-align: center; text-decoration: none; color: var(--gray); font-size: 10px; }
         .nav-item.active { color: var(--text); }
-        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
     </style>
 </head>
 <body>
@@ -53,78 +52,87 @@
     <header class="tesla-header">
         <i class="fa-solid fa-arrow-left"></i>
         <h2 class="tesla-title">TESLA BASE</h2>
-        <div class="header-icons">
-            <i class="fa-regular fa-circle-question"></i>
-            <i class="fa-solid fa-clock-rotate-left"></i>
-        </div>
+        <div style="display:flex; gap:20px;"><i class="fa-regular fa-circle-question"></i><i class="fa-solid fa-clock-rotate-left"></i></div>
     </header>
 
     <div class="assets-card">
-        <div class="assets-label">Total Assets <i class="fa-regular fa-eye" onclick="toggleBlur()"></i></div>
+        <div style="color:var(--gray); font-size:14px;">Total Assets <i class="fa-regular fa-eye"></i></div>
         <div class="balance-row">
-            <h1 id="user-bal">254,948.35</h1>
+            <h1 id="total-usd">0.00</h1>
             <span style="font-weight:bold;">USD <i class="fa-solid fa-caret-down"></i></span>
         </div>
-        <div class="btc-equiv">≈ 2.1847549981 BTC <i class="fa-regular fa-circle-info"></i></div>
-        
-        <div class="available-box">
-            <div style="color:var(--gray); margin-bottom:4px;">Available Balance</div>
-            <div>254,948.35 USD ≈ 2.1847549981 BTC</div>
-        </div>
+        <div class="btc-equiv">≈ <span id="total-btc">0.00000000</span> BTC</div>
     </div>
 
     <div class="action-grid">
-        <div class="action-item"><div class="icon-box"><i class="fa-solid fa-wallet"></i></div><span>Deposit</span></div>
-        <div class="action-item"><div class="icon-box"><i class="fa-solid fa-arrow-up-from-bracket"></i></div><span>Withdraw</span></div>
-        <div class="action-item"><div class="icon-box"><i class="fa-solid fa-right-left"></i></div><span>Transfer</span></div>
-        <div class="action-item"><div class="icon-box"><i class="fa-solid fa-rotate"></i></div><span>Convert</span></div>
+        <div onclick="location.href='deposit.html'"><div class="icon-box"><i class="fa-solid fa-wallet"></i></div><span>Deposit</span></div>
+        <div onclick="location.href='withdraw.html'"><div class="icon-box"><i class="fa-solid fa-arrow-up-from-bracket"></i></div><span>Withdraw</span></div>
+        <div onclick="location.href='convert.html'"><div class="icon-box"><i class="fa-solid fa-rotate"></i></div><span>Convert</span></div>
     </div>
 
-    <div class="asset-tabs">
-        <div class="tab active">Crypto</div>
-        <div class="tab">Fiat</div>
+    <div class="tab-header">Assets</div>
+
+    <div class="search-container">
+        <input type="text" id="assetSearch" class="search-box" placeholder="Search 200+ assets..." onkeyup="filterAssets()">
     </div>
 
-    <div style="display:flex; justify-content:space-between; padding:15px; font-size:12px; color:var(--gray);">
-        <div><input type="checkbox"> Hide zero balances</div>
-        <div><i class="fa-solid fa-magnifying-glass"></i> Search</div>
-    </div>
-
-    <div class="asset-row">
-        <div class="coin-meta">
-            <img src="https://cryptologos.cc/logos/tether-usdt-logo.png">
-            <div class="coin-names"><span class="symbol">USDT</span><span class="full-name">Tether USDT</span></div>
+    <div id="asset-list">
         </div>
-        <div class="coin-balance">
-            <div style="font-weight:bold;">254,948.35</div>
-            <div style="color:var(--gray); font-size:11px;">≈ 254,948.35 USD</div>
-        </div>
-    </div>
-
-    <div class="asset-row">
-        <div class="coin-meta">
-            <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png">
-            <div class="coin-names"><span class="symbol">BTC</span><span class="full-name">Bitcoin</span></div>
-        </div>
-        <div class="coin-balance">
-            <div style="font-weight:bold;">0.0000</div>
-            <div style="color:var(--gray); font-size:11px;">≈ 0.00 USD</div>
-        </div>
-    </div>
 
     <nav class="bottom-nav">
-        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Home</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i>Trade</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-bolt"></i>Earn</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-headset"></i>Support</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-user-gear"></i>Profile</a>
+        <a href="dashboard.html" class="nav-item active"><i class="fa-solid fa-house"></i>Home</a>
+        <a href="trading.html" class="nav-item"><i class="fa-solid fa-chart-line"></i>Trade</a>
+        <a href="investment.html" class="nav-item"><i class="fa-solid fa-bolt"></i>Invest</a>
+        <a href="support.html" class="nav-item"><i class="fa-solid fa-headset"></i>Support</a>
+        <a href="profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i>Profile</a>
     </nav>
 
     <script>
-        function toggleBlur() {
-            const b = document.getElementById('user-bal');
-            b.innerText = b.innerText === "******" ? "254,948.35" : "******";
+        // Professional Asset Data (Top 200 Placeholder)
+        const assets = [
+            { s: 'TSLA', n: 'Tesla Inc.', i: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png' },
+            { s: 'BTC', n: 'Bitcoin', i: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png' },
+            { s: 'ETH', n: 'Ethereum', i: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
+            { s: 'USDT', n: 'Tether', i: 'https://cryptologos.cc/logos/tether-usdt-logo.png' },
+            { s: 'XRP', n: 'XRP', i: 'https://cryptologos.cc/logos/xrp-xrp-logo.png' },
+            { s: 'BNB', n: 'BNB', i: 'https://cryptologos.cc/logos/bnb-bnb-logo.png' },
+            { s: 'SOL', n: 'Solana', i: 'https://cryptologos.cc/logos/solana-sol-logo.png' },
+            { s: 'USDC', n: 'USDC', i: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png' },
+            { s: 'TRX', n: 'TRON', i: 'https://cryptologos.cc/logos/tron-trx-logo.png' },
+            { s: 'DOGE', n: 'Dogecoin', i: 'https://cryptologos.cc/logos/dogecoin-doge-logo.png' },
+            { s: 'ADA', n: 'Cardano', i: 'https://cryptologos.cc/logos/cardano-ada-logo.png' },
+            { s: 'BCH', n: 'Bitcoin Cash', i: 'https://cryptologos.cc/logos/bitcoin-cash-bch-logo.png' },
+            { s: 'SHIB', n: 'Shiba Inu', i: 'https://cryptologos.cc/logos/shiba-inu-shib-logo.png' },
+            { s: 'DOT', n: 'Polkadot', i: 'https://cryptologos.cc/logos/polkadot-new-dot-logo.png' },
+            { s: 'LTC', n: 'Litecoin', i: 'https://cryptologos.cc/logos/litecoin-ltc-logo.png' }
+        ];
+
+        // Generate additional items up to 200 for the list
+        for (let j = 16; j <= 200; j++) {
+            assets.push({ s: `ALT${j}`, n: `Asset Name ${j}`, i: 'https://cryptologos.cc/logos/generic-coin-logo.png' });
         }
+
+        function renderAssets(data) {
+            const list = document.getElementById('asset-list');
+            list.innerHTML = data.map(asset => `
+                <div class="asset-row">
+                    <div class="coin-info">
+                        <img src="${asset.i}" alt="${asset.s}">
+                        <div><span class="symbol">${asset.s}</span><span class="name">${asset.n}</span></div>
+                    </div>
+                    <div class="coin-vals"><span class="val-usd">0.00</span><br><span class="val-sub">≈ 0.00 USD</span></div>
+                </div>
+            `).join('');
+        }
+
+        function filterAssets() {
+            const query = document.getElementById('assetSearch').value.toLowerCase();
+            const filtered = assets.filter(a => a.s.toLowerCase().includes(query) || a.n.toLowerCase().includes(query));
+            renderAssets(filtered);
+        }
+
+        // Initialize view
+        renderAssets(assets);
     </script>
 </body>
 </html>
