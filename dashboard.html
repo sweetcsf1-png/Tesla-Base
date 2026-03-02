@@ -2,58 +2,135 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OKX | Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tesla Base | Funding Account</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
-    <div class="okx-top-toggle">
-        <div class="toggle-item active" onclick="switchTab('exchange')">Exchange</div>
-        <div class="toggle-item" onclick="switchTab('wallet')">Wallet</div>
-    </div>
+<body class="tesla-theme">
 
-    <div class="dashboard-header" style="padding: 20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="color:var(--gray-text); font-size:14px;">Total Equity (USD) <i class="fa-regular fa-eye-slash" onclick="toggleBalanceBlur()" style="margin-left:5px; cursor:pointer;"></i></span>
-            <i class="fa-solid fa-headset" onclick="location.href='support.html'"></i>
+    <header class="tesla-header">
+        <i class="fa-solid fa-arrow-left" onclick="history.back()"></i>
+        <h2 class="tesla-title">TESLA BASE</h2>
+        <div class="header-right">
+            <i class="fa-regular fa-circle-question"></i>
+            <i class="fa-solid fa-clock-rotate-left" onclick="location.href='history.html'"></i>
         </div>
-        <h1 id="total-balance" class="balance-main">$0.00</h1>
-        <div class="balance-sub">+$0.00 (0.00%) Today</div>
-        
-        <div class="quick-actions">
-            <div class="action-btn-circle" onclick="location.href='deposit.html'"><div class="circle-icon"><i class="fa-solid fa-arrow-down"></i></div>Deposit</div>
-            <div class="action-btn-circle" onclick="location.href='withdraw.html'"><div class="circle-icon"><i class="fa-solid fa-paper-plane"></i></div>Withdraw</div>
-            <div class="action-btn-circle" onclick="location.href='trading.html'"><div class="circle-icon"><i class="fa-solid fa-repeat"></i></div>Swap</div>
-            <div class="action-btn-circle" onclick="location.href='investment.html'"><div class="circle-icon"><i class="fa-solid fa-vault"></i></div>Earn</div>
-        </div>
-    </div>
+    </header>
 
-    <div class="market-tabs">
-        <span class="m-tab active">Favorites</span>
-        <span class="m-tab">Hot</span>
-        <span class="m-tab">Gainers</span>
-        <span class="m-tab">New</span>
-    </div>
-
-    <div id="asset-list-container">
+    <main class="funding-container">
+        <div class="assets-card">
+            <div class="assets-label">
+                <span>Total Assets</span>
+                <i class="fa-regular fa-eye" id="toggle-eye" onclick="toggleBalance()"></i>
+            </div>
+            <div class="balance-row">
+                <h1 id="main-balance">254,948.35</h1>
+                <span class="currency-tag">USD <i class="fa-solid fa-caret-down"></i></span>
+            </div>
+            <div class="btc-equiv">≈ <span id="btc-val">2.1847549981</span> BTC <i class="fa-regular fa-circle-info"></i></div>
+            
+            <div class="available-box">
+                <span class="gray">Available Balance</span>
+                <div class="val">254,948.35 USD ≈ 2.1847549981 BTC</div>
+            </div>
         </div>
+
+        <div class="action-grid">
+            <div class="action-item" onclick="location.href='deposit.html'">
+                <div class="icon-bg"><i class="fa-solid fa-wallet"></i></div>
+                <span>Deposit</span>
+            </div>
+            <div class="action-item" onclick="location.href='withdraw.html'">
+                <div class="icon-bg"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+                <span>Withdraw</span>
+            </div>
+            <div class="action-item" onclick="location.href='transfer.html'">
+                <div class="icon-bg"><i class="fa-solid fa-right-left"></i></div>
+                <span>Transfer</span>
+            </div>
+            <div class="action-item" onclick="location.href='convert.html'">
+                <div class="icon-bg"><i class="fa-solid fa-rotate"></i></div>
+                <span>Convert</span>
+            </div>
+        </div>
+
+        <div class="asset-tabs">
+            <div class="tab active">Crypto</div>
+            <div class="tab">Fiat</div>
+        </div>
+
+        <div class="filter-bar">
+            <div class="hide-zero">
+                <input type="checkbox" id="hide-zero">
+                <label for="hide-zero">Hide zero balances</label>
+            </div>
+            <div class="search-mini">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Search</span>
+            </div>
+        </div>
+
+        <div class="list-container">
+            <div class="asset-row">
+                <div class="coin-info">
+                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT">
+                    <div class="coin-names">
+                        <span class="symbol">USDT</span>
+                        <span class="full-name">Tether USDT</span>
+                    </div>
+                </div>
+                <div class="coin-vals">
+                    <span class="amount">254,948.35</span>
+                    <span class="sub-val">≈ 254,948.35 USD</span>
+                </div>
+            </div>
+
+            <div class="asset-row">
+                <div class="coin-info">
+                    <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="BTC">
+                    <div class="coin-names">
+                        <span class="symbol">BTC</span>
+                        <span class="full-name">Bitcoin</span>
+                    </div>
+                </div>
+                <div class="coin-vals">
+                    <span class="amount">0.0000</span>
+                    <span class="sub-val">≈ 0.00 USD</span>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <nav class="bottom-nav">
-        <a href="dashboard.html" class="nav-item active"><i class="fa-solid fa-house"></i>Home</a>
-        <a href="trading.html" class="nav-item"><i class="fa-solid fa-chart-simple"></i>Trade</a>
-        <a href="investment.html" class="nav-item"><i class="fa-solid fa-piggy-bank"></i>Earn</a>
-        <a href="history.html" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
-        <a href="settings.html" class="nav-item"><i class="fa-solid fa-user"></i>Profile</a>
+        <a href="dashboard.html" class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></a>
+        <a href="trading.html" class="nav-item"><i class="fa-solid fa-chart-column"></i><span>Trade</span></a>
+        <a href="investment.html" class="nav-item"><i class="fa-solid fa-bolt"></i><span>Earn</span></a>
+        <a href="support.html" class="nav-item"><i class="fa-solid fa-headset"></i><span>Support</span></a>
+        <a href="profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i><span>Profile</span></a>
     </nav>
 
-    <script src="app.js"></script>
     <script>
-        function toggleBalanceBlur() {
-            const b = document.getElementById('total-balance');
-            b.classList.toggle('blurred-text');
+        let isHidden = false;
+        const mainBal = "254,948.35";
+        const btcVal = "2.1847549981";
+
+        function toggleBalance() {
+            isHidden = !isHidden;
+            const balEl = document.getElementById('main-balance');
+            const btcEl = document.getElementById('btc-val');
+            const eye = document.getElementById('toggle-eye');
+
+            if (isHidden) {
+                balEl.innerText = "******";
+                btcEl.innerText = "******";
+                eye.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                balEl.innerText = mainBal;
+                btcEl.innerText = btcVal;
+                eye.classList.replace('fa-eye-slash', 'fa-eye');
+            }
         }
-        window.onload = () => { applySavedTheme(); loadUserAssets(); };
     </script>
 </body>
 </html>
