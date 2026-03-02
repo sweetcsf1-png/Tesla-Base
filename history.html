@@ -2,44 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Tesla Base | History</title>
+    <title>OKX | History</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <h3 style="padding: 20px;">Transaction History</h3>
-    <div id="history-container">
-        </div>
+    <h3 style="padding:20px;">Transactions</h3>
+    <div id="history-inject"></div>
 
     <nav class="bottom-nav">
-        <a href="dashboard.html" class="nav-item">Assets</a>
+        <a href="dashboard.html" class="nav-item">Home</a>
         <a href="trading.html" class="nav-item">Trade</a>
         <a href="investment.html" class="nav-item">Earn</a>
         <a href="history.html" class="nav-item active">History</a>
     </nav>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
     <script>
-        async function loadMt5History() {
+        async function loadHistory() {
             const { data: { user } } = await _supabase.auth.getUser();
-            const { data } = await _supabase.from('history').select('*').eq('user_id', user.id);
-            const cont = document.getElementById('history-container');
-            
+            const { data } = await _supabase.from('history').select('*').eq('user_id', user.id).order('created_at', {ascending: false});
+            const cont = document.getElementById('history-inject');
             data.forEach(h => {
                 cont.innerHTML += `
                 <div class="history-item">
-                    <div class="hist-left">
-                        <div class="type">buy 0.1</div>
-                        <div class="date">${new Date(h.created_at).toLocaleString()}</div>
+                    <div>
+                        <div class="hist-blue">${h.type}</div>
+                        <div style="font-size:12px; color:#848e9c;">${new Date(h.created_at).toLocaleString()}</div>
                     </div>
-                    <div class="hist-right">
-                        <div class="amount">${h.amount}</div>
-                        <div class="price-at">→ ${h.type}</div>
+                    <div style="text-align:right;">
+                        <div class="hist-blue">$${h.amount.toLocaleString()}</div>
+                        <div style="font-size:12px; color:#00c087;">${h.status}</div>
                     </div>
                 </div>`;
             });
         }
-        window.onload = loadMt5History;
+        window.onload = loadHistory;
     </script>
 </body>
 </html>
