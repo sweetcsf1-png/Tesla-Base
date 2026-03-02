@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OKX | Earn</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="padding: 20px;">
+    <h2 style="margin-bottom:20px;">Tesla ROI Investment</h2>
+    
+    <div id="invest-list">
+        <div class="invest-card">
+            <div class="invest-tier">BRONZE TIER</div>
+            <p>3x Return in 7 Days</p>
+            <input type="number" id="amt-bronze" placeholder="Min $500">
+            <button class="primary-btn" onclick="processInvest('Bronze', 3, 'amt-bronze')">Stake Now</button>
+        </div>
+        <div class="invest-card">
+            <div class="invest-tier">SILVER TIER</div>
+            <p>4x Return in 7 Days</p>
+            <input type="number" id="amt-silver" placeholder="Min $2,000">
+            <button class="primary-btn" onclick="processInvest('Silver', 4, 'amt-silver')">Stake Now</button>
+        </div>
+        </div>
+
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item">Home</a>
+        <a href="trading.html" class="nav-item">Trade</a>
+        <a href="investment.html" class="nav-item active">Earn</a>
+        <a href="history.html" class="nav-item">History</a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+    <script>
+        async function processInvest(tier, mult, inputId) {
+            const amt = parseFloat(document.getElementById(inputId).value);
+            const { data: { user } } = await _supabase.auth.getUser();
+            const { data: prof } = await _supabase.from('profiles').select('balance').eq('id', user.id).single();
+
+            if (prof.balance < amt) return alert("Insufficient Balance");
+
+            // Deduct balance and Record History
+            const newBal = prof.balance - amt;
+            await _supabase.from('profiles').update({ balance: newBal }).eq('id', user.id);
+            await _supabase.from('history').insert([{ user_id: user.id, amount: amt, type: `Invest: ${tier}`, status: 'Success' }]);
+            
+            alert(`Investment of $${amt} in ${tier} is successful!`);
+            location.reload();
+        }
+    </script>
+</body>
+</html>
