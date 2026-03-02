@@ -3,59 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tesla Base | Exchange</title>
+    <title>Tesla Base | Full Exchange</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --bg: #000; --card: #121212; --tesla-red: #E31937; --text: #fff; --gray: #8e8e8e; --border: #1f1f1f; --green: #00ff88; --red: #ff3b3b; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 100px; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 100px; overflow-x: hidden; }
         
-        /* Layout */
+        /* Header */
         .header { display: flex; justify-content: space-between; padding: 20px; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top:0; background: var(--bg); z-index: 100; }
         .bal-card { padding: 25px 20px; border-bottom: 8px solid #0a0a0a; }
         .bal-amount { font-size: 38px; font-weight: 800; margin: 5px 0; }
+
+        /* Functional Buttons */
         .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; }
-        .act-item { background: #111; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #222; font-size: 11px; }
+        .act-item { background: #111; padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; border: 1px solid #222; font-size: 11px; color: #fff; text-decoration: none; }
         .act-item i { display: block; font-size: 22px; margin-bottom: 8px; color: var(--tesla-red); }
 
-        /* Asset Rows */
+        /* Asset List with Fixed Logos */
         .asset-row { display: flex; justify-content: space-between; padding: 15px 20px; border-bottom: 1px solid var(--border); align-items: center; cursor: pointer; }
         .coin-info { display: flex; align-items: center; gap: 12px; }
-        .coin-info img { width: 32px; height: 32px; border-radius: 50%; }
+        .coin-info img { width: 32px; height: 32px; border-radius: 50%; background: #fff; object-fit: cover; }
 
-        /* OTP MODAL */
-        #verify-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999; padding:50px 20px; text-align:center; }
-        .v-box { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--tesla-red); }
-        .t-input { width:100%; padding:15px; background:#000; border:1px solid #333; color:#fff; border-radius:8px; margin-bottom:15px; font-size:18px; text-align:center; }
-
-        /* Trade screen */
+        /* Trade Screen */
         #trade-screen { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index:5000; overflow-y: auto; }
         .chart-box { width: 100%; height: 400px; }
+        .t-input { width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; font-size: 18px; }
+
+        /* Navigation */
+        .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: var(--bg); border-top: 1px solid var(--border); padding: 15px 0; z-index: 100; }
+        .nav-item { flex: 1; text-align: center; font-size: 11px; color: var(--gray); text-decoration: none; }
+        .nav-item.active { color: #fff; }
     </style>
 </head>
 <body>
 
-    <div id="verify-modal">
-        <div class="v-box">
-            <h2 style="color:var(--tesla-red);">Gmail Verification</h2>
-            <p style="color:var(--gray); font-size:13px; margin-bottom:20px;">Check your Gmail for the 6-digit code.</p>
-            <input type="number" id="otp-input" class="t-input" placeholder="000000">
-            <button onclick="confirmOTP()" style="width:100%; background:var(--tesla-red); color:#fff; padding:18px; border-radius:8px; border:none; font-weight:bold;">VERIFY NOW</button>
-            <p onclick="sendOTP()" style="margin-top:20px; color:var(--tesla-red); font-size:12px; cursor:pointer;">Resend Code</p>
-        </div>
-    </div>
-
     <div id="trade-screen">
         <div class="header">
             <i class="fa-solid fa-chevron-left" onclick="closeTrade()"></i>
-            <div id="t-title" style="font-weight:bold;">TRADE</div>
-            <div></div>
+            <div id="t-title" style="font-weight:bold;">BTC/USDT</div>
+            <i class="fa-solid fa-headset"></i>
         </div>
-        <div id="tv-chart" class="chart-box"></div>
-        <div style="padding:20px;">
-            <input type="number" id="t-amt" class="t-input" placeholder="Amount ($)">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <button onclick="trade('BUY')" style="background:var(--green); padding:18px; border:none; border-radius:8px; font-weight:bold;">BUY</button>
-                <button onclick="trade('SELL')" style="background:var(--red); color:#fff; padding:18px; border:none; border-radius:8px; font-weight:bold;">SELL</button>
+        <div id="tradingview_chart" class="chart-box"></div>
+        <div style="padding: 20px; background: var(--card);">
+            <div style="color:var(--gray); font-size:12px; margin-bottom:10px;">Available: <span id="t-bal-display" style="color:#fff;">$0.00</span></div>
+            <input type="number" id="t-amt" class="t-input" placeholder="Enter Amount ($)">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <button onclick="executeTrade('BUY')" style="background:var(--green); color:#000; padding:18px; border-radius:8px; border:none; font-weight:900; cursor:pointer;">BUY</button>
+                <button onclick="executeTrade('SELL')" style="background:var(--red); color:#fff; padding:18px; border-radius:8px; border:none; font-weight:900; cursor:pointer;">SELL</button>
             </div>
         </div>
     </div>
@@ -67,99 +61,115 @@
 
     <div class="bal-card">
         <div style="color:var(--gray); font-size:13px;">Portfolio Balance</div>
-        <div class="bal-amount" id="main-bal">$0.00</div>
+        <div class="bal-amount" id="u-usd">$0.00</div>
     </div>
 
     <div class="actions">
-        <div class="act-item"><i class="fa-solid fa-wallet"></i>Deposit</div>
-        <div class="act-item"><i class="fa-solid fa-arrow-up-from-bracket"></i>Withdraw</div>
-        <div class="act-item"><i class="fa-solid fa-rotate"></i>Convert</div>
+        <div class="act-item" onclick="alert('Deposit Address: 1TeslaBase... (Contact Admin)')"><i class="fa-solid fa-wallet"></i>Deposit</div>
+        <div class="act-item" onclick="alert('Withdrawal pending verification')"><i class="fa-solid fa-arrow-up-from-bracket"></i>Withdraw</div>
+        <div class="act-item" onclick="alert('Converter active')"><i class="fa-solid fa-rotate"></i>Convert</div>
     </div>
 
-    <div style="padding:15px 20px; font-weight:bold;">MARKET ASSETS</div>
+    <div style="padding: 10px 20px; font-weight:bold; color:var(--tesla-red);">200+ MARKET ASSETS</div>
     <div id="asset-list"></div>
 
-    <script src="https://s3.tradingview.com/tv.js"></script>
+    <nav class="nav">
+        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i><br>Home</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i><br>Trade</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-user"></i><br>Profile</a>
+    </nav>
+
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        const coins = [{s:'BTC', n:'Bitcoin', p:69420}, {s:'ETH', n:'Ethereum', p:3750}, {s:'TSLA', n:'Tesla Inc.', p:202.45}];
-        for(let i=4; i<=205; i++) coins.push({s:`COIN${i}`, n:`Asset ${i}`, p:(Math.random()*100).toFixed(2)});
+        const coins = [
+            { s: 'BTC', n: 'Bitcoin', p: 68420 },
+            { s: 'ETH', n: 'Ethereum', p: 3510 },
+            { s: 'TSLA', n: 'Tesla Inc.', p: 202.45 },
+            { s: 'SOL', n: 'Solana', p: 145 },
+            { s: 'BNB', n: 'BNB', p: 592 },
+            { s: 'XRP', n: 'XRP', p: 0.62 }
+        ];
+        // Ensure 200+ assets remain listed
+        for(let i=7; i<=205; i++) {
+            coins.push({ s: `COIN${i}`, n: `Asset ${i}`, p: (Math.random() * 100).toFixed(2) });
+        }
 
-        async function init() {
+        // Logic for fixed logos
+        function getLogo(symbol) {
+            if(symbol === 'TSLA') return 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png';
+            return `https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${symbol.toLowerCase()}.png`;
+        }
+
+        async function syncAndRender() {
             const email = localStorage.getItem('userEmail');
-            if(!email) return;
+            let b = parseFloat(localStorage.getItem('userBalance')) || 0;
 
-            // Step 1: Sync Balance from DB
-            const res = await fetch(`/api/user/data?email=${email}`);
-            const data = await res.json();
-            if(data.balance !== undefined) localStorage.setItem('userBalance', data.balance);
-
-            // Step 2: Show Verification if not verified
-            if(localStorage.getItem('isVerified') !== 'true') {
-                document.getElementById('verify-modal').style.display = 'block';
-                sendOTP();
+            // Database Sync Fail-safe
+            if(email) {
+                try {
+                    const res = await fetch(`/api/user/data?email=${email}`);
+                    const data = await res.json();
+                    if(data.balance !== undefined) {
+                        b = data.balance;
+                        localStorage.setItem('userBalance', b);
+                    }
+                } catch(e) { console.log("Sync unavailable, using local funds."); }
             }
-            render();
-        }
 
-        async function sendOTP() {
-            const email = localStorage.getItem('userEmail');
-            await fetch('/api/auth/send-otp', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ email })
-            });
-        }
+            document.getElementById('u-usd').innerText = "$" + b.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('t-bal-display').innerText = "$" + b.toLocaleString();
 
-        async function confirmOTP() {
-            const email = localStorage.getItem('userEmail');
-            const otp = document.getElementById('otp-input').value;
-            const res = await fetch('/api/auth/verify-otp', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ email, otp })
-            });
-            const data = await res.json();
-            if(data.success) {
-                localStorage.setItem('isVerified', 'true');
-                document.getElementById('verify-modal').style.display = 'none';
-            } else { alert("Incorrect Code"); }
-        }
-
-        function render() {
-            const b = parseFloat(localStorage.getItem('userBalance')) || 0;
-            document.getElementById('main-bal').innerText = "$" + b.toLocaleString();
             document.getElementById('asset-list').innerHTML = coins.map(c => `
                 <div class="asset-row" onclick="openTrade('${c.s}')">
                     <div class="coin-info">
-                        <img src="${c.s==='TSLA'?'https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png':'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/'+c.s.toLowerCase()+'.png'}" onerror="this.src='https://cryptologos.cc/logos/generic-coin-logo.png'">
+                        <img src="${getLogo(c.s)}" onerror="this.src='https://cryptologos.cc/logos/generic-coin-logo.png'">
                         <div><b>${c.s}</b><br><small>${c.n}</small></div>
                     </div>
-                    <b>$${c.p}</b>
+                    <b>$${parseFloat(c.p).toLocaleString()}</b>
                 </div>`).join('');
         }
 
         function openTrade(s) {
-            document.getElementById('trade-screen').style.display='block';
-            new TradingView.widget({"autosize":true, "symbol": s==='TSLA'?'NASDAQ:TSLA':'BINANCE:'+s+'USDT', "theme":"dark", "container_id":"tv-chart"});
+            document.getElementById('trade-screen').style.display = 'block';
+            new TradingView.widget({
+                "autosize": true, "symbol": s === "TSLA" ? "NASDAQ:TSLA" : "BINANCE:" + s + "USDT",
+                "interval": "1", "theme": "dark", "container_id": "tradingview_chart", "hide_top_toolbar": true
+            });
         }
-        function closeTrade() { document.getElementById('trade-screen').style.display='none'; }
 
-        async function trade(type) {
+        function closeTrade() { document.getElementById('trade-screen').style.display = 'none'; }
+
+        async function executeTrade(type) {
             const amt = parseFloat(document.getElementById('t-amt').value);
             let b = parseFloat(localStorage.getItem('userBalance')) || 0;
-            if(amt > b) return alert("Insufficient Balance");
+
+            if (isNaN(amt) || amt <= 0) return alert("Enter valid amount");
             
+            // Fixed Error Message per your instruction
+            if (amt > b) {
+                alert("Insufficient Balance"); 
+                return;
+            }
+
             const newBal = (b - amt).toFixed(2);
-            await fetch('/api/user/update-balance', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ email: localStorage.getItem('userEmail'), newBalance: newBal })
-            });
             localStorage.setItem('userBalance', newBal);
-            render(); closeTrade();
+
+            // Sync to database if online
+            const email = localStorage.getItem('userEmail');
+            if(email) {
+                await fetch('/api/user/update-balance', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email, newBalance: newBal })
+                });
+            }
+
+            alert(type + " order placed for $" + amt);
+            closeTrade();
+            syncAndRender();
         }
 
-        window.onload = init;
+        window.onload = syncAndRender;
     </script>
 </body>
 </html>
