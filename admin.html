@@ -3,88 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tesla Base | Master Admin</title>
+    <title>Tesla Base | Admin Control</title>
     <style>
-        :root { --bg: #000; --card: #111; --tesla-red: #E31937; --text: #fff; --gray: #8e8e8e; }
+        :root { --bg: #000; --tesla-red: #E31937; --card: #111; --text: #fff; }
         body { background: var(--bg); color: var(--text); font-family: sans-serif; padding: 20px; }
-        .box { border: 1px solid var(--tesla-red); border-radius: 12px; padding: 20px; margin-bottom: 25px; background: var(--card); }
-        h2 { font-size: 16px; margin-bottom: 15px; color: var(--tesla-red); text-transform: uppercase; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
-        th { color: var(--gray); padding: 10px; border-bottom: 1px solid #333; }
-        td { padding: 12px 10px; border-bottom: 1px solid #333; }
-        input { background: #fff; border: none; padding: 10px; border-radius: 6px; width: 100%; margin-top: 10px; color: #000; }
-        .btn { padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; color: #fff; }
-        .btn-green { background: #28a745; }
-        .btn-blue { background: #007bff; }
-        .img-link { color: #007bff; text-decoration: none; font-weight: bold; }
+        .box { border: 1px solid var(--tesla-red); border-radius: 12px; padding: 20px; margin-bottom: 20px; background: var(--card); }
+        h2 { font-size: 14px; color: var(--tesla-red); margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+        th, td { padding: 10px; border-bottom: 1px solid #222; }
+        input { width: 100%; padding: 12px; border-radius: 6px; border:none; margin: 10px 0; box-sizing:border-box; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn { padding: 12px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; color:#fff; }
+        .btn-inj { background: #28a745; }
+        .btn-int { background: #ffc107; color:#000; }
+        .btn-ret { background: #007bff; }
+        .btn-ded { background: #6c757d; }
     </style>
 </head>
 <body>
 
-    <h1 style="color:var(--tesla-red); margin-bottom:30px;">MASTER ADMIN CONTROL</h1>
+    <h1 style="color:var(--tesla-red); letter-spacing:2px;">MASTER CONTROL</h1>
 
     <div class="box">
-        <h2>Active User Balances</h2>
+        <h2>User Overview</h2>
         <table>
-            <thead><tr><th>Email</th><th>Password</th><th>Balance</th></tr></thead>
-            <tbody>
-                <tr>
-                    <td>sweetcsf1@gmail.com</td>
-                    <td style="color:var(--tesla-red)">222222</td>
-                    <td id="admin-bal" style="font-weight:bold;">$0.00</td>
-                </tr>
-            </tbody>
+            <tr><th>Email</th><th>Password</th><th>Current Balance</th></tr>
+            <tr>
+                <td>sweetcsf1@gmail.com</td>
+                <td>222222</td>
+                <td id="view-bal" style="color:#28a745; font-weight:bold;">$0.00</td>
+            </tr>
         </table>
     </div>
 
     <div class="box">
-        <h2>Inject Funds</h2>
-        <input type="number" id="injectAmt" placeholder="Enter USD amount">
-        <button class="btn btn-green" onclick="inject()">Inject Deposit</button>
+        <h2>Financial Management</h2>
+        <input type="number" id="amt" placeholder="Enter Amount (USD)">
+        <div class="btn-grid">
+            <button class="btn btn-inj" onclick="mod('add')">Inject Deposit</button>
+            <button class="btn btn-int" onclick="mod('add')">Inject Interest</button>
+            <button class="btn btn-ret" onclick="mod('add')">Inject Return</button>
+            <button class="btn btn-ded" onclick="mod('sub')">Deduct Funds</button>
+        </div>
     </div>
 
     <div class="box">
-        <h2>User Screenshots & Messages</h2>
+        <h2>Support Inbox (Images)</h2>
         <table>
-            <thead>
-                <tr><th>User Email</th><th>Message</th><th>Screenshot</th></tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>sweetcsf1@gmail.com</td>
-                    <td>Proof of $5000 BTC deposit attached.</td>
-                    <td><a href="#" class="img-link">View Screenshot</a></td>
-                </tr>
-            </tbody>
+            <tr><th>User</th><th>Message</th><th>Screenshot</th></tr>
+            <tr>
+                <td>sweetcsf1@gmail.com</td>
+                <td>Help with my BTC deposit</td>
+                <td><a href="#" style="color:#007bff;">View Image</a></td>
+            </tr>
         </table>
     </div>
 
     <div class="box">
-        <h2>Setup Deposit Info</h2>
-        <input type="text" id="wallName" placeholder="Method Name (e.g. BTC)">
-        <input type="text" id="wallInfo" placeholder="Wallet Address">
-        <button class="btn btn-blue" onclick="savePay()">Update Payment Details</button>
+        <h2>Set Wallet Address</h2>
+        <input type="text" id="wall" placeholder="Paste Bitcoin Address">
+        <button class="btn btn-ret" style="width:100%" onclick="save()">Update Deposit Wallet</button>
     </div>
 
     <script>
-        function inject() {
-            const val = parseFloat(document.getElementById('injectAmt').value);
+        function mod(type) {
+            const val = parseFloat(document.getElementById('amt').value);
             if(isNaN(val)) return;
             let current = parseFloat(localStorage.getItem('userBalance')) || 0;
-            localStorage.setItem('userBalance', (current + val).toFixed(2));
+            if(type === 'sub') current -= val; else current += val;
+            localStorage.setItem('userBalance', current.toFixed(2));
             render();
-            alert("Injected successfully!");
+            alert("Funds Updated!");
         }
-
-        function savePay() {
-            localStorage.setItem('dep_name', document.getElementById('wallName').value);
-            localStorage.setItem('dep_info', document.getElementById('wallInfo').value);
-            alert("Payment info updated!");
+        function save() {
+            localStorage.setItem('dep_info', document.getElementById('wall').value);
+            alert("Wallet updated!");
         }
-
         function render() {
             const b = localStorage.getItem('userBalance') || "0.00";
-            document.getElementById('admin-bal').innerText = "$" + parseFloat(b).toLocaleString();
+            document.getElementById('view-bal').innerText = "$" + parseFloat(b).toLocaleString();
         }
         window.onload = render;
     </script>
