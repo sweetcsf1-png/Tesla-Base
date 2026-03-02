@@ -2,74 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Tesla Base | Live Trade</title>
+    <title>OKX | Trade</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://s3.tradingview.com/tv.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div style="padding: 10px; background: var(--card);">
-        <select id="market-select" onchange="loadNewChart(this.value)">
-            <option value="BINANCE:BTCUSDT">Bitcoin (BTC)</option>
-            <option value="BINANCE:ETHUSDT">Ethereum (ETH)</option>
-            <option value="BINANCE:LTCUSDT">Litecoin (LTC)</option>
-            <option value="NASDAQ:TSLA">Tesla (TSLA)</option>
-            <option value="NASDAQ:AAPL">Apple (AAPL)</option>
-            <option value="BINANCE:SOLUSDT">Solana (SOL)</option>
-            </select>
+    <div id="tv_chart" style="height:350px;"></div>
+    <div style="display:flex; padding:15px; gap:10px;">
+        <div style="flex:0.4; font-size:12px;">
+            <div style="color:var(--okx-red);">67,420.5 <span style="float:right;">0.12</span></div>
+            <div style="color:var(--okx-green);">67,419.0 <span style="float:right;">1.05</span></div>
+        </div>
+        <div style="flex:0.6;">
+            <input type="number" id="trade-amt" placeholder="Amount to Trade">
+            <button class="primary-btn" style="background:var(--okx-green);" onclick="executeTrade('Buy')">Buy BTC</button>
+            <button class="primary-btn" style="background:var(--okx-red); margin-top:5px;" onclick="executeTrade('Sell')">Sell BTC</button>
+        </div>
     </div>
-
-    <div id="tradingview_chart" style="height: 450px;"></div>
-
-    <div style="padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-        <button onclick="executeRealTrade('buy')" class="btn-buy">Buy / Long</button>
-        <button onclick="executeRealTrade('sell')" class="btn-sell">Sell / Short</button>
-    </div>
-
-    <div id="live-pnl" style="text-align:center; font-size:24px; font-weight:bold; padding:10px;"></div>
-    <button id="close-btn" onclick="closeTrade()" style="display:none; width:90%; margin: 0 auto;" class="primary-btn">CLOSE TRADE</button>
 
     <nav class="bottom-nav">
-        <a href="dashboard.html" class="nav-item">Assets</a>
+        <a href="dashboard.html" class="nav-item">Home</a>
         <a href="trading.html" class="nav-item active">Trade</a>
         <a href="investment.html" class="nav-item">Earn</a>
         <a href="history.html" class="nav-item">History</a>
     </nav>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
     <script>
-        let currentPnl = 0;
-        let pnlInterval;
-
-        function loadNewChart(sym) {
-            new TradingView.widget({
-                "autosize": true, "symbol": sym, "interval": "1", "theme": localStorage.getItem('theme') || "dark",
-                "style": "1", "container_id": "tradingview_chart", "hide_top_toolbar": true
-            });
-        }
-
-        async function executeRealTrade(type) {
+        async function executeTrade(side) {
+            const amt = parseFloat(document.getElementById('trade-amt').value);
             const { data: { user } } = await _supabase.auth.getUser();
             const { data: prof } = await _supabase.from('profiles').select('balance').eq('id', user.id).single();
+
+            if (prof.balance < amt) return alert("Insufficient Balance");
+
+            const newBal = prof.balance - amt;
+            await _supabase.from('profiles').update({ balance: newBal }).eq('id', user.id);
+            await _supabase.from('history').insert([{ user_id: user.id, amount: amt, type: `Trade: ${side}`, status: 'Success' }]);
             
-            if(prof.balance <= 0) return alert("Insufficient balance to open trade.");
-
-            document.getElementById('close-btn').style.display = 'block';
-            pnlInterval = setInterval(() => {
-                currentPnl += (Math.random() * 5); 
-                document.getElementById('live-pnl').innerText = "+$" + currentPnl.toFixed(2);
-                document.getElementById('live-pnl').style.color = "#00c087";
-            }, 1000);
-        }
-
-        async function closeTrade() {
-            clearInterval(pnlInterval);
-            alert("Trade Closed! Profit of $" + currentPnl.toFixed(2) + " added to balance.");
-            // Logic to update Supabase balance goes here
+            alert(`Trade ${side} Opened!`);
             location.reload();
         }
-
-        window.onload = () => loadNewChart("BINANCE:BTCUSDT");
+        window.onload = () => { new TradingView.widget({"autosize":true,"symbol":"BINANCE:BTCUSDT","theme":"dark","container_id":"tv_chart","hide_top_toolbar":true}); };
     </script>
 </body>
 </html>
