@@ -3,35 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tesla Base | User Dashboard</title>
+    <title>Tesla Base | Full Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --bg: #000; --tesla-red: #E31937; --text: #fff; --gray: #8e8e8e; --border: #1f1f1f; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 80px; }
+        :root { --bg: #000; --card: #121212; --tesla-red: #E31937; --text: #fff; --gray: #8e8e8e; --border: #1f1f1f; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 90px; }
         
-        .header { display: flex; justify-content: space-between; padding: 20px; align-items: center; border-bottom: 1px solid var(--border); }
+        /* Header */
+        .header { display: flex; justify-content: space-between; padding: 20px; align-items: center; position: sticky; top:0; background: var(--bg); z-index: 100; }
         .title { color: var(--tesla-red); font-weight: 900; letter-spacing: 2px; font-size: 14px; }
         
+        /* Balance Section */
         .assets-card { padding: 20px; border-bottom: 8px solid #0a0a0a; }
         .bal-usd { font-size: 36px; font-weight: 700; margin: 5px 0; }
         .bal-btc { font-size: 13px; color: var(--gray); margin-bottom: 15px; }
 
+        /* Restored Buttons */
         .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; text-align: center; }
-        .act-item { background: #1a1a1a; padding: 15px 5px; border-radius: 12px; font-size: 12px; cursor: pointer; }
+        .act-item { background: #1c1c1c; padding: 15px 5px; border-radius: 12px; font-size: 12px; cursor: pointer; }
         .act-item i { display: block; font-size: 22px; margin-bottom: 8px; }
 
-        .search-container { padding: 20px; position: sticky; top: 0; background: var(--bg); z-index: 10; }
-        .search-box { width: 100%; background: #1a1a1a; border: 1px solid var(--border); padding: 12px; border-radius: 10px; color: #fff; outline: none; }
-        
+        /* Search & Asset List */
+        .search-container { padding: 20px; position: sticky; top: 60px; background: var(--bg); z-index: 10; }
+        .search-box { width: 100%; background: #1c1c1c; border: 1px solid var(--border); padding: 12px; border-radius: 10px; color: #fff; outline: none; }
         .asset-row { display: flex; justify-content: space-between; padding: 15px 20px; border-bottom: 1px solid var(--border); align-items: center; }
         .coin-info { display: flex; gap: 12px; align-items: center; }
         .coin-info img { width: 35px; height: 35px; border-radius: 50%; background: #fff; padding: 2px; }
         
-        .upload-section { margin: 20px; padding: 20px; background: #111; border: 1px solid var(--border); border-radius: 15px; }
-        .upload-section h3 { font-size: 16px; color: var(--tesla-red); margin-bottom: 10px; }
-        .upload-section textarea { width: 100%; background: #000; color: #fff; border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
-        .upload-btn { width: 100%; background: var(--tesla-red); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        /* Deposit Warning Overlay */
+        #deposit-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; padding:20px; box-sizing:border-box; }
+        .warning-box { background:var(--card); border: 2px solid var(--tesla-red); border-radius:15px; padding:25px; margin-top:50px; text-align:center; }
+        
+        /* Support Section */
+        .support-box { margin: 20px; padding: 20px; background: #111; border: 1px solid var(--border); border-radius: 15px; }
+        .support-box h3 { font-size: 16px; color: var(--tesla-red); margin-bottom: 10px; }
+        .support-box textarea { width: 100%; background: #000; color: #fff; border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; resize:none; }
 
+        /* Nav */
         .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: var(--bg); border-top: 1px solid var(--border); padding: 12px 0; z-index: 100; }
         .nav-item { flex: 1; text-align: center; font-size: 10px; text-decoration: none; color: var(--gray); }
         .nav-item.active { color: #fff; }
@@ -39,6 +47,18 @@
     </style>
 </head>
 <body>
+
+    <div id="deposit-modal">
+        <div class="warning-box">
+            <i class="fa-solid fa-triangle-exclamation" style="color:var(--tesla-red); font-size:40px;"></i>
+            <h2 style="margin:15px 0;">IMPORTANT</h2>
+            <p style="color:var(--gray); font-size:14px; line-height:1.5;">
+                To avoid loss of funds, ensure you <b style="color:#fff;">ONLY SEND BITCOIN (BTC)</b> to the specific address displayed below. Sending any other asset will result in permanent loss.
+            </p>
+            <div id="addr-display" style="background:#000; padding:15px; margin:20px 0; border:1px dashed #555; word-break:break-all; font-family:monospace;"></div>
+            <button onclick="closeDeposit()" style="width:100%; background:var(--tesla-red); color:#fff; border:none; padding:15px; border-radius:8px; font-weight:bold;">I UNDERSTAND</button>
+        </div>
+    </div>
 
     <div class="header">
         <i class="fa-solid fa-arrow-left"></i>
@@ -48,21 +68,14 @@
 
     <div class="assets-card">
         <div style="color:var(--gray); font-size:13px;">Total Assets <i class="fa-regular fa-eye"></i></div>
-        <div class="bal-usd" id="display-usd">0.00</div>
-        <div class="bal-btc">≈ <span id="display-btc">0.00000000</span> BTC</div>
+        <div class="bal-usd" id="main-usd">0.00</div>
+        <div class="bal-btc">≈ <span id="main-btc">0.00000000</span> BTC</div>
     </div>
 
     <div class="actions">
-        <div class="act-item" onclick="alert('Deposit details copied!')"><i class="fa-solid fa-wallet"></i>Deposit</div>
+        <div class="act-item" onclick="openDeposit()"><i class="fa-solid fa-wallet"></i>Deposit</div>
         <div class="act-item"><i class="fa-solid fa-arrow-up-from-bracket"></i>Withdraw</div>
         <div class="act-item"><i class="fa-solid fa-rotate"></i>Convert</div>
-    </div>
-
-    <div class="upload-section">
-        <h3>Submit Proof / Message</h3>
-        <textarea id="userMsg" rows="3" placeholder="Explain your deposit or request..."></textarea>
-        <input type="file" id="userFile" accept="image/*" style="margin-bottom: 15px; font-size: 12px;">
-        <button class="upload-btn" onclick="submitToAdmin()">Send to Admin</button>
     </div>
 
     <div class="search-container">
@@ -70,6 +83,13 @@
     </div>
 
     <div id="asset-list"></div>
+
+    <div class="support-box">
+        <h3><i class="fa-solid fa-headset"></i> Customer Support</h3>
+        <textarea id="supportMsg" placeholder="Describe your issue..."></textarea>
+        <input type="file" id="supportImg" accept="image/*" style="font-size:12px; margin-bottom:10px;">
+        <button onclick="sendSupport()" style="width:100%; background:#fff; color:#000; border:none; padding:12px; border-radius:8px; font-weight:bold;">Send Image & Message</button>
+    </div>
 
     <nav class="nav">
         <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Home</a>
@@ -83,14 +103,16 @@
             { s: 'TSLA', n: 'Tesla Inc.', i: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png' },
             { s: 'BTC', n: 'Bitcoin', i: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png' },
             { s: 'ETH', n: 'Ethereum', i: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
-            { s: 'USDT', n: 'Tether', i: 'https://cryptologos.cc/logos/tether-usdt-logo.png' }
+            { s: 'USDT', n: 'Tether', i: 'https://cryptologos.cc/logos/tether-usdt-logo.png' },
+            { s: 'BNB', n: 'BNB', i: 'https://cryptologos.cc/logos/bnb-bnb-logo.png' },
+            { s: 'SOL', n: 'Solana', i: 'https://cryptologos.cc/logos/solana-sol-logo.png' }
         ];
-        for(let x=5; x<=200; x++){ assets.push({s:`COIN${x}`, n:`Asset ${x}`, i:'https://cryptologos.cc/logos/generic-coin-logo.png'}); }
+        for(let x=7; x<=200; x++){ assets.push({s:`COIN${x}`, n:`Crypto Asset ${x}`, i:'https://cryptologos.cc/logos/generic-coin-logo.png'}); }
 
         function render(data) {
             const bal = parseFloat(localStorage.getItem('userBalance')) || 0;
-            document.getElementById('display-usd').innerText = bal.toLocaleString(undefined, {minimumFractionDigits:2});
-            document.getElementById('display-btc').innerText = (bal / 65000).toFixed(8);
+            document.getElementById('main-usd').innerText = bal.toLocaleString(undefined, {minimumFractionDigits:2});
+            document.getElementById('main-btc').innerText = (bal / 65000).toFixed(8);
 
             document.getElementById('asset-list').innerHTML = data.map(a => `
                 <div class="asset-row">
@@ -105,9 +127,17 @@
             render(assets.filter(a => a.s.toLowerCase().includes(q) || a.n.toLowerCase().includes(q)));
         }
 
-        function submitToAdmin() {
-            alert("Success! Your message and image have been queued for the Admin.");
-            document.getElementById('userMsg').value = "";
+        function openDeposit() {
+            const addr = localStorage.getItem('dep_info') || "Contact Admin for Address";
+            document.getElementById('addr-display').innerText = addr;
+            document.getElementById('deposit-modal').style.display = 'block';
+        }
+
+        function closeDeposit() { document.getElementById('deposit-modal').style.display = 'none'; }
+
+        function sendSupport() {
+            alert("Message and screenshot sent to support. Admin will review shortly.");
+            document.getElementById('supportMsg').value = "";
         }
 
         setInterval(() => render(assets), 2000);
