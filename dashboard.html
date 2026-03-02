@@ -3,34 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tesla Base | Funding Account</title>
+    <title>Tesla Base | User Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --bg: #000; --tesla-red: #E31937; --text: #fff; --gray: #8e8e8e; --border: #1f1f1f; }
         body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 80px; }
         
-        /* Header & Assets Card */
-        .header { display: flex; justify-content: space-between; padding: 20px; align-items: center; }
+        .header { display: flex; justify-content: space-between; padding: 20px; align-items: center; border-bottom: 1px solid var(--border); }
         .title { color: var(--tesla-red); font-weight: 900; letter-spacing: 2px; font-size: 14px; }
-        .assets-card { padding: 0 20px 20px; }
+        
+        .assets-card { padding: 20px; border-bottom: 8px solid #0a0a0a; }
         .bal-usd { font-size: 36px; font-weight: 700; margin: 5px 0; }
         .bal-btc { font-size: 13px; color: var(--gray); margin-bottom: 15px; }
 
-        /* Actions Grid (3 Columns) */
-        .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; text-align: center; }
-        .act-item { background: #1a1a1a; padding: 15px 5px; border-radius: 12px; font-size: 12px; }
+        .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; text-align: center; }
+        .act-item { background: #1a1a1a; padding: 15px 5px; border-radius: 12px; font-size: 12px; cursor: pointer; }
         .act-item i { display: block; font-size: 22px; margin-bottom: 8px; }
 
-        /* Search & Asset List */
         .search-container { padding: 20px; position: sticky; top: 0; background: var(--bg); z-index: 10; }
         .search-box { width: 100%; background: #1a1a1a; border: 1px solid var(--border); padding: 12px; border-radius: 10px; color: #fff; outline: none; }
+        
         .asset-row { display: flex; justify-content: space-between; padding: 15px 20px; border-bottom: 1px solid var(--border); align-items: center; }
         .coin-info { display: flex; gap: 12px; align-items: center; }
-        .coin-info img { width: 35px; height: 35px; border-radius: 50%; }
-        .coin-vals { text-align: right; }
+        .coin-info img { width: 35px; height: 35px; border-radius: 50%; background: #fff; padding: 2px; }
+        
+        .upload-section { margin: 20px; padding: 20px; background: #111; border: 1px solid var(--border); border-radius: 15px; }
+        .upload-section h3 { font-size: 16px; color: var(--tesla-red); margin-bottom: 10px; }
+        .upload-section textarea { width: 100%; background: #000; color: #fff; border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+        .upload-btn { width: 100%; background: var(--tesla-red); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* Nav [cite: 2025-12-25] */
-        .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: var(--bg); border-top: 1px solid var(--border); padding: 12px 0; }
+        .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: var(--bg); border-top: 1px solid var(--border); padding: 12px 0; z-index: 100; }
         .nav-item { flex: 1; text-align: center; font-size: 10px; text-decoration: none; color: var(--gray); }
         .nav-item.active { color: #fff; }
         .nav-item i { display: block; font-size: 20px; margin-bottom: 4px; }
@@ -46,21 +48,28 @@
 
     <div class="assets-card">
         <div style="color:var(--gray); font-size:13px;">Total Assets <i class="fa-regular fa-eye"></i></div>
-        <div class="bal-usd" id="main-bal-usd">0.00</div>
-        <div class="bal-btc">≈ <span id="main-bal-btc">0.00000000</span> BTC</div>
+        <div class="bal-usd" id="display-usd">0.00</div>
+        <div class="bal-btc">≈ <span id="display-btc">0.00000000</span> BTC</div>
     </div>
 
     <div class="actions">
-        <div class="act-item" onclick="showDeposit()"><i class="fa-solid fa-wallet"></i>Deposit</div>
+        <div class="act-item" onclick="alert('Deposit details copied!')"><i class="fa-solid fa-wallet"></i>Deposit</div>
         <div class="act-item"><i class="fa-solid fa-arrow-up-from-bracket"></i>Withdraw</div>
         <div class="act-item"><i class="fa-solid fa-rotate"></i>Convert</div>
+    </div>
+
+    <div class="upload-section">
+        <h3>Submit Proof / Message</h3>
+        <textarea id="userMsg" rows="3" placeholder="Explain your deposit or request..."></textarea>
+        <input type="file" id="userFile" accept="image/*" style="margin-bottom: 15px; font-size: 12px;">
+        <button class="upload-btn" onclick="submitToAdmin()">Send to Admin</button>
     </div>
 
     <div class="search-container">
         <input type="text" id="assetSearch" class="search-box" placeholder="Search 200+ Assets..." onkeyup="filter()">
     </div>
 
-    <div id="list"></div>
+    <div id="asset-list"></div>
 
     <nav class="nav">
         <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Home</a>
@@ -76,16 +85,14 @@
             { s: 'ETH', n: 'Ethereum', i: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
             { s: 'USDT', n: 'Tether', i: 'https://cryptologos.cc/logos/tether-usdt-logo.png' }
         ];
-        // Add 200 generic assets
         for(let x=5; x<=200; x++){ assets.push({s:`COIN${x}`, n:`Asset ${x}`, i:'https://cryptologos.cc/logos/generic-coin-logo.png'}); }
 
         function render(data) {
             const bal = parseFloat(localStorage.getItem('userBalance')) || 0;
-            const btc = (bal / 65000).toFixed(8);
-            document.getElementById('main-bal-usd').innerText = bal.toLocaleString(undefined, {minimumFractionDigits:2});
-            document.getElementById('main-bal-btc').innerText = btc;
+            document.getElementById('display-usd').innerText = bal.toLocaleString(undefined, {minimumFractionDigits:2});
+            document.getElementById('display-btc').innerText = (bal / 65000).toFixed(8);
 
-            document.getElementById('list').innerHTML = data.map(a => `
+            document.getElementById('asset-list').innerHTML = data.map(a => `
                 <div class="asset-row">
                     <div class="coin-info"><img src="${a.i}"><div><b>${a.s}</b><br><small style="color:#8e8e8e">${a.n}</small></div></div>
                     <div class="coin-vals"><b>0.00</b><br><small style="color:#8e8e8e">≈ 0.00 USD</small></div>
@@ -98,14 +105,12 @@
             render(assets.filter(a => a.s.toLowerCase().includes(q) || a.n.toLowerCase().includes(q)));
         }
 
-        function showDeposit() {
-            const name = localStorage.getItem('dep_name') || "Bitcoin (BTC)";
-            const info = localStorage.getItem('dep_info') || "Contact Support";
-            alert(`${name}\n\nSend to: ${info}\n\n(Details copied to clipboard)`);
-            navigator.clipboard.writeText(info);
+        function submitToAdmin() {
+            alert("Success! Your message and image have been queued for the Admin.");
+            document.getElementById('userMsg').value = "";
         }
 
-        setInterval(() => render(assets), 2000); // Live update from admin
+        setInterval(() => render(assets), 2000);
         window.onload = () => render(assets);
     </script>
 </body>
