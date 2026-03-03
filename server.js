@@ -8,16 +8,16 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static('public'));
 
-// 1. DATABASE CONNECTION
-// Use the "External Database URL" from your Render Dashboard here
-const connectionString = "YOUR_POSTGRESQL_URL_HERE";
+// --- DATABASE CONFIG ---
+// RULE: Use the External Database URL from Render Dashboard
+const connectionString = "PASTE_YOUR_RENDER_EXTERNAL_URL_HERE";
 
 const pool = new Pool({
     connectionString: connectionString,
     ssl: { rejectUnauthorized: false }
 });
 
-// AUTO-FIX: This creates the table automatically if it's missing
+// AUTO-FIX: This creates the table automatically so you don't get the 42601 error
 const initDb = async () => {
     try {
         await pool.query(`
@@ -62,7 +62,6 @@ app.post('/api/auth/register', async (req, res) => {
         await pool.query('INSERT INTO users (email, password, balance) VALUES ($1, $2, 0.00)', [email, password]);
         res.json({ success: true });
     } catch (err) { 
-        console.error(err);
         res.status(500).json({ error: "Registration failed" }); 
     }
 });
@@ -96,4 +95,3 @@ app.post('/api/user/update-balance', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Tesla Base Master Live on ${PORT}`));
-                                  
