@@ -2,218 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tesla Base | Authentication</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --bg: #000000;
-            --tesla-red: #E31937;
-            --card-bg: #111111;
-            --text-main: #ffffff;
-            --text-gray: #888888;
-            --border: #222222;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .auth-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 40px 20px;
-            text-align: center;
-        }
-
-        .logo {
-            font-size: 28px;
-            font-weight: 900;
-            color: var(--tesla-red);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-bottom: 40px;
-        }
-
-        .form-box {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-        }
-
-        h2 {
-            font-size: 20px;
-            margin-bottom: 25px;
-            font-weight: 600;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        label {
-            display: block;
-            color: var(--text-gray);
-            font-size: 12px;
-            margin-bottom: 8px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        input {
-            width: 100%;
-            background: #000;
-            border: 1px solid #333;
-            padding: 14px 15px;
-            border-radius: 8px;
-            color: #fff;
-            outline: none;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        input:focus {
-            border-color: var(--tesla-red);
-        }
-
-        .btn-primary {
-            width: 100%;
-            background: var(--tesla-red);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 8px;
-            font-weight: 800;
-            font-size: 14px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 10px;
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
-
-        .switch-mode {
-            margin-top: 25px;
-            font-size: 14px;
-            color: var(--text-gray);
-        }
-
-        .switch-link {
-            color: var(--tesla-red);
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .error-msg {
-            color: #ff3b3b;
-            font-size: 13px;
-            margin-top: 15px;
-            display: none;
-        }
+        body { background: #000; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .auth-card { background: #111; padding: 40px; border-radius: 12px; width: 350px; text-align: center; border: 1px solid #222; }
+        input { width: 100%; padding: 14px; margin: 10px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 14px; background: #E31937; border: none; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        .error { color: #ff3b3b; font-size: 13px; margin-top: 15px; display: none; }
+        .logo { color: #E31937; font-size: 24px; font-weight: 900; letter-spacing: 4px; margin-bottom: 30px; }
     </style>
 </head>
 <body>
 
-    <div class="auth-container">
-        <div class="logo">Tesla Base</div>
-        
-        <div class="form-box" id="auth-box">
-            <h2 id="form-title">Sign In</h2>
-            
-            <div class="input-group">
-                <label>Email Address</label>
-                <input type="email" id="email" placeholder="name@example.com" required>
-            </div>
-
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" id="password" placeholder="••••••••" required>
-            </div>
-
-            <button class="btn-primary" id="submit-btn" onclick="handleAuth()">Login</button>
-            
-            <div class="error-msg" id="error-text"></div>
-
-            <div class="switch-mode">
-                <span id="mode-text">New to Tesla Base?</span>
-                <span class="switch-link" id="mode-link" onclick="toggleMode()">Create Account</span>
-            </div>
-        </div>
+    <div class="auth-card">
+        <div class="logo">TESLA BASE</div>
+        <h3 id="title">Login</h3>
+        <input type="email" id="email" placeholder="Email Address">
+        <input type="password" id="password" placeholder="Password">
+        <button id="btn" onclick="handleAuth()">Login</button>
+        <p id="error" class="error"></p>
+        <p style="font-size: 14px; color: #888; margin-top: 25px;">
+            <span id="mode-text">New to Tesla Base?</span> 
+            <span style="color:#E31937; cursor:pointer; font-weight:bold;" onclick="toggle()">Create Account</span>
+        </p>
     </div>
 
     <script>
-        let isLoginMode = true;
+        let isLogin = true;
+        // Persistence: No sign out until explicit logout
+        if (localStorage.getItem('userEmail')) window.location.href = 'dashboard.html';
 
-        // PERSISTENCE RULE: Check if user is already logged in
-        window.onload = () => {
-            const savedUser = localStorage.getItem('userEmail');
-            if (savedUser) {
-                window.location.href = 'dashboard.html';
-            }
-        };
-
-        function toggleMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('form-title').innerText = isLoginMode ? 'Sign In' : 'Register';
-            document.getElementById('submit-btn').innerText = isLoginMode ? 'Login' : 'Create Account';
-            document.getElementById('mode-text').innerText = isLoginMode ? 'New to Tesla Base?' : 'Already have an account?';
-            document.getElementById('mode-link').innerText = isLoginMode ? 'Create Account' : 'Sign In';
-            document.getElementById('error-text').style.display = 'none';
+        function toggle() {
+            isLogin = !isLogin;
+            document.getElementById('title').innerText = isLogin ? 'Login' : 'Register';
+            document.getElementById('btn').innerText = isLogin ? 'Login' : 'Create Account';
+            document.getElementById('mode-text').innerText = isLogin ? 'New to Tesla Base?' : 'Already have an account?';
         }
 
         async function handleAuth() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const errorText = document.getElementById('error-text');
-            
-            if (!email || !password) {
-                showError("Please fill in all fields.");
-                return;
-            }
+            // IMPORTANT: Point directly to your Render URL
+            const baseUrl = "https://tesla-base.onrender.com";
+            const path = isLogin ? '/api/auth/login' : '/api/auth/register';
 
-            const endpoint = isLoginMode ? '/api/auth/login' : '/api/auth/register';
-            
             try {
-                const response = await fetch(endpoint, {
+                const res = await fetch(baseUrl + path, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ email, password })
                 });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // RULE: Association of email to account and fast login
+                const data = await res.json();
+                if (res.ok) {
                     localStorage.setItem('userEmail', email);
                     window.location.href = 'dashboard.html';
                 } else {
-                    showError(data.error || "Authentication failed.");
+                    showError(data.error);
                 }
-            } catch (err) {
-                showError("Connection error. Is the server running?");
+            } catch (e) {
+                showError("Connection error. Check Render Logs.");
             }
         }
 
         function showError(msg) {
-            const errorText = document.getElementById('error-text');
-            errorText.innerText = msg;
-            errorText.style.display = 'block';
+            const err = document.getElementById('error');
+            err.innerText = msg;
+            err.style.display = 'block';
         }
     </script>
 </body>
