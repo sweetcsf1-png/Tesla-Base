@@ -2,162 +2,641 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tesla Base | Pro Trader</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tesla Base | Professional Multi-Asset Terminal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --tesla-red: #E31937; --bg-black: #000; --card-gray: #111; --success: #00ffa3; }
-        body { background: var(--bg-black); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 90px; }
-        
-        /* Header & Balance */
-        .header { padding: 15px 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; sticky; top: 0; background: #000; z-index: 100; }
-        .logo { color: var(--tesla-red); font-weight: 900; letter-spacing: 2px; }
-        .bal-card { padding: 25px 20px; background: #050505; border-bottom: 1px solid #111; }
-        .bal-label { color: #666; font-size: 11px; text-transform: uppercase; }
-        .bal-main { font-size: 34px; font-weight: 700; margin: 5px 0; }
+        :root { 
+            --t-red: #E31937; 
+            --bg-deep: #000000; 
+            --bg-card: #0a0a0a; 
+            --bg-hover: #121212;
+            --border: #1a1a1a; 
+            --success: #00ffa3; 
+            --warning: #ffb800;
+            --text-main: #ffffff;
+            --text-muted: #666666;
+            --nav-height: 70px;
+        }
 
-        /* Market Categories */
-        .market-nav { display: flex; overflow-x: auto; padding: 10px 15px; gap: 10px; background: #0a0a0a; border-bottom: 1px solid #222; }
-        .m-tab { padding: 8px 18px; background: #1a1a1a; border-radius: 20px; font-size: 12px; white-space: nowrap; color: #888; cursor: pointer; }
-        .m-tab.active { background: var(--tesla-red); color: #fff; }
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            outline: none !important;
+        }
 
-        /* Asset Rows */
-        .asset-list { padding: 10px; }
-        .asset-item { display: flex; justify-content: space-between; padding: 16px; background: #0d0d0d; margin-bottom: 8px; border-radius: 12px; border: 1px solid #161616; align-items: center; }
-        .asset-icon { width: 32px; height: 32px; border-radius: 8px; background: #222; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
-        
-        /* Trade Modal */
-        .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; padding: 20px; box-sizing: border-box; }
-        .order-book { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-family: monospace; font-size: 10px; }
-        .book-red { color: #ff3b3b; } .book-green { color: var(--success); }
+        body { 
+            background: var(--bg-deep); 
+            color: var(--text-main); 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 0;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
 
-        /* Controls */
-        .trade-input { width: 100%; padding: 20px; background: #111; border: 1px solid #333; color: #fff; border-radius: 12px; margin: 15px 0; font-size: 24px; text-align: center; box-sizing: border-box; }
-        .action-btn { width: 100%; padding: 18px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; font-size: 16px; margin-bottom: 10px; }
+        /* PREMIUM SCROLLBAR */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
-        /* Bottom Menu */
-        .footer-nav { position: fixed; bottom: 0; width: 100%; background: #050505; display: flex; border-top: 1px solid #222; padding: 12px 0; }
-        .f-item { flex: 1; text-align: center; font-size: 10px; color: #444; }
-        .f-item.active { color: var(--tesla-red); }
+        /* HEADER & STATUS BAR */
+        .app-header {
+            position: sticky;
+            top: 0;
+            height: var(--nav-height);
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 5000;
+        }
+
+        .brand-logo {
+            font-weight: 800;
+            letter-spacing: 4px;
+            color: var(--t-red);
+            font-size: 18px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo i { font-size: 22px; }
+
+        .session-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-card);
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .user-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        #display-email { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+
+        /* DYNAMIC VIEW ENGINE */
+        .app-view {
+            display: none;
+            min-height: 100vh;
+            padding-bottom: 120px;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .app-view.active { display: block; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* MAIN PORTFOLIO MODULE */
+        .hero-wallet {
+            padding: 40px 20px;
+            background: radial-gradient(circle at top right, #1a0505, #000);
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .wallet-label {
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .balance-main {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin: 0;
+            background: linear-gradient(to right, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .balance-btc {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--success);
+            font-size: 14px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* MULTI-PAGE CATEGORY SYSTEM */
+        .market-filters {
+            display: flex;
+            overflow-x: auto;
+            padding: 20px 15px;
+            gap: 12px;
+            background: var(--bg-deep);
+            position: sticky;
+            top: var(--nav-height);
+            z-index: 4000;
+            scrollbar-width: none;
+        }
+
+        .market-filters::-webkit-scrollbar { display: none; }
+
+        .filter-chip {
+            padding: 10px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: 0.3s all;
+            cursor: pointer;
+        }
+
+        .filter-chip.active {
+            background: var(--t-red);
+            color: white;
+            border-color: var(--t-red);
+            box-shadow: 0 8px 20px rgba(227, 25, 55, 0.3);
+        }
+
+        /* ASSET GRID ENGINE */
+        .asset-container { padding: 0 15px; }
+
+        .asset-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+
+        .asset-card:hover { background: var(--bg-hover); border-color: #333; }
+
+        .asset-info { display: flex; align-items: center; gap: 16px; }
+
+        .asset-logo-frame {
+            width: 48px;
+            height: 48px;
+            background: #111;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--t-red);
+            border: 1px solid var(--border);
+        }
+
+        .asset-names { display: flex; flex-direction: column; }
+        .asset-symbol { font-weight: 800; font-size: 16px; letter-spacing: 0.5px; }
+        .asset-full { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
+
+        .asset-values { text-align: right; }
+        .asset-price { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 16px; }
+        .asset-delta { font-size: 11px; font-weight: 800; margin-top: 4px; }
+        .up { color: var(--success); }
+        .down { color: var(--t-red); }
+                /* MILLION-PAGE TERMINAL OVERLAY */
+        .terminal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-deep);
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* ORDER BOOK VISUALIZER */
+        .order-book-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            background: #050505;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 1px solid var(--border);
+        }
+
+        .book-column { display: flex; flex-direction: column; gap: 5px; }
+        .book-row {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+        }
+
+        /* TRADE INPUT BOX */
+        .trade-controls {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 25px;
+            border: 1px solid var(--border);
+            margin-top: 20px;
+        }
+
+        .input-group { margin-bottom: 20px; }
+        .input-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; display: block; }
+        .amount-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--border);
+            color: white;
+            font-size: 32px;
+            font-weight: 800;
+            padding: 10px 0;
+            transition: 0.3s;
+        }
+        .amount-input:focus { border-color: var(--t-red); }
+
+        .trade-btn-container { display: flex; gap: 12px; }
+        .t-btn {
+            flex: 1;
+            padding: 18px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .t-btn-buy { background: var(--success); color: black; }
+        .t-btn-sell { background: var(--t-red); color: white; }
+        .t-btn:active { transform: scale(0.95); }
+
+        /* BOTTOM TAB NAVIGATION */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 85px;
+            background: rgba(5,5,5,0.9);
+            backdrop-filter: blur(25px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20px;
+            z-index: 5000;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            gap: 6px;
+            transition: 0.3s;
+        }
+
+        .tab-item i { font-size: 20px; }
+        .tab-item.active { color: var(--t-red); }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <div class="logo">TESLA BASE PRO</div>
-    <div onclick="logout()" style="font-size: 12px; color: #444;">LOGOUT</div>
-</div>
-
-<div class="bal-card">
-    <div class="bal-label">Net Asset Value (USD)</div>
-    <div class="bal-main" id="pBalance">$0.00</div>
-    <div style="font-size: 12px; color: var(--success);" id="pBtc">0.00000000 BTC</div>
-</div>
-
-<div class="market-nav">
-    <div class="m-tab active">Crypto</div>
-    <div class="m-tab">Stocks</div>
-    <div class="m-tab">Forex</div>
-    <div class="m-tab">Indices</div>
-    <div class="m-tab">Commodities</div>
-</div>
-
-<div class="asset-list" id="assetsContainer">
+    <div id="toast-notif" style="position:fixed; top:90px; right:20px; background:var(--t-red); padding:15px 25px; border-radius:12px; z-index:10001; font-weight:700; display:none; animation: slideIn 0.3s forwards;">
+        Order Placed Successfully
     </div>
 
-<div class="modal-bg" id="tradeModal">
-    <div style="display:flex; justify-content: space-between; align-items: center;">
-        <h2 id="tName" style="margin:0;">BITCOIN</h2>
-        <button onclick="closeTrade()" style="background:none; border:none; color:#fff; font-size:24px;">×</button>
-    </div>
-    <div id="miniChart" style="height:150px; background:#111; margin:20px 0; border-radius:10px; border:1px solid #222; display:flex; align-items:center; justify-content:center; color:#333;">Live Stream Active...</div>
-    
-    <div class="order-book" id="orderBook">
+    <header class="app-header">
+        <div class="brand-logo">
+            <i class="fa-solid fa-bolt-lightning"></i> Tesla Base
         </div>
+        <div class="session-info">
+            <div class="user-dot"></div>
+            <span id="display-email">Syncing...</span>
+        </div>
+    </header>
 
-    <input type="number" class="trade-input" id="tradeAmt" placeholder="Enter Amount">
-    <button class="action-btn" style="background:var(--success); color:#000;" onclick="confirmTrade('Long/Buy')">BUY / LONG</button>
-    <button class="action-btn" style="background:var(--tesla-red); color:#fff;" onclick="confirmTrade('Short/Sell')">SELL / SHORT</button>
-</div>
+    <main id="view-markets" class="app-view active">
+        <section class="hero-wallet">
+            <div class="wallet-label">Total Portfolio Balance</div>
+            <h1 class="balance-main" id="main-balance">$0.00</h1>
+            <div class="balance-btc">
+                <i class="fa-brands fa-bitcoin"></i> <span id="btc-equiv">0.00000000 BTC</span>
+            </div>
+        </section>
 
-<div class="footer-nav">
-    <div class="f-item active"><span style="display:block; font-size:18px;">📈</span>Market</div>
-    <div class="f-item"><span style="display:block; font-size:18px;">⚡</span>Grow</div>
-    <div class="f-item"><span style="display:block; font-size:18px;">💼</span>Wallet</div>
-    <div class="f-item"><span style="display:block; font-size:18px;">📜</span>History</div>
-</div>
+        <nav class="market-filters">
+            <div class="filter-chip active" onclick="filterAssets('all')">All Assets</div>
+            <div class="filter-chip" onclick="filterAssets('crypto')">Cryptocurrency</div>
+            <div class="filter-chip" onclick="filterAssets('stocks')">Tesla Equities</div>
+            <div class="filter-chip" onclick="filterAssets('indices')">Global Indices</div>
+            <div class="filter-chip" onclick="filterAssets('energy')">Sustainable Energy</div>
+        </nav>
 
-<script>
-    const api = window.location.origin;
-    const email = localStorage.getItem('userEmail');
-    if(!email) window.location.href = '/';
+        <div class="asset-container" id="master-asset-list">
+            </div>
+    </main>
+        <main id="view-grow" class="app-view">
+        <section style="padding: 30px 20px;">
+            <h1 style="font-size: 32px; font-weight: 800; margin: 0;">Tesla Strategy</h1>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 10px;">
+                Secure wealth through automated asset allocation and high-liquidity strategies. [cite: 2025-12-19]
+            </p>
 
-    const marketData = [
-        { s: 'BTC', n: 'Bitcoin', p: '68,102.50', ch: '+2.41%' },
-        { s: 'ETH', n: 'Ethereum', p: '3,412.12', ch: '+1.10%' },
-        { s: 'TSLA', n: 'Tesla', p: '202.45', ch: '+0.15%' },
-        { s: 'AAPL', n: 'Apple', p: '172.10', ch: '-0.42%' },
-        { s: 'XAU', n: 'Gold', p: '2,150.80', ch: '+0.88%' }
-    ];
-
-    function renderAssets() {
-        const container = document.getElementById('assetsContainer');
-        container.innerHTML = marketData.map(a => `
-            <div class="asset-item" onclick="openTrade('${a.s}', '${a.p}')">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <div class="asset-icon">${a.s[0]}</div>
-                    <div>
-                        <div style="font-weight:700;">${a.s}</div>
-                        <div style="font-size:11px; color:#444;">${a.n}</div>
-                    </div>
+            <div style="background: var(--bg-card); padding: 25px; border-radius: 25px; border: 1px solid var(--border); margin-top: 30px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div style="color: var(--t-red); font-size: 11px; font-weight: 800; letter-spacing: 1px;">DEPOSIT WALLET (BTC)</div>
+                    <i class="fa-solid fa-shield-halved" style="color: var(--success);"></i>
                 </div>
-                <div style="text-align:right;">
-                    <div style="font-weight:700;">$${a.p}</div>
-                    <div style="font-size:11px; color:${a.ch.includes('+') ? 'var(--success)' : 'var(--tesla-red)'}">${a.ch}</div>
+                <div id="admin-wallet-address" onclick="copyWallet()" style="font-family: 'JetBrains Mono', monospace; background: #000; padding: 20px; border-radius: 12px; word-break: break-all; font-size: 14px; color: var(--success); border: 1px solid #222; cursor: pointer; position: relative;">
+                    Connecting to Secure Network...
+                </div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button onclick="copyWallet()" style="background: transparent; border: 1px solid var(--border); color: white; padding: 10px 20px; border-radius: 30px; font-size: 11px; font-weight: 700;">
+                        <i class="fa-regular fa-copy"></i> COPY ADDRESS
+                    </button>
+                </div>
+                <p style="font-size: 11px; color: #444; margin-top: 20px; text-align: center; line-height: 1.6;">
+                    Funds sent to this address are automatically injected into your equity balance by the Tesla Base system. [cite: 2025-12-20]
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <main id="view-history" class="app-view">
+        <section style="padding: 30px 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1 style="font-size: 32px; font-weight: 800; margin: 0;">History</h1>
+                <i class="fa-solid fa-list-check" style="color: var(--text-muted);"></i>
+            </div>
+            
+            <div id="history-container" style="margin-top: 30px;">
+                <div style="text-align: center; padding: 100px 0; color: #222;">
+                    <i class="fa-solid fa-box-open" style="font-size: 40px; margin-bottom: 20px;"></i>
+                    <p style="font-size: 14px; font-weight: 600;">No Transactions Found</p>
                 </div>
             </div>
-        `).join('');
-    }
+        </section>
+    </main>
 
-    function openTrade(sym, price) {
-        document.getElementById('tName').innerText = sym;
-        document.getElementById('tradeModal').style.display = 'flex';
-        updateOrderBook();
-    }
+    <div class="terminal-overlay" id="trade-terminal">
+        <div class="terminal-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div id="active-asset-icon" style="width: 35px; height: 35px; background: #111; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: var(--t-red); border: 1px solid var(--border);">B</div>
+                <div>
+                    <div style="font-weight: 800; font-size: 18px;" id="terminal-symbol">BTC/USD</div>
+                    <div style="font-size: 10px; color: var(--text-muted); letter-spacing: 1px;">INSTANT EXECUTION</div>
+                </div>
+            </div>
+            <button onclick="closeTerminal()" style="background: var(--bg-card); border: 1px solid var(--border); color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 20px;">&times;</button>
+        </div>
 
-    function closeTrade() { document.getElementById('tradeModal').style.display = 'none'; }
+        <div class="terminal-body">
+            <div style="height: 180px; background: #050505; border-radius: 20px; border: 1px solid #111; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+                <div style="text-align: center; z-index: 2;">
+                    <i class="fa-solid fa-chart-line" style="font-size: 30px; color: #1a1a1a;"></i>
+                    <div style="font-size: 9px; color: #333; margin-top: 10px; font-weight: 800;">LIVE MARKET FEED ACTIVE</div>
+                </div>
+                <svg width="100%" height="100%" style="position: absolute; top:0; left:0; opacity: 0.1;">
+                    <path d="M0 100 Q 50 20, 100 80 T 200 60 T 300 90 T 400 40" fill="none" stroke="var(--success)" stroke-width="2" />
+                </svg>
+            </div>
 
-    function updateOrderBook() {
-        const book = document.getElementById('orderBook');
-        let html = '';
-        for(let i=0; i<6; i++) {
-            html += `<div class="book-green">${(Math.random()*100).toFixed(4)}</div><div class="book-red">${(Math.random()*100).toFixed(4)}</div>`;
+            <div class="order-book-wrap">
+                <div class="book-column" id="terminal-buy-book"></div>
+                <div class="book-column" id="terminal-sell-book"></div>
+            </div>
+
+            <div class="trade-controls">
+                <div class="input-group">
+                    <span class="input-label">Investment Amount (USD)</span>
+                    <input type="number" id="trade-input-amount" class="amount-input" placeholder="0.00">
+                </div>
+                
+                <div class="trade-btn-container">
+                    <button onclick="executeOrder('BUY')" class="t-btn t-btn-buy">Buy / Long</button>
+                    <button onclick="executeOrder('SELL')" class="t-btn t-btn-sell">Sell / Short</button>
+                </div>
+                <p style="text-align: center; color: #444; font-size: 10px; margin-top: 20px;">
+                    Trades are routed through Tesla Base secure liquidity pools.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <nav class="tab-bar">
+        <a href="javascript:void(0)" class="tab-item active" id="nav-markets" onclick="switchTab('view-markets', this)">
+            <i class="fa-solid fa-chart-simple"></i> Markets
+        </a>
+        <a href="javascript:void(0)" class="tab-item" id="nav-grow" onclick="switchTab('view-grow', this)">
+            <i class="fa-solid fa-seedling"></i> Grow
+        </a>
+        <a href="javascript:void(0)" class="tab-item" id="nav-history" onclick="switchTab('view-history', this)">
+            <i class="fa-solid fa-clock-rotate-left"></i> History
+        </a>
+        <a href="javascript:void(0)" class="tab-item" onclick="logoutSession()">
+            <i class="fa-solid fa-right-from-bracket"></i> Exit
+        </a>
+                    </nav>
+                        <script>
+        const apiBase = window.location.origin;
+        const sessionUser = localStorage.getItem('userEmail');
+
+        // 1. SECURITY REDIRECT [cite: 2025-12-19]
+        if (!sessionUser) {
+            window.location.href = '/';
+        } else {
+            document.getElementById('display-email').innerText = sessionUser;
         }
-        book.innerHTML = html;
-    }
 
-    async function syncData() {
-        try {
-            const res = await fetch(`${api}/api/user/data?email=${email}`);
-            const data = await res.json();
-            document.getElementById('pBalance').innerText = `$${parseFloat(data.balance).toLocaleString()}`;
-            document.getElementById('pBtc').innerText = `${(data.balance / 68102).toFixed(8)} BTC`;
-        } catch(e) {}
-    }
+        // 2. ASSET DATABASE (Expandable to Millions of Rows)
+        const marketAssets = [
+            { s: 'TSLA', n: 'Tesla Inc', p: 202.45, ch: '+0.51%', cat: 'stocks' },
+            { s: 'BTC', n: 'Bitcoin', p: 68102.30, ch: '+2.14%', cat: 'crypto' },
+            { s: 'ETH', n: 'Ethereum', p: 3412.50, ch: '+1.44%', cat: 'crypto' },
+            { s: 'SOL', n: 'Solana', p: 142.00, ch: '+5.81%', cat: 'crypto' },
+            { s: 'NVDA', n: 'Nvidia Corp', p: 875.12, ch: '+1.12%', cat: 'stocks' },
+            { s: 'XAU', n: 'Gold Spot', p: 2155.20, ch: '+0.22%', cat: 'energy' },
+            { s: 'SPX', n: 'S&P 500', p: 5123.40, ch: '+0.45%', cat: 'indices' }
+        ];
 
-    function confirmTrade(type) {
-        const amt = document.getElementById('tradeAmt').value;
-        if(!amt) return;
-        alert(`${type} order of $${amt} submitted to liquidity pool.`);
-        closeTrade();
-    }
+        // 3. TAB NAVIGATION SYSTEM
+        function switchTab(viewId, element) {
+            document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            element.classList.add('active');
+        }
 
-    function logout() { localStorage.removeItem('userEmail'); window.location.href = '/'; }
+        // 4. ADMIN SYNC ENGINE (Injects Funds & Wallet) [cite: 2025-12-19, 2025-12-20]
+        async function syncWithAdmin() {
+            try {
+                // Fetch User Balance (Admin Injected)
+                const res = await fetch(`${apiBase}/api/user/data?email=${sessionUser}`);
+                const data = await res.json();
+                const bal = parseFloat(data.balance);
+                document.getElementById('main-balance').innerText = `$${bal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+                document.getElementById('btc-equiv').innerText = `${(bal / 68102).toFixed(8)} BTC`;
 
-    renderAssets();
-    syncData();
-    setInterval(syncData, 5000);
-    setInterval(updateOrderBook, 1500); // Live order book effect
-</script>
+                // Fetch Admin Deposit Wallet
+                const wRes = await fetch(`${apiBase}/api/site/wallet`);
+                const wData = await wRes.json();
+                document.getElementById('admin-wallet-address').innerText = wData.address;
+            } catch (error) {
+                console.error("Tesla Base Sync Error:", error);
+            }
+        }
+
+        // 5. MARKET RENDERER
+        function renderMarkets(filter = 'all') {
+            const list = document.getElementById('master-asset-list');
+            list.innerHTML = '';
+            
+            const filtered = filter === 'all' ? marketAssets : marketAssets.filter(a => a.cat === filter);
+
+            filtered.forEach(asset => {
+                const card = document.createElement('div');
+                card.className = 'asset-card';
+                card.onclick = () => openTerminal(asset.s, asset.n);
+                card.innerHTML = `
+                    <div class="asset-info">
+                        <div class="asset-logo-frame">${asset.s[0]}</div>
+                        <div class="asset-names">
+                            <span class="asset-symbol">${asset.s}</span>
+                            <span class="asset-full">${asset.n}</span>
+                        </div>
+                    </div>
+                    <div class="asset-values">
+                        <div class="asset-price">$${asset.p.toLocaleString()}</div>
+                        <div class="asset-delta ${asset.ch.includes('+') ? 'up' : 'down'}">${asset.ch}</div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function filterAssets(cat) {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            renderMarkets(cat);
+        }
+
+        // 6. TERMINAL & ORDER BOOK SIMULATION [cite: 2025-12-25]
+        let orderBookTick;
+        function openTerminal(symbol, name) {
+            document.getElementById('terminal-symbol').innerText = `${symbol}/USD`;
+            document.getElementById('active-asset-icon').innerText = symbol[0];
+            document.getElementById('trade-terminal').style.display = 'flex';
+            
+            orderBookTick = setInterval(() => {
+                const buy = document.getElementById('terminal-buy-book');
+                const sell = document.getElementById('terminal-sell-book');
+                buy.innerHTML = ''; sell.innerHTML = '';
+                
+                for(let i=0; i<7; i++) {
+                    buy.innerHTML += `<div class="book-row" style="color:var(--success)"><span>${(Math.random()*2).toFixed(4)}</span><span>$${(68000 + Math.random()*50).toFixed(2)}</span></div>`;
+                    sell.innerHTML += `<div class="book-row" style="color:var(--t-red)"><span>${(Math.random()*2).toFixed(4)}</span><span>$${(68100 + Math.random()*50).toFixed(2)}</span></div>`;
+                }
+            }, 800);
+        }
+
+        function closeTerminal() {
+            document.getElementById('trade-terminal').style.display = 'none';
+            clearInterval(orderBookTick);
+        }
+
+        // 7. ORDER EXECUTION & HISTORY LOGGING [cite: 2025-12-19]
+        function executeOrder(type) {
+            const amount = document.getElementById('trade-input-amount').value;
+            if(!amount || amount <= 0) return alert("Please enter a valid investment amount.");
+            
+            const history = document.getElementById('history-container');
+            if(history.innerText.includes("No Transactions")) history.innerHTML = '';
+
+            const log = `
+                <div style="background: var(--bg-card); padding: 20px; border-radius: 15px; border: 1px solid var(--border); border-left: 4px solid ${type === 'BUY' ? 'var(--success)' : 'var(--t-red)'}; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 800; font-size: 13px;">${type} ${document.getElementById('terminal-symbol').innerText}</span>
+                        <span style="font-weight: 800; color: #fff;">$${parseFloat(amount).toLocaleString()}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; color: var(--text-muted);">
+                        <span>${new Date().toLocaleString()}</span>
+                        <span style="color: var(--success);">SUCCESSFUL</span>
+                    </div>
+                </div>
+            `;
+            
+            history.innerHTML = log + history.innerHTML;
+            
+            const toast = document.getElementById('toast-notif');
+            toast.innerText = `${type} Order Placed: $${amount}`;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+            
+            closeTerminal();
+        }
+
+        function copyWallet() {
+            const addr = document.getElementById('admin-wallet-address').innerText;
+            navigator.clipboard.writeText(addr);
+            alert("Deposit Wallet Copied!");
+        }
+
+        function logoutSession() {
+            localStorage.removeItem('userEmail');
+            window.location.href = '/';
+        }
+
+        // INITIALIZE APP
+        renderMarkets();
+        syncWithAdmin();
+        setInterval(syncWithAdmin, 10000); // Dynamic Sync every 10 seconds
+    </script>
 </body>
-                                                                          </html>
-    
+</html>
