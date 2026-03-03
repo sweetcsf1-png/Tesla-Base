@@ -6,10 +6,12 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use(express.static('public'));
+
+// --- SERVE YOUR FRONTEND FILES ---
+// This tells the server where your index.html and other files are
+app.use(express.static(path.join(__dirname))); 
 
 // --- DATABASE CONFIG ---
-// We encode the password to handle the '$' and '#' symbols
 const dbUser = "postgres.ggrvkcxnizchfbzfwvjv";
 const dbPass = encodeURIComponent("SOLOMON2003$#56777");
 const dbHost = "aws-1-us-east-1.pooler.supabase.com";
@@ -20,7 +22,7 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false }
 });
 
-// AUTO-FIX: Automatically creates the users table
+// AUTO-FIX: Create users table
 const initDb = async () => {
     try {
         await pool.query(`
@@ -33,12 +35,18 @@ const initDb = async () => {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
-        console.log("✅ Database Connected and Table Verified");
+        console.log("✅ Database Connected & Ready");
     } catch (err) {
-        console.error("❌ DB Init Error:", err.message);
+        console.error("❌ Database Connection Error:", err.message);
     }
 };
 initDb();
+
+// --- HOMEPAGE ROUTE ---
+// This stops the "Cannot GET /" error by serving your index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 const ADMIN_PASS = "SOLOMON200";
 
@@ -50,7 +58,7 @@ app.post('/api/admin/verify', (req, res) => {
 
 app.get('/api/admin/users', async (req, res) => {
     try {
-        const result = await pool.query('SELECT email, password, balance FROM users ORDER BY id DESC');
+        const result = await pool.query('SELECT email, password, balance, wallet_address FROM users ORDER BY id DESC');
         res.json(result.rows);
     } catch (err) { res.status(500).json({ error: "Access Denied" }); }
 });
@@ -59,7 +67,9 @@ app.get('/api/admin/users', async (req, res) => {
 app.post('/api/auth/register', async (req, res) => {
     const { email, password } = req.body;
     try {
-        await pool.query('INSERT INTO users (email, password) VALUES ($1, $2)', [email, password]);
+        const check = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (check.rows.length > 0) return res.status(400).json({ error: "Email already exists" });
+        await pool.query('INSERT INTO users (email, password, balance) VALUES ($1, $2, 0.00)', [email, password]);
         res.json({ success: true });
     } catch (err) { res.status(500).json({ error: "Registration failed" }); }
 });
