@@ -9,16 +9,18 @@ app.use(cors());
 app.use(express.static('public'));
 
 // --- DATABASE CONFIG ---
-// Combined with your Session Pooler link and password
-const connectionString = "postgresql://postgres.ggrvkcxnizchfbzfwvjv:SOLOMON2003$#56777@aws-1-us-east-1.pooler.supabase.com:5432/postgres";
+// We use encodeURIComponent to handle the '$' and '#' in your password SOLOMON2003$#56777
+const dbUser = "postgres.ggrvkcxnizchfbzfwvjv";
+const dbPass = encodeURIComponent("SOLOMON2003$#56777");
+const dbHost = "aws-1-us-east-1.pooler.supabase.com";
+const connectionString = `postgresql://${dbUser}:${dbPass}@${dbHost}:5432/postgres`;
 
 const pool = new Pool({
     connectionString: connectionString,
-    ssl: { rejectUnauthorized: false },
-    connectionTimeoutMillis: 10000 
+    ssl: { rejectUnauthorized: false }
 });
 
-// AUTO-FIX: Automatically creates the users table on startup
+// AUTO-FIX: Automatically creates the users table
 const initDb = async () => {
     try {
         await pool.query(`
@@ -31,7 +33,7 @@ const initDb = async () => {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
-        console.log("✅ Database Table Verified and Connected via Session Pooler");
+        console.log("✅ Database Table Verified and Connected via IPv4 Pooler");
     } catch (err) {
         console.error("❌ Database Connection Error:", err.message);
     }
