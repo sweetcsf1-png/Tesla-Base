@@ -22,14 +22,12 @@
         body {
             background-color: var(--bg);
             color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, sans-serif;
             margin: 0;
-            padding: 0;
-            padding-bottom: 90px; /* Space for Nav */
+            padding-bottom: 90px;
             overflow-x: hidden;
         }
 
-        /* Top Header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -43,247 +41,44 @@
             z-index: 1000;
         }
 
-        .logo {
-            font-weight: 900;
-            color: var(--tesla-red);
-            letter-spacing: 3px;
-            font-size: 18px;
-            text-transform: uppercase;
-        }
+        .logo { font-weight: 900; color: var(--tesla-red); letter-spacing: 3px; font-size: 18px; text-transform: uppercase; }
 
-        /* Portfolio Balance Card */
         .balance-card {
             padding: 35px 20px;
             background: linear-gradient(180deg, #111111 0%, #000000 100%);
             border-bottom: 10px solid #080808;
-            text-align: left;
         }
 
-        .balance-label {
-            color: var(--text-gray);
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
+        .balance-label { color: var(--text-gray); font-size: 13px; text-transform: uppercase; margin-bottom: 8px; }
+        .balance-amount { font-size: 42px; font-weight: 800; margin: 5px 0; }
+        .btc-calculator { color: var(--tesla-red); font-family: monospace; font-size: 16px; font-weight: bold; }
 
-        .balance-amount {
-            font-size: 42px;
-            font-weight: 800;
-            letter-spacing: -1px;
-            margin: 5px 0;
-        }
+        .tabs { display: flex; background: var(--bg); border-bottom: 1px solid var(--border); position: sticky; top: 65px; z-index: 999; }
+        .tab { flex: 1; padding: 16px; text-align: center; font-size: 13px; font-weight: 700; color: var(--text-gray); cursor: pointer; }
+        .tab.active { color: var(--tesla-red); border-bottom: 2px solid var(--tesla-red); }
 
-        .btc-calculator {
-            color: var(--tesla-red);
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 4px;
-        }
+        .search-wrapper { padding: 15px 20px; }
+        .search-bar { width: 100%; background: #111; border: 1px solid #333; padding: 14px 15px; border-radius: 10px; color: #fff; outline: none; }
 
-        /* Tab Navigation */
-        .tabs {
-            display: flex;
-            background: var(--bg);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 65px;
-            z-index: 999;
-        }
+        .asset-row { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--border); }
+        .asset-icon { width: 38px; height: 38px; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; color: var(--tesla-red); font-weight: bold; }
+        .price-text { font-weight: 700; font-size: 16px; }
+        .up { color: var(--success); } .down { color: var(--danger); }
 
-        .tab {
-            flex: 1;
-            padding: 16px;
-            text-align: center;
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-gray);
-            cursor: pointer;
-            transition: 0.3s;
-        }
+        .plan-wrapper { padding: 20px; display: none; }
+        .plan-card { background: var(--card-bg); border-radius: 16px; padding: 25px; margin-bottom: 20px; border-left: 6px solid var(--tesla-red); }
+        .invest-btn { width: 100%; background: var(--tesla-red); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: 800; margin-top: 20px; cursor: pointer; }
 
-        .tab.active {
-            color: var(--tesla-red);
-            border-bottom: 2px solid var(--tesla-red);
-        }
-
-        /* Asset List Styling */
-        .asset-container {
-            padding: 0;
-        }
-
-        .search-wrapper {
-            padding: 15px 20px;
-            background: var(--bg);
-        }
-
-        .search-bar {
-            width: 100%;
-            background: #111;
-            border: 1px solid #333;
-            padding: 14px 15px;
-            border-radius: 10px;
-            color: #fff;
-            font-size: 15px;
-            outline: none;
-        }
-
-        .asset-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 18px 20px;
-            border-bottom: 1px solid var(--border);
-            transition: background 0.2s;
-        }
-
-        .asset-row:active {
-            background: #111;
-        }
-
-        .asset-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .asset-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: #222;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: var(--tesla-red);
-        }
-
-        .asset-name-wrapper b {
-            display: block;
-            font-size: 16px;
-            letter-spacing: 0.5px;
-        }
-
-        .asset-name-wrapper small {
-            color: var(--text-gray);
-            font-size: 12px;
-        }
-
-        .asset-price-wrapper {
-            text-align: right;
-        }
-
-        .price-text {
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-        .change-text {
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .up { color: var(--success); }
-        .down { color: var(--danger); }
-
-        /* Investment Plan Cards */
-        .plan-wrapper {
-            padding: 20px;
-            display: none; /* Hidden by default, toggled via JS */
-        }
-
-        .plan-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border-left: 6px solid var(--tesla-red);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .plan-card h3 {
-            margin: 0 0 10px 0;
-            font-size: 20px;
-            color: var(--text-main);
-        }
-
-        .plan-stats {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #222;
-        }
-
-        .stat-box small {
-            display: block;
-            color: var(--text-gray);
-            font-size: 11px;
-            margin-bottom: 4px;
-        }
-
-        .stat-box b {
-            font-size: 15px;
-            color: var(--success);
-        }
-
-        .invest-btn {
-            width: 100%;
-            background: var(--tesla-red);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-weight: 800;
-            margin-top: 20px;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        /* Bottom Navbar */
-        .nav-bar {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: rgba(0,0,0,0.95);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 0;
-            z-index: 1001;
-        }
-
-        .nav-item {
-            text-align: center;
-            color: var(--text-gray);
-            text-decoration: none;
-            font-size: 10px;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-
-        .nav-item i {
-            font-size: 22px;
-            margin-bottom: 4px;
-            display: block;
-        }
-
-        .nav-item.active {
-            color: var(--tesla-red);
-        }
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1001; }
+        .nav-item { text-align: center; color: var(--text-gray); text-decoration: none; font-size: 10px; font-weight: 600; }
+        .nav-item i { font-size: 22px; margin-bottom: 4px; display: block; }
+        .nav-item.active { color: var(--tesla-red); }
     </style>
 </head>
 <body>
-
     <header class="header">
         <div class="logo">Tesla Base</div>
-        <div class="user-actions">
-            <i class="fa-solid fa-bell" style="font-size: 20px; margin-right: 15px;"></i>
-            <i class="fa-solid fa-circle-user" style="font-size: 24px; color: var(--tesla-red);"></i>
-        </div>
+        <div class="user-actions"><i class="fa-solid fa-circle-user" style="font-size: 24px; color: var(--tesla-red);"></i></div>
     </header>
 
     <section class="balance-card">
@@ -298,124 +93,107 @@
     </nav>
 
     <main id="page-market">
-        <div class="search-wrapper">
+        <div class="search-wrapper"><input type="text" id="asset-search" class="search-bar" placeholder="Search 200+ Assets..." onkeyup="filterAssets()"></div>
+        <div id="asset-list"></div>
+    </main>
 
-                <nav class="nav-bar">
-        <a href="#" class="nav-item active" onclick="switchPage('market')">
-            <i class="fa-solid fa-chart-line"></i>Home
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fa-solid fa-wallet"></i>Wallet
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fa-solid fa-arrow-right-arrow-left"></i>Swap
-        </a>
-        <a href="#" class="nav-item" onclick="switchPage('invest')">
-            <i class="fa-solid fa-bolt"></i>Grow
-        </a>
+    <main id="page-invest" class="plan-wrapper">
+        <div class="plan-card">
+            <h3>7-Day Starter Growth</h3>
+            <p style="color: var(--text-gray);">Min: $500 | Return: +15.5%</p>
+            <button class="invest-btn" onclick="processInvest(500)">Activate Plan</button>
+        </div>
+        <div class="plan-card" style="border-left-color: var(--success);">
+            <h3>14-Day Premium Tesla</h3>
+            <p style="color: var(--text-gray);">Min: $5,000 | Return: +42.0%</p>
+            <button class="invest-btn" style="background: var(--success);" onclick="processInvest(5000)">Activate Plan</button>
+        </div>
+    </main>
+
+    <nav class="nav-bar">
+        <a href="#" class="nav-item active" onclick="switchPage('market')"><i class="fa-solid fa-chart-line"></i>Home</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-wallet"></i>Wallet</a>
+        <a href="#" class="nav-item" onclick="switchPage('invest')"><i class="fa-solid fa-bolt"></i>Grow</a>
+        <a href="#" class="nav-item" onclick="localStorage.clear(); location.reload();"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
     </nav>
+        <script>
+        let btcPrice = 69000; 
+        const userEmail = localStorage.getItem('userEmail');
 
-    <script>
-        // --- 1. GLOBAL STATE ---
-        let btcPrice = 69000; // Default fallback
-        const email = localStorage.getItem('userEmail');
-        
-        // 200+ Assets Generator
         const assetBase = [
-            {s: 'BTC', n: 'Bitcoin', p: 69392},
-            {s: 'ETH', n: 'Ethereum', p: 3510},
-            {s: 'TSLA', n: 'Tesla Inc', p: 202.45},
-            {s: 'SOL', n: 'Solana', p: 145.20},
-            {s: 'XRP', n: 'Ripple', p: 0.62}
+            {s: 'BTC', n: 'Bitcoin', p: 69392}, {s: 'ETH', n: 'Ethereum', p: 3510},
+            {s: 'TSLA', n: 'Tesla Inc', p: 202.45}, {s: 'SOL', n: 'Solana', p: 145.20}
         ];
-
-        // Generate the remaining 195+ assets automatically
         for (let i = 1; i <= 200; i++) {
-            assetBase.push({
-                s: 'AST' + i,
-                n: 'Global Asset ' + i,
-                p: (Math.random() * 150).toFixed(2)
-            });
+            assetBase.push({ s: 'AST' + i, n: 'Global Asset ' + i, p: (Math.random() * 150).toFixed(2) });
         }
 
-        // --- 2. INITIALIZATION ---
         async function init() {
-            if (!email) {
-                window.location.href = 'index.html'; // Redirect if no persistent login
-                return;
+            // FIX: If userEmail exists, we STAY. If not, we only redirect if strictly necessary.
+            if (!userEmail) {
+                console.log("No session found.");
+                return; 
             }
             await fetchBtcPrice();
             await syncUserData();
             renderAssets();
-            // Refresh balance every 10 seconds for accuracy
-            setInterval(syncUserData, 10000);
+            setInterval(syncUserData, 5000); // Fast sync for accuracy
         }
 
-        // Fetch Live BTC Price for the calculator
         async function fetchBtcPrice() {
             try {
                 const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
                 const data = await res.json();
-                btcPrice = parseFloat(data.price);
-            } catch (e) { console.error("Price feed failed, using fallback."); }
+                if(data.price) btcPrice = parseFloat(data.price);
+            } catch (e) { console.warn("Price feed offline"); }
         }
 
-        // --- 3. CORE LOGIC ---
         async function syncUserData() {
+            if (!userEmail) return;
             try {
-                const res = await fetch(`/api/user/data?email=${email}`);
+                const res = await fetch(`/api/user/data?email=${encodeURIComponent(userEmail)}`);
+                if (!res.ok) return; // Keep current view if server is busy
                 const user = await res.json();
-                
                 if (user && user.balance !== undefined) {
                     const bal = parseFloat(user.balance);
                     document.getElementById('usd-balance').innerText = `$${bal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
                     document.getElementById('btc-balance').innerText = (bal / btcPrice).toFixed(8) + " BTC";
+                    localStorage.setItem('lastBalance', bal);
                 }
-            } catch (err) { console.error("Sync failed"); }
+            } catch (err) {
+                const savedBal = localStorage.getItem('lastBalance') || "0.00";
+                document.getElementById('usd-balance').innerText = `$${parseFloat(savedBal).toLocaleString()}`;
+            }
         }
 
         function renderAssets() {
             const list = document.getElementById('asset-list');
             const search = document.getElementById('asset-search').value.toUpperCase();
-            
-            list.innerHTML = assetBase
-                .filter(a => a.s.includes(search) || a.n.toUpperCase().includes(search))
-                .map(a => `
-                    <div class="asset-row">
-                        <div class="asset-info">
-                            <div class="asset-icon">${a.s.charAt(0)}</div>
-                            <div class="asset-name-wrapper">
-                                <b>${a.s}</b>
-                                <small>${a.n}</small>
-                            </div>
-                        </div>
-                        <div class="asset-price-wrapper">
-                            <div class="price-text">$${parseFloat(a.p).toLocaleString()}</div>
-                            <div class="change-text ${Math.random() > 0.4 ? 'up' : 'down'}">
-                                ${Math.random() > 0.4 ? '+' : '-'}${(Math.random() * 5).toFixed(2)}%
-                            </div>
-                        </div>
+            list.innerHTML = assetBase.filter(a => a.s.includes(search)).map(a => `
+                <div class="asset-row">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <div class="asset-icon">${a.s.charAt(0)}</div>
+                        <div><b>${a.s}</b><br><small style="color:var(--text-gray)">${a.n}</small></div>
                     </div>
-                `).join('');
+                    <div style="text-align:right">
+                        <div class="price-text">$${parseFloat(a.p).toLocaleString()}</div>
+                        <div class="up">+1.25%</div>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function switchPage(page) {
             document.getElementById('page-market').style.display = page === 'market' ? 'block' : 'none';
             document.getElementById('page-invest').style.display = page === 'invest' ? 'block' : 'none';
-            
             document.getElementById('tab-market').classList.toggle('active', page === 'market');
             document.getElementById('tab-invest').classList.toggle('active', page === 'invest');
         }
 
-        function processInvest(amount) {
-            alert("Confirming investment of $" + amount + ". Funds will be locked for the selected duration.");
-            // Logic for growth plans can be expanded here
-        }
-
+        function processInvest(amount) { alert("Investment processing for $" + amount); }
         function filterAssets() { renderAssets(); }
 
         window.onload = init;
     </script>
 </body>
-        </html>
-            
+</html>
