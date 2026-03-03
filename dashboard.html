@@ -3,161 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tesla Base | Trading & Growth</title>
+    <title>Tesla Base | Pro Trader</title>
     <style>
-        :root { --tesla-red: #E31937; --bg-black: #000; --card-gray: #111; }
-        body { background: var(--bg-black); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 70px; }
+        :root { --tesla-red: #E31937; --bg-black: #000; --card-gray: #111; --success: #00ffa3; }
+        body { background: var(--bg-black); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 90px; }
         
         /* Header & Balance */
-        .header { padding: 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        .header { padding: 15px 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; sticky; top: 0; background: #000; z-index: 100; }
         .logo { color: var(--tesla-red); font-weight: 900; letter-spacing: 2px; }
-        .balance-section { padding: 30px 20px; text-align: left; }
-        .balance-label { color: #888; font-size: 12px; text-transform: uppercase; }
-        .balance-main { font-size: 42px; font-weight: bold; margin: 5px 0; }
-        .btc-val { color: var(--tesla-red); font-family: monospace; }
+        .bal-card { padding: 25px 20px; background: #050505; border-bottom: 1px solid #111; }
+        .bal-label { color: #666; font-size: 11px; text-transform: uppercase; }
+        .bal-main { font-size: 34px; font-weight: 700; margin: 5px 0; }
 
-        /* Navigation Tabs */
-        .tabs { display: flex; border-bottom: 2px solid #222; margin-bottom: 10px; }
-        .tab { flex: 1; text-align: center; padding: 15px; color: #888; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 13px; }
-        .tab.active { color: #fff; border-bottom: 3px solid var(--tesla-red); }
+        /* Market Categories */
+        .market-nav { display: flex; overflow-x: auto; padding: 10px 15px; gap: 10px; background: #0a0a0a; border-bottom: 1px solid #222; }
+        .m-tab { padding: 8px 18px; background: #1a1a1a; border-radius: 20px; font-size: 12px; white-space: nowrap; color: #888; cursor: pointer; }
+        .m-tab.active { background: var(--tesla-red); color: #fff; }
 
-        /* Market List */
-        .search-box { padding: 15px; }
-        input[type="text"] { width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; }
-        .asset-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #111; }
-        .asset-info { display: flex; align-items: center; gap: 15px; }
-        .asset-icon { width: 35px; height: 35px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--tesla-red); font-weight: bold; }
-        .asset-name { font-weight: bold; }
-        .asset-sub { color: #666; font-size: 12px; }
-        .price-up { color: #00ff00; font-size: 12px; }
+        /* Asset Rows */
+        .asset-list { padding: 10px; }
+        .asset-item { display: flex; justify-content: space-between; padding: 16px; background: #0d0d0d; margin-bottom: 8px; border-radius: 12px; border: 1px solid #161616; align-items: center; }
+        .asset-icon { width: 32px; height: 32px; border-radius: 8px; background: #222; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
+        
+        /* Trade Modal */
+        .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; padding: 20px; box-sizing: border-box; }
+        .order-book { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-family: monospace; font-size: 10px; }
+        .book-red { color: #ff3b3b; } .book-green { color: var(--success); }
 
-        /* Deposit/Withdraw View */
-        .view-content { display: none; padding: 20px; }
-        .view-content.active { display: block; }
-        .card { background: var(--card-gray); padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 20px; }
-        .wallet-addr { background: #000; padding: 15px; border-radius: 8px; border: 1px dashed #444; color: #00ff00; word-break: break-all; font-family: monospace; margin: 10px 0; }
+        /* Controls */
+        .trade-input { width: 100%; padding: 20px; background: #111; border: 1px solid #333; color: #fff; border-radius: 12px; margin: 15px 0; font-size: 24px; text-align: center; box-sizing: border-box; }
+        .action-btn { width: 100%; padding: 18px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; font-size: 16px; margin-bottom: 10px; }
 
-        /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; border-top: 1px solid #222; padding: 10px 0; }
-        .nav-item { flex: 1; text-align: center; font-size: 10px; color: #666; cursor: pointer; }
-        .nav-item.active { color: var(--tesla-red); }
-        .nav-icon { font-size: 20px; display: block; margin-bottom: 2px; }
+        /* Bottom Menu */
+        .footer-nav { position: fixed; bottom: 0; width: 100%; background: #050505; display: flex; border-top: 1px solid #222; padding: 12px 0; }
+        .f-item { flex: 1; text-align: center; font-size: 10px; color: #444; }
+        .f-item.active { color: var(--tesla-red); }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div class="logo">TESLA BASE</div>
-    <div onclick="logout()" style="cursor:pointer; color:#888;">Logout ➔</div>
+    <div class="logo">TESLA BASE PRO</div>
+    <div onclick="logout()" style="font-size: 12px; color: #444;">LOGOUT</div>
 </div>
 
-<div class="balance-section">
-    <div class="balance-label">Total Injected Assets</div>
-    <div class="balance-main" id="displayBalance">$0.00</div>
-    <div class="btc-val" id="displayBtc">0.00000000 BTC</div>
+<div class="bal-card">
+    <div class="bal-label">Net Asset Value (USD)</div>
+    <div class="bal-main" id="pBalance">$0.00</div>
+    <div style="font-size: 12px; color: var(--success);" id="pBtc">0.00000000 BTC</div>
 </div>
 
-<div class="tabs">
-    <div class="tab active" onclick="switchView('market')">Market</div>
-    <div class="tab" onclick="switchView('grow')">Tesla Grow</div>
+<div class="market-nav">
+    <div class="m-tab active">Crypto</div>
+    <div class="m-tab">Stocks</div>
+    <div class="m-tab">Forex</div>
+    <div class="m-tab">Indices</div>
+    <div class="m-tab">Commodities</div>
 </div>
 
-<div id="marketView" class="view-content active">
-    <div class="search-box">
-        <input type="text" placeholder="Search 200+ Assets...">
+<div class="asset-list" id="assetsContainer">
     </div>
-    <div id="assetList">
+
+<div class="modal-bg" id="tradeModal">
+    <div style="display:flex; justify-content: space-between; align-items: center;">
+        <h2 id="tName" style="margin:0;">BITCOIN</h2>
+        <button onclick="closeTrade()" style="background:none; border:none; color:#fff; font-size:24px;">×</button>
+    </div>
+    <div id="miniChart" style="height:150px; background:#111; margin:20px 0; border-radius:10px; border:1px solid #222; display:flex; align-items:center; justify-content:center; color:#333;">Live Stream Active...</div>
+    
+    <div class="order-book" id="orderBook">
         </div>
+
+    <input type="number" class="trade-input" id="tradeAmt" placeholder="Enter Amount">
+    <button class="action-btn" style="background:var(--success); color:#000;" onclick="confirmTrade('Long/Buy')">BUY / LONG</button>
+    <button class="action-btn" style="background:var(--tesla-red); color:#fff;" onclick="confirmTrade('Short/Sell')">SELL / SHORT</button>
 </div>
 
-<div id="growView" class="view-content">
-    <div class="card">
-        <h3 style="color:var(--tesla-red)">Deposit Funds</h3>
-        <p style="font-size:13px; color:#888;">Send BTC to your official investment wallet below:</p>
-        <div class="wallet-addr" id="officialBtcAddr">Loading Official Address...</div>
-    </div>
-
-    <div class="card">
-        <h3>Withdrawal</h3>
-        <input type="text" placeholder="Enter Wallet Address" style="margin-bottom:10px;">
-        <input type="number" placeholder="Amount to Withdraw">
-        <button style="width:100%; background:var(--tesla-red); border:none; color:#fff; padding:15px; border-radius:8px; margin-top:10px; font-weight:bold;">INITIATE WITHDRAWAL</button>
-    </div>
-</div>
-
-<div class="bottom-nav">
-    <div class="nav-item active" onclick="switchView('market')"><span class="nav-icon">📈</span>Home</div>
-    <div class="nav-item" onclick="switchView('grow')"><span class="nav-icon">💼</span>Wallet</div>
-    <div class="nav-item" onclick="switchView('grow')"><span class="nav-icon">⚡</span>Grow</div>
-    <div class="nav-item" onclick="logout()"><span class="nav-icon">👤</span>Logout</div>
+<div class="footer-nav">
+    <div class="f-item active"><span style="display:block; font-size:18px;">📈</span>Market</div>
+    <div class="f-item"><span style="display:block; font-size:18px;">⚡</span>Grow</div>
+    <div class="f-item"><span style="display:block; font-size:18px;">💼</span>Wallet</div>
+    <div class="f-item"><span style="display:block; font-size:18px;">📜</span>History</div>
 </div>
 
 <script>
     const api = window.location.origin;
     const email = localStorage.getItem('userEmail');
-
     if(!email) window.location.href = '/';
 
-    function switchView(view) {
-        document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(view + 'View').classList.add('active');
-        // Simple UI toggle logic
-    }
-
-    async function refreshData() {
-        try {
-            // Get User Stats
-            const uRes = await fetch(`${api}/api/user/data?email=${email}`);
-            const uData = await uRes.json();
-            const balance = parseFloat(uData.balance);
-            document.getElementById('displayBalance').innerText = `$${balance.toLocaleString()}`;
-            document.getElementById('displayBtc').innerText = `${(balance / 69000).toFixed(8)} BTC`;
-
-            // Get Admin Wallet
-            const wRes = await fetch(`${api}/api/site/wallet`);
-            const wData = await wRes.json();
-            document.getElementById('officialBtcAddr').innerText = wData.address;
-        } catch(e) { console.log("Refresh error"); }
-    }
-
-    const assets = [
-        { name: 'BTC', full: 'Bitcoin', price: '$69,392', change: '+1.25%' },
-        { name: 'ETH', full: 'Ethereum', price: '$3,510', change: '+1.25%' },
-        { name: 'TSLA', full: 'Tesla Inc.', price: '$202.45', change: '+2.10%' },
-        { name: 'SOL', full: 'Solana', price: '$145.12', change: '+4.50%' },
-        { name: 'BNB', full: 'Binance', price: '$590.00', change: '+0.80%' }
+    const marketData = [
+        { s: 'BTC', n: 'Bitcoin', p: '68,102.50', ch: '+2.41%' },
+        { s: 'ETH', n: 'Ethereum', p: '3,412.12', ch: '+1.10%' },
+        { s: 'TSLA', n: 'Tesla', p: '202.45', ch: '+0.15%' },
+        { s: 'AAPL', n: 'Apple', p: '172.10', ch: '-0.42%' },
+        { s: 'XAU', n: 'Gold', p: '2,150.80', ch: '+0.88%' }
     ];
 
-    function loadAssets() {
-        const container = document.getElementById('assetList');
-        assets.forEach(a => {
-            container.innerHTML += `
-                <div class="asset-row">
-                    <div class="asset-info">
-                        <div class="asset-icon">${a.name[0]}</div>
-                        <div>
-                            <div class="asset-name">${a.name}</div>
-                            <div class="asset-sub">${a.full}</div>
-                        </div>
-                    </div>
-                    <div style="text-align:right">
-                        <div class="asset-name">${a.price}</div>
-                        <div class="price-up">${a.change}</div>
+    function renderAssets() {
+        const container = document.getElementById('assetsContainer');
+        container.innerHTML = marketData.map(a => `
+            <div class="asset-item" onclick="openTrade('${a.s}', '${a.p}')">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="asset-icon">${a.s[0]}</div>
+                    <div>
+                        <div style="font-weight:700;">${a.s}</div>
+                        <div style="font-size:11px; color:#444;">${a.n}</div>
                     </div>
                 </div>
-            `;
-        });
+                <div style="text-align:right;">
+                    <div style="font-weight:700;">$${a.p}</div>
+                    <div style="font-size:11px; color:${a.ch.includes('+') ? 'var(--success)' : 'var(--tesla-red)'}">${a.ch}</div>
+                </div>
+            </div>
+        `).join('');
     }
 
-    function logout() {
-        localStorage.removeItem('userEmail');
-        window.location.href = '/';
+    function openTrade(sym, price) {
+        document.getElementById('tName').innerText = sym;
+        document.getElementById('tradeModal').style.display = 'flex';
+        updateOrderBook();
     }
 
-    loadAssets();
-    refreshData();
-    setInterval(refreshData, 10000); // Live updates from Admin Panel
+    function closeTrade() { document.getElementById('tradeModal').style.display = 'none'; }
+
+    function updateOrderBook() {
+        const book = document.getElementById('orderBook');
+        let html = '';
+        for(let i=0; i<6; i++) {
+            html += `<div class="book-green">${(Math.random()*100).toFixed(4)}</div><div class="book-red">${(Math.random()*100).toFixed(4)}</div>`;
+        }
+        book.innerHTML = html;
+    }
+
+    async function syncData() {
+        try {
+            const res = await fetch(`${api}/api/user/data?email=${email}`);
+            const data = await res.json();
+            document.getElementById('pBalance').innerText = `$${parseFloat(data.balance).toLocaleString()}`;
+            document.getElementById('pBtc').innerText = `${(data.balance / 68102).toFixed(8)} BTC`;
+        } catch(e) {}
+    }
+
+    function confirmTrade(type) {
+        const amt = document.getElementById('tradeAmt').value;
+        if(!amt) return;
+        alert(`${type} order of $${amt} submitted to liquidity pool.`);
+        closeTrade();
+    }
+
+    function logout() { localStorage.removeItem('userEmail'); window.location.href = '/'; }
+
+    renderAssets();
+    syncData();
+    setInterval(syncData, 5000);
+    setInterval(updateOrderBook, 1500); // Live order book effect
 </script>
 </body>
-</html>
+                                                                          </html>
+    
