@@ -9,7 +9,7 @@
         :root {
             --bg: #000;
             --tesla-red: #E31937;
-            --card-bg: #121212;
+            --card-bg: #111;
             --text-main: #ffffff;
             --text-gray: #888888;
             --border: #222222;
@@ -22,176 +22,339 @@
         body {
             background-color: var(--bg);
             color: var(--text-main);
-            font-family: -apple-system, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            padding-bottom: 90px;
+            padding-bottom: 100px;
             overflow-x: hidden;
         }
 
+        /* Top Header */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 18px 20px;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(10px);
+            background: #000;
             border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
             z-index: 1000;
         }
 
-        .logo { font-weight: 900; color: var(--tesla-red); letter-spacing: 3px; font-size: 18px; text-transform: uppercase; }
-
-        .balance-card {
-            padding: 35px 20px;
-            background: linear-gradient(180deg, #111111 0%, #000000 100%);
-            border-bottom: 10px solid #080808;
+        .logo {
+            font-weight: 900;
+            color: var(--tesla-red);
+            letter-spacing: 2px;
+            font-size: 18px;
+            text-transform: uppercase;
         }
 
-        .balance-label { color: var(--text-gray); font-size: 13px; text-transform: uppercase; margin-bottom: 8px; }
-        .balance-amount { font-size: 42px; font-weight: 800; margin: 5px 0; }
-        .btc-calculator { color: var(--tesla-red); font-family: monospace; font-size: 16px; font-weight: bold; }
+        /* Balance Section */
+        .balance-card {
+            padding: 30px 20px;
+            text-align: left;
+        }
 
-        .tabs { display: flex; background: var(--bg); border-bottom: 1px solid var(--border); position: sticky; top: 65px; z-index: 999; }
-        .tab { flex: 1; padding: 16px; text-align: center; font-size: 13px; font-weight: 700; color: var(--text-gray); cursor: pointer; }
-        .tab.active { color: var(--tesla-red); border-bottom: 2px solid var(--tesla-red); }
+        .balance-label {
+            color: var(--text-gray);
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
 
+        .balance-amount {
+            font-size: 45px;
+            font-weight: 800;
+            margin: 5px 0;
+        }
+
+        .live-pl {
+            color: var(--success);
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Action Buttons (Deposit, Withdraw, Convert) */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 0 20px;
+            margin-bottom: 30px;
+        }
+
+        .action-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .action-btn:active { transform: scale(0.95); }
+
+        .action-btn i {
+            color: var(--tesla-red);
+            font-size: 22px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .action-btn span {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Section Titles */
+        .section-title {
+            color: var(--tesla-red);
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 0 20px;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        /* Active Positions */
+        .active-positions {
+            padding: 0 20px;
+            color: var(--text-gray);
+            font-size: 13px;
+            margin-bottom: 30px;
+        }
+
+        /* Tab Navigation */
+        .tabs {
+            display: flex;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 10px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-gray);
+            cursor: pointer;
+        }
+
+        .tab.active {
+            color: var(--tesla-red);
+            border-bottom: 2px solid var(--tesla-red);
+        }
+
+        /* Asset List */
         .search-wrapper { padding: 15px 20px; }
-        .search-bar { width: 100%; background: #111; border: 1px solid #333; padding: 14px 15px; border-radius: 10px; color: #fff; outline: none; }
+        .search-bar {
+            width: 100%;
+            background: #111;
+            border: 1px solid #333;
+            padding: 14px 15px;
+            border-radius: 10px;
+            color: #fff;
+            outline: none;
+        }
 
-        .asset-row { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--border); }
-        .asset-icon { width: 38px; height: 38px; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; color: var(--tesla-red); font-weight: bold; }
-        .price-text { font-weight: 700; font-size: 16px; }
-        .up { color: var(--success); } .down { color: var(--danger); }
+        .asset-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 20px;
+            border-bottom: 1px solid #111;
+        }
 
-        .plan-wrapper { padding: 20px; display: none; }
-        .plan-card { background: var(--card-bg); border-radius: 16px; padding: 25px; margin-bottom: 20px; border-left: 6px solid var(--tesla-red); }
-        .invest-btn { width: 100%; background: var(--tesla-red); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: 800; margin-top: 20px; cursor: pointer; }
+        .asset-info { display: flex; align-items: center; gap: 15px; }
+        .asset-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--tesla-red);
+        }
 
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1001; }
-        .nav-item { text-align: center; color: var(--text-gray); text-decoration: none; font-size: 10px; font-weight: 600; }
+        /* Growth Plans */
+        .plan-wrapper { display: none; padding: 20px; }
+        .plan-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 6px solid var(--tesla-red);
+        }
+
+        .invest-btn {
+            width: 100%;
+            background: var(--tesla-red);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 800;
+            margin-top: 15px;
+        }
+
+        /* Bottom Nav */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #000;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1001;
+        }
+
+        .nav-item {
+            text-align: center;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
         .nav-item i { font-size: 22px; margin-bottom: 4px; display: block; }
         .nav-item.active { color: var(--tesla-red); }
     </style>
 </head>
 <body>
+
     <header class="header">
         <div class="logo">Tesla Base</div>
-        <div class="user-actions"><i class="fa-solid fa-circle-user" style="font-size: 24px; color: var(--tesla-red);"></i></div>
+        <i class="fa-solid fa-bell" style="font-size: 20px;"></i>
     </header>
 
-    <section class="balance-card">
-        <div class="balance-label">Total Injected Assets</div>
-        <div class="balance-amount" id="usd-balance">$0.00</div>
-        <div class="btc-calculator" id="btc-balance">0.00000000 BTC</div>
-    </section>
+    <div id="home-view">
+        <section class="balance-card">
+            <div class="balance-label">Portfolio Balance</div>
+            <div class="balance-amount" id="usd-balance">$0.00</div>
+            <div class="live-pl">Live P/L: +$0.00</div>
+        </section>
 
-    <nav class="tabs">
-        <div class="tab active" id="tab-market" onclick="switchPage('market')">MARKET</div>
-        <div class="tab" id="tab-invest" onclick="switchPage('invest')">TESLA GROW</div>
-    </nav>
+        <section class="action-grid">
+            <div class="action-btn" onclick="alert('Wallet Address: 1Tesla...')">
+                <i class="fa-solid fa-wallet"></i><span>Deposit</span>
+            </div>
+            <div class="action-btn">
+                <i class="fa-solid fa-upload"></i><span>Withdraw</span>
+            </div>
+            <div class="action-btn">
+                <i class="fa-solid fa-rotate"></i><span>Convert</span>
+            </div>
+        </section>
 
-    <main id="page-market">
-        <div class="search-wrapper"><input type="text" id="asset-search" class="search-bar" placeholder="Search 200+ Assets..." onkeyup="filterAssets()"></div>
-        <div id="asset-list"></div>
-    </main>
+        <div class="section-title">Active Positions</div>
+        <div class="active-positions">No active trades</div>
 
-    <main id="page-invest" class="plan-wrapper">
-        <div class="plan-card">
-            <h3>7-Day Starter Growth</h3>
-            <p style="color: var(--text-gray);">Min: $500 | Return: +15.5%</p>
-            <button class="invest-btn" onclick="processInvest(500)">Activate Plan</button>
+        <nav class="tabs">
+            <div class="tab active" id="tab-market" onclick="switchTab('market')">MARKET</div>
+            <div class="tab" id="tab-grow" onclick="switchTab('grow')">TESLA GROW</div>
+        </nav>
+
+        <div id="market-view">
+            <div class="section-title">Market Assets</div>
+            <div class="search-wrapper">
+                <input type="text" id="search" class="search-bar" placeholder="Search 200+ Assets..." onkeyup="renderAssets()">
+            </div>
+            <div id="asset-list"></div>
         </div>
-        <div class="plan-card" style="border-left-color: var(--success);">
-            <h3>14-Day Premium Tesla</h3>
-            <p style="color: var(--text-gray);">Min: $5,000 | Return: +42.0%</p>
-            <button class="invest-btn" style="background: var(--success);" onclick="processInvest(5000)">Activate Plan</button>
+
+        <div id="grow-view" class="plan-wrapper">
+            <div class="section-title">Investment Plans</div>
+            <div class="plan-card">
+                <h3>7-Day Starter Growth</h3>
+                <p style="color:var(--text-gray)">Min: $500 | Return: +15.5%</p>
+                <button class="invest-btn">Activate Plan</button>
+            </div>
+            <div class="plan-card" style="border-left-color: var(--success);">
+                <h3>14-Day Premium Tesla</h3>
+                <p style="color:var(--text-gray)">Min: $5,000 | Return: +42.0%</p>
+                <button class="invest-btn" style="background:var(--success)">Activate Plan</button>
+            </div>
         </div>
-    </main>
+    </div>
 
     <nav class="nav-bar">
-        <a href="#" class="nav-item active" onclick="switchPage('market')"><i class="fa-solid fa-chart-line"></i>Home</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-wallet"></i>Wallet</a>
-        <a href="#" class="nav-item" onclick="switchPage('invest')"><i class="fa-solid fa-bolt"></i>Grow</a>
-        <a href="#" class="nav-item" onclick="localStorage.clear(); location.reload();"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
+        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Home</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i>Trade</a>
+        <a href="#" class="nav-item" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
     </nav>
         <script>
-        let btcPrice = 69000; 
         const userEmail = localStorage.getItem('userEmail');
-
         const assetBase = [
-            {s: 'BTC', n: 'Bitcoin', p: 69392}, {s: 'ETH', n: 'Ethereum', p: 3510},
-            {s: 'TSLA', n: 'Tesla Inc', p: 202.45}, {s: 'SOL', n: 'Solana', p: 145.20}
+            {s: 'BTC', n: 'Bitcoin', p: 69420},
+            {s: 'ETH', n: 'Ethereum', p: 3750},
+            {s: 'TSLA', n: 'Tesla Inc.', p: 202.45}
         ];
-        for (let i = 1; i <= 200; i++) {
-            assetBase.push({ s: 'AST' + i, n: 'Global Asset ' + i, p: (Math.random() * 150).toFixed(2) });
+
+        // Generate 200+ Assets automatically as requested
+        for (let i = 1; i < 200; i++) {
+            assetBase.push({ s: 'AST'+i, n: 'Global Asset '+i, p: (Math.random()*150).toFixed(2) });
         }
 
         async function init() {
-            // FIX: If userEmail exists, we STAY. If not, we only redirect if strictly necessary.
-            if (!userEmail) {
-                console.log("No session found.");
+            // Rule: No sign-out until explicit logout
+            if (!userEmail) { 
+                window.location.href = 'index.html'; 
                 return; 
             }
-            await fetchBtcPrice();
-            await syncUserData();
+            await sync();
             renderAssets();
-            setInterval(syncUserData, 5000); // Fast sync for accuracy
+            // Accuracy Rule: Sync balance every 5 seconds
+            setInterval(sync, 5000);
         }
 
-        async function fetchBtcPrice() {
-            try {
-                const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
-                const data = await res.json();
-                if(data.price) btcPrice = parseFloat(data.price);
-            } catch (e) { console.warn("Price feed offline"); }
-        }
-
-        async function syncUserData() {
-            if (!userEmail) return;
+        async function sync() {
             try {
                 const res = await fetch(`/api/user/data?email=${encodeURIComponent(userEmail)}`);
-                if (!res.ok) return; // Keep current view if server is busy
-                const user = await res.json();
-                if (user && user.balance !== undefined) {
-                    const bal = parseFloat(user.balance);
-                    document.getElementById('usd-balance').innerText = `$${bal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-                    document.getElementById('btc-balance').innerText = (bal / btcPrice).toFixed(8) + " BTC";
-                    localStorage.setItem('lastBalance', bal);
+                const data = await res.json();
+                if (data.balance !== undefined) {
+                    const b = parseFloat(data.balance);
+                    document.getElementById('usd-balance').innerText = `$${b.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
                 }
-            } catch (err) {
-                const savedBal = localStorage.getItem('lastBalance') || "0.00";
-                document.getElementById('usd-balance').innerText = `$${parseFloat(savedBal).toLocaleString()}`;
+            } catch (e) { 
+                console.warn("Syncing..."); 
             }
         }
 
         function renderAssets() {
+            const q = document.getElementById('search').value.toUpperCase();
             const list = document.getElementById('asset-list');
-            const search = document.getElementById('asset-search').value.toUpperCase();
-            list.innerHTML = assetBase.filter(a => a.s.includes(search)).map(a => `
+            list.innerHTML = assetBase.filter(a => a.s.includes(q) || a.n.toUpperCase().includes(q)).map(a => `
                 <div class="asset-row">
-                    <div style="display:flex; align-items:center; gap:15px;">
-                        <div class="asset-icon">${a.s.charAt(0)}</div>
+                    <div class="asset-info">
+                        <div class="asset-icon">${a.s[0]}</div>
                         <div><b>${a.s}</b><br><small style="color:var(--text-gray)">${a.n}</small></div>
                     </div>
                     <div style="text-align:right">
-                        <div class="price-text">$${parseFloat(a.p).toLocaleString()}</div>
-                        <div class="up">+1.25%</div>
+                        <b>$${parseFloat(a.p).toLocaleString()}</b><br>
+                        <small style="color:var(--success)">+1.25%</small>
                     </div>
                 </div>
             `).join('');
         }
 
-        function switchPage(page) {
-            document.getElementById('page-market').style.display = page === 'market' ? 'block' : 'none';
-            document.getElementById('page-invest').style.display = page === 'invest' ? 'block' : 'none';
-            document.getElementById('tab-market').classList.toggle('active', page === 'market');
-            document.getElementById('tab-invest').classList.toggle('active', page === 'invest');
+        function switchTab(view) {
+            document.getElementById('market-view').style.display = view === 'market' ? 'block' : 'none';
+            document.getElementById('grow-view').style.display = view === 'grow' ? 'block' : 'none';
+            document.getElementById('tab-market').classList.toggle('active', view === 'market');
+            document.getElementById('tab-grow').classList.toggle('active', view === 'grow');
         }
 
-        function processInvest(amount) { alert("Investment processing for $" + amount); }
-        function filterAssets() { renderAssets(); }
+        function logout() { 
+            localStorage.clear(); 
+            window.location.href = 'index.html'; 
+        }
 
         window.onload = init;
     </script>
