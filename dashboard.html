@@ -3,261 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tesla Base | Premium Terminal</title>
+    <title>Tesla Base | Professional Terminal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <script src="https://s3.tradingview.com/tv.js"></script>
     <style>
-        :root { --t-red: #E31937; --bg: #000; --card: #0a0a0a; --border: #1a1a1a; --success: #00ffa3; --text: #fff; }
+        :root { --t-red: #E31937; --bg: #000; --card: #0a0a0a; --border: #1a1a1a; --success: #00ffa3; --text: #fff; --brown-bg: #15100c; --brown-border: #231a14; --gold: #f5cc91; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         
-        /* Balance Header */
-        .p-header { padding: 40px 20px; background: linear-gradient(180deg, #0d0d0d 0%, #000 100%); border-bottom: 1px solid var(--border); position: relative; }
-        .bal-container { display: flex; align-items: center; gap: 15px; }
-        .bal-usd { font-size: 42px; font-weight: 800; margin: 0; letter-spacing: -1.5px; }
-        .hide-eye { font-size: 24px; color: #444; cursor: pointer; transition: 0.3s; }
-        .hide-eye:hover { color: var(--text); }
-        .bal-btc { font-family: 'JetBrains Mono', monospace; color: var(--success); font-size: 14px; margin-top: 5px; }
+        /* Balance Section */
+        .p-header { padding: 45px 20px; background: linear-gradient(180deg, #0d0d0d 0%, #000 100%); border-bottom: 1px solid var(--border); }
+        .bal-row { display: flex; align-items: center; gap: 12px; }
+        .bal-usd { font-size: 40px; font-weight: 800; letter-spacing: -1.5px; }
+        .hide-eye { font-size: 22px; color: #444; cursor: pointer; }
+        .bal-btc { font-family: 'JetBrains Mono', monospace; color: var(--success); font-size: 13px; margin-top: 5px; }
         
-        /* Search Bar */
-        .search-container { padding: 10px 20px; position: sticky; top: 0; background: var(--bg); z-index: 100; }
-        .search-input { width: 100%; padding: 12px 40px; background: #111; border: 1px solid var(--border); border-radius: 10px; color: #fff; font-size: 14px; }
-        .search-icon { position: absolute; left: 32px; top: 22px; color: #555; }
+        /* Action Buttons */
+        .action-bar { display: flex; gap: 12px; padding: 0 20px; margin-top: -28px; }
+        .action-btn { flex: 1; padding: 16px; border-radius: 14px; border: 1px solid var(--border); background: var(--card); color: #fff; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.6); transition: 0.2s; }
+        .action-btn:active { transform: scale(0.95); }
 
-        .action-bar { display: flex; gap: 10px; padding: 0 20px; margin-top: -25px; }
-        .action-btn { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: #fff; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        /* Search & Markets */
+        .search-box { padding: 15px 20px; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
+        .search-input { width: 100%; padding: 14px 45px; background: #111; border: 1px solid var(--border); border-radius: 12px; color: #fff; font-size: 15px; }
+        .s-icon { position: absolute; left: 35px; top: 29px; color: #555; }
 
-        /* Market Assets */
-        .asset-card { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; margin-bottom: 12px; cursor: pointer; }
-        .asset-logo { width: 40px; height: 40px; border-radius: 50%; background: #1a1a1a; object-fit: contain; padding: 5px; }
+        .market-list { padding: 10px 20px 100px; }
+        .asset-card { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; cursor: pointer; }
+        .asset-img { width: 42px; height: 42px; border-radius: 50%; background: #fff; padding: 4px; object-fit: contain; }
 
-        /* History Brown Theme */
-        .tab-sub-nav { display: flex; background: #231a14; padding: 5px; border-radius: 10px; margin: 20px 15px; }
-        .tab-sub { flex: 1; background: none; border: none; color: #d4a373; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; }
-        .tab-sub.active { background: #f5cc91; color: #231a14; }
-        
-        .history-card { background: #15100c; border-radius: 12px; padding: 20px; margin: 0 15px 15px; border: 1px solid #231a14; }
-        
+        /* Investment Cards */
+        .plan-card { background: #111; border: 1px solid #222; border-radius: 18px; padding: 22px; margin-bottom: 20px; border-top: 5px solid var(--t-red); }
+        .plan-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .plan-title { font-weight: 800; font-size: 22px; color: var(--gold); }
+        .plan-tag { background: var(--t-red); padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 900; }
+
+        /* History (Brown Theme) */
+        .hist-nav { display: flex; background: var(--brown-border); padding: 6px; border-radius: 12px; margin: 20px 18px; }
+        .hist-tab { flex: 1; background: none; border: none; color: #d4a373; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 13px; }
+        .hist-tab.active { background: var(--gold); color: #231a14; }
+        .history-card { background: var(--brown-bg); border-radius: 15px; padding: 22px; margin: 0 18px 15px; border: 1px solid var(--brown-border); }
+
         /* Modals & Terminal */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 10000; display: none; flex-direction: column; overflow-y: auto; padding: 20px; }
-        .modal-content { background: #0a0a0a; border: 1px solid #222; border-radius: 20px; padding: 25px; margin-top: 50px; }
-        input, select { width: 100%; padding: 18px; background: #111; border: 1px solid #333; color: #fff; border-radius: 12px; margin-bottom: 15px; font-size: 16px; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 10000; display: none; flex-direction: column; overflow-y: auto; }
+        .modal-body { padding: 30px 20px; }
+        .modal-content { background: #0a0a0a; border: 1px solid #222; border-radius: 24px; padding: 28px; }
+        input, select { width: 100%; padding: 18px; background: #111; border: 1px solid #333; color: #fff; border-radius: 14px; margin-bottom: 18px; font-size: 16px; outline: none; }
         
         /* Footer Nav */
-        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: #000; display: flex; border-top: 1px solid var(--border); z-index: 9000; padding-bottom: 15px; }
-        .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #444; cursor: pointer; }
+        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: #000; display: flex; border-top: 1px solid var(--border); z-index: 9000; padding-bottom: 12px; }
+        .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #444; letter-spacing: 0.5px; cursor: pointer; }
         .tab-item.active { color: var(--t-red); }
+        .tab-item i { font-size: 22px; margin-bottom: 6px; }
         
-        .about-text { color: #888; font-size: 14px; line-height: 1.8; text-align: justify; }
+        .about-section { color: #888; font-size: 14px; line-height: 1.8; text-align: justify; padding: 10px 0; }
     </style>
 </head>
 <body>
 
     <div id="v-market" class="view">
         <div class="p-header">
-            <div class="bal-container">
+            <div class="bal-row">
                 <h1 class="bal-usd" id="mainBal">$0.00</h1>
-                <i class="fa-solid fa-eye hide-eye" id="toggleBal" onclick="toggleBalanceVisibility()"></i>
+                <i class="fa-solid fa-eye hide-eye" id="eyeIcon" onclick="toggleBalance()"></i>
             </div>
             <div class="bal-btc" id="btcBal">0.00000000 BTC</div>
         </div>
         <div class="action-bar">
-            <div class="action-btn" onclick="openModal('modalDeposit')">Deposit</div>
-            <div class="action-btn" onclick="openModal('modalWithdraw')">Withdraw</div>
+            <div class="action-btn" onclick="openModal('modalDep')"><i class="fa-solid fa-plus"></i>Deposit</div>
+            <div class="action-btn" onclick="openModal('modalWith')"><i class="fa-solid fa-arrow-up"></i>Withdraw</div>
         </div>
-        
-        <div class="search-container">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" class="search-input" id="assetSearch" placeholder="Search markets..." oninput="filterAssets()">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass s-icon"></i>
+            <input type="text" class="search-input" id="assetSearch" placeholder="Search 50+ Markets..." oninput="filterAssets()">
         </div>
-
-        <div id="marketList" style="padding:10px 20px 100px;"></div>
+        <div id="marketList" class="market-list"></div>
     </div>
 
     <div id="v-invest" class="view" style="display:none; padding:30px 20px 100px;">
-        <h1 style="font-weight:800; margin-bottom:25px;">Investment Plans</h1>
+        <h1 style="font-weight:800; margin-bottom:25px;">Strategic Investment</h1>
         <div id="investmentList"></div>
     </div>
 
     <div id="v-history" class="view" style="display:none; padding-bottom:100px;">
-        <div class="tab-sub-nav">
-            <button class="tab-sub active" id="btnHoldings" onclick="switchHist('live')">My Holdings</button>
-            <button class="tab-sub" id="btnClosed" onclick="switchHist('closed')">Closed Positions</button>
+        <div class="hist-nav">
+            <button class="hist-tab active" id="tabLive" onclick="setHistTab('live')">My Holdings</button>
+            <button class="hist-tab" id="tabClosed" onclick="setHistTab('closed')">Closed Positions</button>
         </div>
-        <div id="historyContainer"></div>
+        <div id="historyList"></div>
     </div>
 
-    <div id="v-exit" class="view" style="display:none; padding:40px 20px 100px;">
-        <div style="background:#111; padding:20px; border-radius:15px; margin-bottom:20px;">
-            <h3>User ID: <span id="displayUserID" style="color:var(--t-red)">...</span></h3>
-            <button class="action-btn" style="width:100%; background:var(--t-red);" onclick="confirmLogout()">LOGOUT</button>
+    <div id="v-settings" class="view" style="display:none; padding:40px 20px 100px;">
+        <div style="background:#111; padding:25px; border-radius:20px; border:1px solid #222; margin-bottom:25px;">
+            <p style="color:#666; font-size:12px; margin:0;">Account User ID</p>
+            <h2 id="userID" style="margin:10px 0 20px; color:var(--gold);">...</h2>
+            <button class="action-btn" style="width:100%; background:var(--t-red); border:none;" onclick="handleLogout()">EXIT TERMINAL</button>
         </div>
-        <div style="background:#111; padding:20px; border-radius:15px;">
-            <h3>About Tesla Base</h3>
-            <div class="about-text" id="aboutContent"></div>
+        <div style="background:#111; padding:25px; border-radius:20px; border:1px solid #222;">
+            <h3>Platform Intelligence</h3>
+            <div id="aboutParagraphs" class="about-section"></div>
         </div>
     </div>
+
+    <div id="modalWith" class="modal">
+        <div class="modal-body">
+            <div class="modal-content">
+                <h2 style="margin-top:0;">Request Withdrawal</h2>
+                <select id="w_method">
+                    <option value="" disabled selected>Select Payment Method</option>
+                    <option value="Bank">Bank Transfer</option>
+                    <option value="BTC">Bitcoin (BTC)</option>
+                    <option value="ETH">Ethereum (ETH)</option>
+                    <option value="USDT">USDT (TRC20)</option>
+                </select>
+                <input type="text" id="w_address" placeholder="Bank Account or Wallet Address">
+                <input type="number" id="w_amount" placeholder="Amount ($)">
+                <button class="action-btn" style="background:var(--success); color:#000; width:100%; border:none;" onclick="processWithdraw()">Withdraw Now</button>
+                <button class="action-btn" style="width:100%; margin-top:12px;" onclick="closeModal('modalWith')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalDep" class="modal">
+        <div class="modal-body">
+            <div class="modal-content">
+                <h2 style="margin-top:0;">Fund Account</h2>
+                <p style="color:#666; font-size:14px; margin-bottom:20px;">Copy the secure Bitcoin address below to fund your balance instantly.</p>
+                <div id="adminBtc" style="background:#1a1a1a; padding:18px; border-radius:12px; border:1px dashed #333; font-family:monospace; color:var(--success); word-break:break-all; font-size:13px; margin-bottom:20px;">Loading address...</div>
+                <button class="action-btn" style="background:var(--t-red); width:100%; border:none;" onclick="closeModal('modalDep')">I Have Sent Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="tab-bar">
+        <div class="tab-item active" onclick="nav('v-market', this)"><i class="fa-solid fa-chart-line"></i>MARKET</div>
+        <div class="tab-item" onclick="nav('v-invest', this)"><i class="fa-solid fa-bolt"></i>INVEST</div>
+        <div class="tab-item" onclick="nav('v-history', this)"><i class="fa-solid fa-history"></i>HISTORY</div>
+        <div class="tab-item" onclick="nav('v-settings', this)"><i class="fa-solid fa-gear"></i>SETTINGS</div>
+    </nav>
     <script>
-    const email = localStorage.getItem('userEmail') || "user@test.com"; 
+    const email = localStorage.getItem('userEmail') || "user@example.com";
     let balance = 0;
-    let isBalHidden = false;
-    let currentHistTab = 'live';
+    let isHidden = false;
+    let histTab = 'live';
 
-    // 50 Assets with Logos
+    // 50 Asset Database
     const assets = [
         { s: 'TSLA', n: 'Tesla Inc', logo: 'https://logo.clearbit.com/tesla.com' },
         { s: 'BTC', n: 'Bitcoin', logo: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png' },
         { s: 'ETH', n: 'Ethereum', logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
         { s: 'AAPL', n: 'Apple Inc', logo: 'https://logo.clearbit.com/apple.com' },
         { s: 'NVDA', n: 'NVIDIA', logo: 'https://logo.clearbit.com/nvidia.com' },
-        { s: 'XAU', n: 'Gold Spot', logo: 'https://cdn-icons-png.flaticon.com/512/2912/2912761.png' },
         { s: 'AMZN', n: 'Amazon', logo: 'https://logo.clearbit.com/amazon.com' },
-        { s: 'SOL', n: 'Solana', logo: 'https://cryptologos.cc/logos/solana-sol-logo.png' },
+        { s: 'MSFT', n: 'Microsoft', logo: 'https://logo.clearbit.com/microsoft.com' },
+        { s: 'GOOGL', n: 'Alphabet', logo: 'https://logo.clearbit.com/google.com' },
         { s: 'META', n: 'Meta Platforms', logo: 'https://logo.clearbit.com/meta.com' },
-        { s: 'NFLX', n: 'Netflix', logo: 'https://logo.clearbit.com/netflix.com' }
-        // ... (remaining 40 assets follow this pattern)
+        { s: 'NFLX', n: 'Netflix', logo: 'https://logo.clearbit.com/netflix.com' },
+        { s: 'XAU', n: 'Gold Spot', logo: 'https://cdn-icons-png.flaticon.com/512/2912/2912761.png' },
+        { s: 'SOL', n: 'Solana', logo: 'https://cryptologos.cc/logos/solana-sol-logo.png' },
+        { s: 'XRP', n: 'Ripple', logo: 'https://cryptologos.cc/logos/xrp-xrp-logo.png' },
+        { s: 'ADA', n: 'Cardano', logo: 'https://cryptologos.cc/logos/cardano-ada-logo.png' },
+        { s: 'DOT', n: 'Polkadot', logo: 'https://cryptologos.cc/logos/polkadot-dot-logo.png' },
+        { s: 'AVAX', n: 'Avalanche', logo: 'https://cryptologos.cc/logos/avalanche-avax-logo.png' },
+        { s: 'TRX', n: 'TRON', logo: 'https://cryptologos.cc/logos/tron-trx-logo.png' },
+        { s: 'LTC', n: 'Litecoin', logo: 'https://cryptologos.cc/logos/litecoin-ltc-logo.png' },
+        { s: 'BABA', n: 'Alibaba', logo: 'https://logo.clearbit.com/alibaba.com' },
+        { s: 'V', n: 'Visa', logo: 'https://logo.clearbit.com/visa.com' },
+        { s: 'MA', n: 'Mastercard', logo: 'https://logo.clearbit.com/mastercard.com' },
+        { s: 'PYPL', n: 'PayPal', logo: 'https://logo.clearbit.com/paypal.com' },
+        { s: 'DIS', n: 'Disney', logo: 'https://logo.clearbit.com/disney.com' },
+        { s: 'NKE', n: 'Nike', logo: 'https://logo.clearbit.com/nike.com' },
+        { s: 'SBUX', n: 'Starbucks', logo: 'https://logo.clearbit.com/starbucks.com' },
+        { s: 'KO', n: 'Coca-Cola', logo: 'https://logo.clearbit.com/cocacola.com' },
+        { s: 'WMT', n: 'Walmart', logo: 'https://logo.clearbit.com/walmart.com' },
+        { s: 'COST', n: 'Costco', logo: 'https://logo.clearbit.com/costco.com' },
+        { s: 'TM', n: 'Toyota', logo: 'https://logo.clearbit.com/toyota.com' },
+        { s: 'F', n: 'Ford', logo: 'https://logo.clearbit.com/ford.com' },
+        { s: 'UBER', n: 'Uber', logo: 'https://logo.clearbit.com/uber.com' },
+        { s: 'ABNB', n: 'Airbnb', logo: 'https://logo.clearbit.com/airbnb.com' },
+        { s: 'SHOP', n: 'Shopify', logo: 'https://logo.clearbit.com/shopify.com' },
+        { s: 'COIN', n: 'Coinbase', logo: 'https://logo.clearbit.com/coinbase.com' },
+        { s: 'AMD', n: 'AMD', logo: 'https://logo.clearbit.com/amd.com' },
+        { s: 'CRM', n: 'Salesforce', logo: 'https://logo.clearbit.com/salesforce.com' },
+        { s: 'ORCL', n: 'Oracle', logo: 'https://logo.clearbit.com/oracle.com' },
+        { s: 'IBM', n: 'IBM', logo: 'https://logo.clearbit.com/ibm.com' },
+        { s: 'MCD', n: 'McDonalds', logo: 'https://logo.clearbit.com/mcdonalds.com' },
+        { s: 'PEP', n: 'PepsiCo', logo: 'https://logo.clearbit.com/pepsico.com' },
+        { s: 'SQ', n: 'Block', logo: 'https://logo.clearbit.com/block.xyz' },
+        { s: 'SPOT', n: 'Spotify', logo: 'https://logo.clearbit.com/spotify.com' },
+        { s: 'MSTR', n: 'MicroStrategy', logo: 'https://logo.clearbit.com/microstrategy.com' },
+        { s: 'ZD', n: 'Ziff Davis', logo: 'https://logo.clearbit.com/ziffdavis.com' },
+        { s: 'JNJ', n: 'J&J', logo: 'https://logo.clearbit.com/jnj.com' },
+        { s: 'PFE', n: 'Pfizer', logo: 'https://logo.clearbit.com/pfizer.com' },
+        { s: 'INTC', n: 'Intel', logo: 'https://logo.clearbit.com/intel.com' },
+        { s: 'CSCO', n: 'Cisco', logo: 'https://logo.clearbit.com/cisco.com' },
+        { s: 'LINK', n: 'Chainlink', logo: 'https://cryptologos.cc/logos/chainlink-link-logo.png' },
+        { s: 'MATIC', n: 'Polygon', logo: 'https://cryptologos.cc/logos/polygon-matic-logo.png' }
     ];
 
+    const tiers = {
+        bronze:  { n: 'Bronze',  m: 3, color: '#CD7F32' },
+        silver:  { n: 'Silver',  m: 4, color: '#C0C0C0' },
+        gold:    { n: 'Gold',    m: 5, color: '#FFD700' },
+        diamond: { n: 'Diamond', m: 8, color: '#B9F2FF' }
+    };
+
     async function init() {
-        try {
-            const res = await fetch(`/api/user/data?email=${email}`);
-            const data = await res.json();
-            
-            // Fix NaN: Ensure we default to 0 if data is missing
-            balance = parseFloat(data.balance) || 0;
-            document.getElementById('displayUserID').innerText = data.userId || "T-8829";
-            
-            updateBalUI();
-            renderMarket(assets);
-            generateAboutText();
-        } catch (e) {
-            console.error("Fetch error, using local defaults.");
-            balance = 0;
-            updateBalUI();
-            renderMarket(assets);
+        const res = await fetch(`/api/user/data?email=${email}`);
+        const data = await res.json();
+        balance = parseFloat(data.balance) || 0;
+        document.getElementById('userID').innerText = data.userId || 'T-' + Math.floor(1000 + Math.random()*9000);
+        document.getElementById('adminBtc').innerText = data.adminWallet || "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh";
+        
+        updateUI();
+        renderMarket(assets);
+        renderPlans();
+        renderHistory();
+        genAbout();
+    }
+
+    function updateUI() {
+        const u = document.getElementById('mainBal');
+        const b = document.getElementById('btcBal');
+        if(isHidden) { u.innerText = "$****"; b.innerText = "**** BTC"; }
+        else { 
+            u.innerText = `$${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            b.innerText = `${(balance / 68500).toFixed(8)} BTC`;
         }
     }
 
-    function updateBalUI() {
-        const usdEl = document.getElementById('mainBal');
-        const btcEl = document.getElementById('btcBal');
-        if (isBalHidden) {
-            usdEl.innerText = "$****";
-            btcEl.innerText = "**** BTC";
-        } else {
-            usdEl.innerText = `$${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            btcEl.innerText = `${(balance / 68000).toFixed(8)} BTC`;
-        }
-    }
-
-    function toggleBalanceVisibility() {
-        isBalHidden = !isBalHidden;
-        const icon = document.getElementById('toggleBal');
-        icon.className = isBalHidden ? "fa-solid fa-eye-slash hide-eye" : "fa-solid fa-eye hide-eye";
-        updateBalUI();
-    }
-
-    function renderMarket(dataList) {
-        const list = document.getElementById('marketList');
-        list.innerHTML = dataList.map(a => `
-            <div class="asset-card" onclick="openTradeTerminal('${a.s}')">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <img src="${a.logo}" class="asset-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2912/2912761.png'">
+    function renderMarket(list) {
+        document.getElementById('marketList').innerHTML = list.map(a => `
+            <div class="asset-card" onclick="openTerminal('${a.s}')">
+                <div style="display:flex; align-items:center; gap:14px;">
+                    <img src="${a.logo}" class="asset-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2912/2912761.png'">
                     <div><div style="font-weight:800;">${a.s}</div><div style="font-size:11px; color:#555;">${a.n}</div></div>
                 </div>
                 <div style="text-align:right;">
-                    <div style="font-family:'JetBrains Mono'; font-weight:700;">$${(Math.random()*200 + 50).toFixed(2)}</div>
-                    <div style="color:var(--success); font-size:11px;">+${(Math.random()*2).toFixed(2)}%</div>
+                    <div style="font-family:'JetBrains Mono'; font-weight:700;">$${(Math.random()*300+40).toFixed(2)}</div>
+                    <div style="color:var(--success); font-size:11px; font-weight:800;">+${(Math.random()*3).toFixed(2)}%</div>
                 </div>
             </div>`).join('');
     }
 
-    function filterAssets() {
-        const query = document.getElementById('assetSearch').value.toLowerCase();
-        const filtered = assets.filter(a => a.s.toLowerCase().includes(query) || a.n.toLowerCase().includes(query));
-        renderMarket(filtered);
-    }
-    </script>
-    <script>
-    function openTradeTerminal(sym) {
-        const asset = assets.find(x => x.s === sym);
+    function openTerminal(sym) {
+        const a = assets.find(x => x.s === sym);
         document.body.insertAdjacentHTML('beforeend', `
-            <div id="terminal" class="modal" style="display:flex;">
-                <div style="padding:15px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #222;">
-                    <h3 style="margin:0;">${asset.s} Trading View</h3>
-                    <i class="fa-solid fa-xmark" onclick="document.getElementById('terminal').remove()" style="font-size:24px;"></i>
+            <div id="term" class="modal" style="display:flex;">
+                <div style="padding:15px; display:flex; justify-content:space-between; align-items:center; background:#000;">
+                    <h3 style="margin:0;">${a.s}/USD Terminal</h3>
+                    <i class="fa-solid fa-xmark" onclick="document.getElementById('term').remove()" style="font-size:24px;"></i>
                 </div>
-                <div id="chart_container" style="flex:1; width:100%;"></div>
-                <div style="padding:20px; background:#0a0a0a;">
-                    <input type="number" id="tradeAmt" placeholder="Enter Amount ($)">
-                    <div style="display:flex; gap:10px;">
-                        <button class="action-btn" style="background:var(--success); color:#000;" onclick="execTrade('${asset.s}', 'BUY')">BUY</button>
-                        <button class="action-btn" style="background:var(--t-red); color:#fff;" onclick="execTrade('${asset.s}', 'SELL')">SELL</button>
+                <div id="tv_box" style="flex:1;"></div>
+                <div style="padding:25px; background:#0a0a0a; border-top:1px solid #222;">
+                    <input type="number" id="t_amt" placeholder="Trade Amount ($)">
+                    <div style="display:flex; gap:12px;">
+                        <button class="action-btn" style="background:var(--success); color:#000; border:none;" onclick="execTrade('${a.s}','BUY')">BUY / LONG</button>
+                        <button class="action-btn" style="background:var(--t-red); color:#fff; border:none;" onclick="execTrade('${a.s}','SELL')">SELL / SHORT</button>
                     </div>
                 </div>
-            </div>
-        `);
-
-        new TradingView.widget({
-            "container_id": "chart_container",
-            "symbol": sym + "USD",
-            "interval": "D",
-            "theme": "dark",
-            "autosize": true
-        });
+            </div>`);
+        new TradingView.widget({"container_id":"tv_box","symbol":sym+"USD","interval":"5","theme":"dark","autosize":true});
     }
 
-    async function submitWithdraw() {
-        const type = document.getElementById('w_type').value;
-        const addr = document.getElementById('w_addr').value;
-        const amt = parseFloat(document.getElementById('w_amt').value);
+    function renderPlans() {
+        document.getElementById('investmentList').innerHTML = Object.entries(tiers).map(([k, p]) => `
+            <div class="plan-card" style="border-top-color: ${p.color}">
+                <div class="plan-header">
+                    <span class="plan-title">${p.n} Tier</span>
+                    <span class="plan-tag">${p.m}X PROFIT</span>
+                </div>
+                <p style="font-size:12px; color:#555; margin-bottom:15px;">Maturity: 7 Days • AI-Backtested Growth</p>
+                <input type="number" id="amt_${k}" placeholder="Capital ($150 - $20,000)" oninput="calcP('${k}', ${p.m})">
+                <div id="p_${k}" style="color:var(--success); font-weight:800; font-size:14px; margin-bottom:20px;">Return: $0.00</div>
+                <button class="action-btn" style="background:var(--t-red); width:100%; border:none;" onclick="startI('${k}')">START INVESTMENT</button>
+            </div>`).join('');
+    }
+        <script>
+    async function processWithdraw() {
+        const amt = parseFloat(document.getElementById('w_amount').value);
+        if(!amt || amt < 3500) return alert("System Notice: Minimum withdrawal requirement is $3,500.00 USD.");
+        if(amt > balance) return alert("System Notice: Insufficient funds for this request.");
 
-        if (amt < 3500) {
-            return alert("Withdrawal Failed: Minimum withdrawal amount is $3,500.00");
-        }
-        if (amt > balance) return alert("Insufficient funds.");
-
-        alert(`Withdrawal Request of $${amt} received. A 15% maintenance fee is required before final approval.`);
+        alert(`Request Logged! A 15% maintenance and verification fee is required. Please check your deposit tab for the official BTC address.`);
     }
 
-    function generateAboutText() {
-        let text = "";
+    function renderHistory() {
+        const trades = JSON.parse(localStorage.getItem(`trades_${email}`)) || [];
+        const filtered = trades.filter(t => t.status === (histTab === 'live' ? 'live' : 'closed') || t.status === 'awaiting');
+        
+        document.getElementById('historyList').innerHTML = filtered.length ? filtered.map(t => `
+            <div class="history-card">
+                <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+                    <b style="color:var(--gold);">${t.symbol || t.plan}</b>
+                    <span class="plan-tag" style="background:${t.type==='trade'?'#222':'var(--t-red)'}">${t.side || '7-DAY'}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; color:#888;">
+                    <span>Capital: $${t.capital}</span>
+                    <span style="color:var(--success)">${t.payout ? 'Profit: $'+t.payout : 'Live P&L: +'+(Math.random()*4).toFixed(2)+'%'}</span>
+                </div>
+                ${t.status === 'live' ? `<button class="action-btn" style="width:100%; margin-top:15px; font-size:10px; padding:8px;" onclick="closeT('${t.id}')">CLOSE POSITION</button>` : ''}
+            </div>`).join('') : `<div style="text-align:center; padding:50px; color:#333;">No active positions found.</div>`;
+    }
+
+    function genAbout() {
+        let h = "";
         for(let i=1; i<=400; i++) {
-            text += `<p>Paragraph ${i}: Tesla Base is a revolutionary high-frequency trading infrastructure sponsored directly by the vision of Elon Musk and Tesla Inc. Built on the bedrock of decentralization, it has become the most trusted platform across North America, Europe, and Asia. Our proprietary neural networks analyze over 50 market sectors in milliseconds, ensuring that every user, from Bronze to Diamond, experiences the pinnacle of financial engineering. With zero-latency execution and military-grade encryption, your assets remain secured in cold storage, backed by the largest liquidity providers in the world. Tesla Base isn't just a website; it is the future of the global economy, vetted by international financial regulators and used by millions of professional traders globally.</p>`;
+            h += `<p>Paragraph ${i}: Tesla Base is a multi-national financial ecosystem founded on the principles of transparency and high-frequency growth. Sponsored by the visionary leadership of Elon Musk, this platform integrates Tesla's proprietary neural-link market analysis with decentralized liquidity pools. We are trusted in over 140 countries, providing Bronze to Diamond tier users with 3x to 8x returns through 7-day automated cycles. Our infrastructure is audited by international security firms to ensure that once funds are injected, they remain secured and tethered to the user's unique ID, regardless of market volatility. Join the future of autonomous wealth generation.</p>`;
         }
-        document.getElementById('aboutContent').innerHTML = text;
+        document.getElementById('aboutParagraphs').innerHTML = h;
     }
 
-    function nav(id, el) {
-        document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
-        document.getElementById(id).style.display = 'block';
-        document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
+    // Helper Functions
+    function nav(v, e) {
+        document.querySelectorAll('.view').forEach(x => x.style.display = 'none');
+        document.getElementById(v).style.display = 'block';
+        document.querySelectorAll('.tab-item').forEach(x => x.classList.remove('active'));
+        e.classList.add('active');
+        if(v==='v-market') renderMarket(assets);
     }
+    function toggleBalance() { isHidden = !isHidden; document.getElementById('eyeIcon').className = isHidden ? "fa-solid fa-eye-slash hide-eye" : "fa-solid fa-eye hide-eye"; updateUI(); }
+    function filterAssets() {
+        const q = document.getElementById('assetSearch').value.toLowerCase();
+        renderMarket(assets.filter(a => a.s.toLowerCase().includes(q) || a.n.toLowerCase().includes(q)));
+    }
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function setHistTab(t) { histTab = t; document.getElementById('tabLive').className = t==='live'?'hist-tab active':'hist-tab'; document.getElementById('tabClosed').className = t==='closed'?'hist-tab active':'hist-tab'; renderHistory(); }
+    function handleLogout() { if(confirm("Are you sure you want to logout?")) { localStorage.clear(); window.location.href = "/login"; } }
 
     window.onload = init;
 </script>
-
-<div id="modalWithdraw" class="modal">
-    <div class="modal-content">
-        <h2>Withdrawal</h2>
-        <select id="w_type">
-            <option value="bank">Bank Transfer</option>
-            <option value="crypto">Crypto Wallet (BTC/ETH)</option>
-        </select>
-        <input type="text" id="w_addr" placeholder="Enter Account/Address">
-        <input type="number" id="w_amt" placeholder="Amount">
-        <button class="action-btn" style="background:var(--success); color:#000; width:100%;" onclick="submitWithdraw()">Withdraw Now</button>
-        <button class="action-btn" style="width:100%; margin-top:10px;" onclick="closeModal('modalWithdraw')">Cancel</button>
-    </div>
-</div>
-
-<nav class="tab-bar">
-    <div class="tab-item active" onclick="nav('v-market', this)"><i class="fa-solid fa-chart-line"></i>MARKET</div>
-    <div class="tab-item" onclick="nav('v-invest', this)"><i class="fa-solid fa-bolt"></i>INVEST</div>
-    <div class="tab-item" onclick="nav('v-history', this)"><i class="fa-solid fa-history"></i>HISTORY</div>
-    <div class="tab-item" onclick="nav('v-exit', this)"><i class="fa-solid fa-gear"></i>SETTINGS</div>
-</nav>
 </body>
 </html>
