@@ -5,70 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tesla Base | Premium Terminal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <script src="https://s3.tradingview.com/tv.js"></script>
     <style>
-        :root { --t-red: #E31937; --bg: #000; --card: #0a0a0a; --border: #1a1a1a; --success: #00ffa3; --warning: #ffb800; --text: #fff; }
+        :root { --t-red: #E31937; --bg: #000; --card: #0a0a0a; --border: #1a1a1a; --success: #00ffa3; --text: #fff; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
-        .p-header { padding: 40px 20px; background: linear-gradient(180deg, #0d0d0d 0%, #000 100%); border-bottom: 1px solid var(--border); }
-        .bal-usd { font-size: 42px; font-weight: 900; letter-spacing: -1.5px; margin: 0; }
-        .bal-btc { font-family: 'JetBrains Mono', monospace; color: var(--success); font-size: 14px; margin-top: 5px; }
-        .action-bar { display: flex; gap: 10px; padding: 0 20px; margin-top: -25px; }
-        .action-btn { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: #fff; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .asset-card { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; margin-bottom: 10px; cursor: pointer; }
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; display: none; flex-direction: column; }
-        .modal-content { flex: 1; padding: 25px; overflow-y: auto; padding-bottom: 100px; }
-        
-        /* EXACT MATCH TO YOUR UPLOADED IMAGE */
-        .tab-sub-nav { display: flex; background: #231a14; padding: 5px; border-radius: 10px; margin-bottom: 20px; }
-        .tab-sub { flex: 1; background: none; border: none; color: #d4a373; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; }
-        .tab-sub.active { background: #f5cc91; color: #231a14; }
-        .history-card { background: #15100c; border-radius: 12px; padding: 20px; margin-bottom: 15px; border: 1px solid #231a14; }
-        .hc-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
-        .hc-label { color: #888; }
-        .hc-val { color: #eee; font-family: 'JetBrains Mono', monospace; }
-        .symbol-badge { background: #E31937; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 900; color: #fff; }
 
-        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); display: flex; border-top: 1px solid var(--border); z-index: 9000; padding-bottom: 15px; }
+        /* Header & Balances */
+        .p-header { padding: 40px 20px; background: linear-gradient(180deg, #0d0d0d 0%, #000 100%); border-bottom: 1px solid var(--border); }
+        .bal-usd { font-size: 42px; font-weight: 800; margin: 0; letter-spacing: -1.5px; }
+        .bal-btc { font-family: 'JetBrains Mono', monospace; color: var(--success); font-size: 14px; margin-top: 5px; }
+
+        /* Navigation & Tabs */
+        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); display: flex; border-top: 1px solid var(--border); z-index: 9000; padding-bottom: 15px; }
         .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #444; text-transform: uppercase; cursor: pointer; }
         .tab-item.active { color: var(--t-red); }
+        .tab-item i { font-size: 22px; margin-bottom: 4px; }
+
+        /* Action Buttons */
+        .action-bar { display: flex; gap: 10px; padding: 0 20px; margin-top: -25px; }
+        .action-btn { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: #fff; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+
+        /* Market Assets */
+        .asset-card { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; }
+        .asset-card:active { transform: scale(0.98); background: #111; }
+
+        /* Investment Cards */
+        .plan-card { background: #111; border: 1px solid #222; border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 5px solid var(--t-red); }
+        .plan-title { font-weight: 800; font-size: 18px; color: #f5cc91; margin-bottom: 10px; }
+        .plan-info { font-size: 13px; color: #888; margin-bottom: 5px; display: flex; justify-content: space-between; }
+
+        /* History (The Exact Brown/Black Style) */
+        .tab-sub-nav { display: flex; background: #231a14; padding: 5px; border-radius: 10px; margin: 20px 15px; }
+        .tab-sub { flex: 1; background: none; border: none; color: #d4a373; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; }
+        .tab-sub.active { background: #f5cc91; color: #231a14; }
+        
+        .history-card { background: #15100c; border-radius: 12px; padding: 20px; margin: 0 15px 15px; border: 1px solid #231a14; }
+        .hc-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; border-bottom: 1px solid #1f1812; padding-bottom: 4px; }
+        .hc-label { color: #888; }
+        .hc-val { color: #eee; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+        .symbol-badge { background: var(--t-red); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 900; color: #fff; display: inline-block; }
+        
+        .close-pos-btn { width: 100%; background: var(--t-red); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 800; margin-top: 15px; cursor: pointer; }
+
+        /* Modals */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: none; flex-direction: column; overflow-y: auto; }
     </style>
 </head>
 <body>
-    <div id="v-market" class="view" style="display:block;">
+
+    <div id="v-market" class="view">
         <div class="p-header">
-            <p style="color:#666; font-size:11px; text-transform:uppercase;">Available Balance</p>
             <h1 class="bal-usd" id="usdBalance">$0.00</h1>
             <div class="bal-btc" id="btcBalance">0.00000000 BTC</div>
         </div>
         <div class="action-bar">
-            <div class="action-btn" onclick="openModal('modalDeposit')">Deposit</div>
-            <div class="action-btn" onclick="openModal('modalWithdraw')">Withdraw</div>
+            <div class="action-btn" onclick="openModal('modalDeposit')"><i class="fa-solid fa-plus"></i> Deposit</div>
+            <div class="action-btn" onclick="openModal('modalWithdraw')"><i class="fa-solid fa-wallet"></i> Withdraw</div>
         </div>
         <div id="assetList" style="padding:40px 20px 100px;"></div>
     </div>
 
-    <div id="v-history" class="view" style="display:none; padding:20px 15px 100px;">
+    <div id="v-invest" class="view" style="display:none; padding:30px 20px 100px;">
+        <h1 style="font-weight:800; margin-bottom:25px;">Investment Strategies</h1>
+        <div id="investmentList"></div>
+    </div>
+
+    <div id="v-history" class="view" style="display:none; padding-bottom:100px;">
         <div class="tab-sub-nav">
-            <button class="tab-sub active" onclick="toggleHistoryTab('holdings')">My Holdings</button>
-            <button class="tab-sub" onclick="toggleHistoryTab('closed')">Closed Positions</button>
+            <button class="tab-sub active" id="btnHoldings" onclick="switchHist('live')">My Holdings</button>
+            <button class="tab-sub" id="btnClosed" onclick="switchHist('closed')">Closed Positions</button>
         </div>
-        <div id="ledger-list"></div>
+        <div id="historyContainer"></div>
     </div>
 
     <div id="tradeTerminal" class="modal">
-        <div class="modal-content" style="padding:0; background:#000;">
-            <div style="padding:15px; display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="chartSym" style="margin:0;">BTC/USD</h3>
-                <span class="close-btn" onclick="closeModals()">&times;</span>
+        <div style="padding:20px; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border);">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <img id="modalLogo" src="" width="30">
+                <h3 id="chartSym" style="margin:0;">ASSET/USD</h3>
             </div>
-            <div id="chartContainer" style="height:350px; width:100%;"></div>
-            <div style="padding:20px;">
-                <input type="number" id="tradeQty" placeholder="Amount ($)" style="width:100%; background:#111; border:1px solid #333; padding:15px; border-radius:10px; color:#fff; margin-bottom:15px;">
-                <div style="display:flex; gap:10px;">
-                    <button class="action-btn" style="background:var(--success); color:#000;" onclick="processTrade('BUY')">BUY</button>
-                    <button class="action-btn" style="background:var(--t-red);" onclick="processTrade('SELL')">SELL</button>
-                </div>
+            <span onclick="closeTerminal()" style="font-size:35px; cursor:pointer;">&times;</span>
+        </div>
+        <div id="tv_chart" style="height:380px;"></div>
+        <div style="padding:25px; background: #050505;">
+            <label style="color:#666; font-size:12px; font-weight:800;">ORDER AMOUNT (USD)</label>
+            <input type="number" id="tradeAmount" placeholder="0.00" style="width:100%; padding:18px; background:#111; border:1px solid #222; color:#fff; border-radius:12px; margin:10px 0 20px 0; font-size:20px; font-weight:800;">
+            <div style="display:flex; gap:10px;">
+                <button class="action-btn" style="background:var(--success); color:#000; height:60px;" onclick="executeTrade('BUY')">BUY / LONG</button>
+                <button class="action-btn" style="background:var(--t-red); height:60px;" onclick="executeTrade('SELL')">SELL / SHORT</button>
             </div>
         </div>
     </div>
@@ -78,169 +104,297 @@
         <div class="tab-item" onclick="nav('v-invest', this)"><i class="fa-solid fa-bolt"></i>Invest</div>
         <div class="tab-item" onclick="nav('v-history', this)"><i class="fa-solid fa-history"></i>History</div>
         <div class="tab-item" onclick="logout()"><i class="fa-solid fa-power-off"></i>Exit</div>
-            </nav>
-            <script>
-    const api = window.location.origin;
-    const email = localStorage.getItem('userEmail');
-    let userBalance = 0;
-    let selectedAsset = "";
-
+    </nav>
+    <script>
+    // Asset Data (Complete 50 Assets)
     const assets = [
+        { s: 'TSLA', n: 'Tesla Inc', logo: 'https://logo.clearbit.com/tesla.com' },
+        { s: 'ZD', n: 'Ziff Davis, Inc.', logo: 'https://logo.clearbit.com/ziffdavis.com' },
         { s: 'BTC', n: 'Bitcoin', logo: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png' },
         { s: 'ETH', n: 'Ethereum', logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
-        { s: 'TSLA', n: 'Tesla Inc', logo: 'https://www.logo.wine/a/logo/Tesla%2C_Inc./Tesla%2C_Inc.-Logo.wine.svg' },
-        { s: 'ZD', n: 'Ziff Davis, Inc.', logo: 'https://logo.clearbit.com/ziffdavis.com' },
         { s: 'AAPL', n: 'Apple Inc', logo: 'https://logo.clearbit.com/apple.com' },
         { s: 'NVDA', n: 'NVIDIA', logo: 'https://logo.clearbit.com/nvidia.com' },
-        { s: 'XAU', n: 'Gold Spot', logo: 'https://cdn-icons-png.flaticon.com/512/2912/2912761.png' },
-        { s: 'MSFT', n: 'Microsoft', logo: 'https://logo.clearbit.com/microsoft.com' },
         { s: 'AMZN', n: 'Amazon', logo: 'https://logo.clearbit.com/amazon.com' },
-        { s: 'META', n: 'Meta', logo: 'https://logo.clearbit.com/meta.com' },
-        { s: 'NFLX', n: 'Netflix', logo: 'https://logo.clearbit.com/netflix.com' },
+        { s: 'MSFT', n: 'Microsoft', logo: 'https://logo.clearbit.com/microsoft.com' },
         { s: 'GOOGL', n: 'Alphabet', logo: 'https://logo.clearbit.com/google.com' },
+        { s: 'META', n: 'Meta Platforms', logo: 'https://logo.clearbit.com/meta.com' },
+        { s: 'NFLX', n: 'Netflix', logo: 'https://logo.clearbit.com/netflix.com' },
         { s: 'SOL', n: 'Solana', logo: 'https://cryptologos.cc/logos/solana-sol-logo.png' },
-        { s: 'COIN', n: 'Coinbase', logo: 'https://logo.clearbit.com/coinbase.com' },
-        { s: 'UBER', n: 'Uber', logo: 'https://logo.clearbit.com/uber.com' },
-        { s: 'SHOP', n: 'Shopify', logo: 'https://logo.clearbit.com/shopify.com' },
-        { s: 'DOGE', n: 'Dogecoin', logo: 'https://cryptologos.cc/logos/dogecoin-doge-logo.png' },
-        { s: 'BNB', n: 'Binance', logo: 'https://cryptologos.cc/logos/bnb-bnb-logo.png' },
-        { s: 'ADA', n: 'Cardano', logo: 'https://cryptologos.cc/logos/cardano-ada-logo.png' },
         { s: 'XRP', n: 'Ripple', logo: 'https://cryptologos.cc/logos/xrp-xrp-logo.png' },
+        { s: 'ADA', n: 'Cardano', logo: 'https://cryptologos.cc/logos/cardano-ada-logo.png' },
+        { s: 'AVAX', n: 'Avalanche', logo: 'https://cryptologos.cc/logos/avalanche-avax-logo.png' },
+        { s: 'DOT', n: 'Polkadot', logo: 'https://cryptologos.cc/logos/polkadot-dot-logo.png' },
+        { s: 'MATIC', n: 'Polygon', logo: 'https://cryptologos.cc/logos/polygon-matic-logo.png' },
+        { s: 'LINK', n: 'Chainlink', logo: 'https://cryptologos.cc/logos/chainlink-link-logo.png' },
+        { s: 'TRX', n: 'TRON', logo: 'https://cryptologos.cc/logos/tron-trx-logo.png' },
         { s: 'LTC', n: 'Litecoin', logo: 'https://cryptologos.cc/logos/litecoin-ltc-logo.png' },
         { s: 'BABA', n: 'Alibaba', logo: 'https://logo.clearbit.com/alibaba.com' },
         { s: 'V', n: 'Visa', logo: 'https://logo.clearbit.com/visa.com' },
         { s: 'MA', n: 'Mastercard', logo: 'https://logo.clearbit.com/mastercard.com' },
         { s: 'PYPL', n: 'PayPal', logo: 'https://logo.clearbit.com/paypal.com' },
-        { s: 'INTC', n: 'Intel', logo: 'https://logo.clearbit.com/intel.com' },
-        { s: 'AMD', n: 'AMD', logo: 'https://logo.clearbit.com/amd.com' },
+        { s: 'DIS', n: 'Disney', logo: 'https://logo.clearbit.com/disney.com' },
         { s: 'NKE', n: 'Nike', logo: 'https://logo.clearbit.com/nike.com' },
         { s: 'SBUX', n: 'Starbucks', logo: 'https://logo.clearbit.com/starbucks.com' },
         { s: 'KO', n: 'Coca-Cola', logo: 'https://logo.clearbit.com/cocacola.com' },
-        { s: 'DIS', n: 'Disney', logo: 'https://logo.clearbit.com/disney.com' },
         { s: 'WMT', n: 'Walmart', logo: 'https://logo.clearbit.com/walmart.com' },
         { s: 'COST', n: 'Costco', logo: 'https://logo.clearbit.com/costco.com' },
         { s: 'TM', n: 'Toyota', logo: 'https://logo.clearbit.com/toyota.com' },
         { s: 'F', n: 'Ford', logo: 'https://logo.clearbit.com/ford.com' },
-        { s: 'GM', n: 'GM', logo: 'https://logo.clearbit.com/gm.com' },
+        { s: 'UBER', n: 'Uber', logo: 'https://logo.clearbit.com/uber.com' },
         { s: 'ABNB', n: 'Airbnb', logo: 'https://logo.clearbit.com/airbnb.com' },
-        { s: 'SPOT', n: 'Spotify', logo: 'https://logo.clearbit.com/spotify.com' },
+        { s: 'SHOP', n: 'Shopify', logo: 'https://logo.clearbit.com/shopify.com' },
         { s: 'SQ', n: 'Block', logo: 'https://logo.clearbit.com/block.xyz' },
-        { s: 'T', n: 'AT&T', logo: 'https://logo.clearbit.com/att.com' },
-        { s: 'VZ', n: 'Verizon', logo: 'https://logo.clearbit.com/verizon.com' },
-        { s: 'ORCL', n: 'Oracle', logo: 'https://logo.clearbit.com/oracle.com' },
+        { s: 'SPOT', n: 'Spotify', logo: 'https://logo.clearbit.com/spotify.com' },
+        { s: 'MSTR', n: 'MicroStrategy', logo: 'https://logo.clearbit.com/microstrategy.com' },
+        { s: 'COIN', n: 'Coinbase', logo: 'https://logo.clearbit.com/coinbase.com' },
+        { s: 'AMD', n: 'AMD', logo: 'https://logo.clearbit.com/amd.com' },
+        { s: 'INTC', n: 'Intel', logo: 'https://logo.clearbit.com/intel.com' },
         { s: 'CRM', n: 'Salesforce', logo: 'https://logo.clearbit.com/salesforce.com' },
+        { s: 'ORCL', n: 'Oracle', logo: 'https://logo.clearbit.com/oracle.com' },
         { s: 'IBM', n: 'IBM', logo: 'https://logo.clearbit.com/ibm.com' },
         { s: 'CSCO', n: 'Cisco', logo: 'https://logo.clearbit.com/cisco.com' },
-        { s: 'HD', n: 'Home Depot', logo: 'https://logo.clearbit.com/homedepot.com' },
-        { s: 'LOW', n: 'Lowes', logo: 'https://logo.clearbit.com/lowes.com' },
-        { s: 'PEP', n: 'Pepsi', logo: 'https://logo.clearbit.com/pepsico.com' },
         { s: 'MCD', n: 'McDonalds', logo: 'https://logo.clearbit.com/mcdonalds.com' },
-        { s: 'JNJ', n: 'J&J', logo: 'https://logo.clearbit.com/jnj.com' }
+        { s: 'PEP', n: 'PepsiCo', logo: 'https://logo.clearbit.com/pepsico.com' },
+        { s: 'JNJ', n: 'Johnson & Johnson', logo: 'https://logo.clearbit.com/jnj.com' },
+        { s: 'PFE', n: 'Pfizer', logo: 'https://logo.clearbit.com/pfizer.com' },
+        { s: 'XAU', n: 'Gold Spot', logo: 'https://cdn-icons-png.flaticon.com/512/2912/2912761.png' }
     ];
 
-    async function sync() {
-        const res = await fetch(`${api}/api/user/data?email=${email}`);
-        const data = await res.json();
-        userBalance = parseFloat(data.balance);
-        document.getElementById('usdBalance').innerText = `$${userBalance.toLocaleString(undefined,{minimumFractionDigits:2})}`;
-        document.getElementById('btcBalance').innerText = `${(userBalance / 68000).toFixed(8)} BTC`;
-        renderAssets();
-        renderLedger();
-    }
-
-    async function processTrade(side) {
-        const qty = parseFloat(document.getElementById('tradeQty').value);
-        if(!qty || qty > userBalance) return alert("Insufficient funds.");
-        
-        const buyPrice = (Math.random() * 50 + 20).toFixed(2);
-        const orderId = "PRE" + Date.now();
-        
-        const trade = {
-            id: orderId,
-            asset: selectedAsset.n,
-            symbol: selectedAsset.s,
-            buyPrice: buyPrice,
-            sellPrice: side === 'SELL' ? (buyPrice * 1.61).toFixed(2) : "---",
-            qty: (qty / buyPrice).toFixed(2),
-            fee: "0.22",
-            profit: (qty * 0.61).toFixed(4),
-            time: new Date().toLocaleString(),
-            status: side === 'SELL' ? 'Closed' : 'Open'
-        };
-
-        let history = JSON.parse(localStorage.getItem(`ledger_${email}`)) || [];
-        history.unshift(trade);
-        localStorage.setItem(`ledger_${email}`, JSON.stringify(history));
-
-        await fetch(`${api}/api/user/update-balance`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ email, amount: -qty, type: 'TRADE' })
-        });
-
-        alert("Trade executed and logged to history.");
-        closeModals(); sync();
-    }
-
-    function renderLedger() {
-        const list = JSON.parse(localStorage.getItem(`ledger_${email}`)) || [];
-        document.getElementById('ledger-list').innerHTML = list.map(t => `
-            <div class="history-card">
-                <div style="margin-bottom:10px;">
-                    <span style="color:#eee; font-weight:800;">${t.asset}</span><br>
-                    <span class="symbol-badge">${t.symbol}</span>
+    function renderMarket() {
+        const container = document.getElementById('assetList');
+        container.innerHTML = assets.map(a => {
+            const price = (Math.random() * 500 + 10).toFixed(2);
+            const change = (Math.random() * 5).toFixed(2);
+            return `
+                <div class="asset-card" onclick="openTerminal('${a.s}')">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <img src="${a.logo}" width="32" height="32" style="border-radius:50%; background:#fff; padding:2px;">
+                        <div>
+                            <div style="font-weight:800; font-size:15px;">${a.s}</div>
+                            <div style="font-size:11px; color:#555;">${a.n}</div>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-family:'JetBrains Mono'; font-weight:600;">$${price}</div>
+                        <div style="color:var(--success); font-size:11px; font-weight:700;">+${change}%</div>
+                    </div>
                 </div>
-                <div class="hc-row"><span class="hc-label">Order No</span><span class="hc-val">${t.id}</span></div>
-                <div class="hc-row"><span class="hc-label">Purchase Time</span><span class="hc-val">${t.time}</span></div>
-                <div class="hc-row"><span class="hc-label">Buy Price</span><span class="hc-val">${t.buyPrice}</span></div>
-                ${t.status === 'Closed' ? `<div class="hc-row"><span class="hc-label">Sell Price</span><span class="hc-val">${t.sellPrice}</span></div>` : ''}
-                <div class="hc-row"><span class="hc-label">Quantity</span><span class="hc-val">${t.qty}</span></div>
-                <div class="hc-row"><span class="hc-label">Transaction Fee</span><span class="hc-val">${t.fee}</span></div>
-                <div class="hc-row"><span class="hc-label">Return (%)</span><span class="hc-val" style="color:var(--success)">61.00%</span></div>
-                <div class="hc-row"><span class="hc-label">Profit/Loss</span><span class="hc-val" style="color:var(--success)">${t.profit}</span></div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
-    function renderAssets() {
-        document.getElementById('assetList').innerHTML = assets.map(a => `
-            <div class="asset-card" onclick="openTradingTerminal('${a.s}')">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <img src="${a.logo}" style="width:30px; height:30px; border-radius:5px;">
-                    <div><div style="font-weight:800;">${a.s}</div><div style="font-size:10px; color:#555;">${a.n}</div></div>
-                </div>
-                <div style="text-align:right;">
-                    <div style="font-family:monospace;">$${(Math.random()*500).toFixed(2)}</div>
-                    <div style="color:var(--success); font-size:10px;">+2.1%</div>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function openTradingTerminal(symbol) {
-        selectedAsset = assets.find(a => a.s === symbol);
-        document.getElementById('chartSym').innerText = symbol + "/USD";
+    function openTerminal(symbol) {
+        const asset = assets.find(a => a.s === symbol);
+        currentSelectedAsset = asset;
+        document.getElementById('modalLogo').src = asset.logo;
+        document.getElementById('chartSym').innerText = asset.s + "/USD";
         document.getElementById('tradeTerminal').style.display = 'flex';
+        
         new TradingView.widget({
-            "container_id": "chartContainer",
+            "autosize": true,
             "symbol": symbol + "USD",
             "interval": "5",
+            "timezone": "Etc/UTC",
             "theme": "dark",
             "style": "1",
-            "width": "100%",
-            "height": 350,
-            "hide_top_toolbar": true
+            "locale": "en",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_top_toolbar": true,
+            "save_image": false,
+            "container_id": "tv_chart"
         });
+    }
+
+    function closeTerminal() {
+        document.getElementById('tradeTerminal').style.display = 'none';
+        document.getElementById('tv_chart').innerHTML = "";
+    }
+    </script>
+    <script>
+    const email = localStorage.getItem('userEmail');
+    let userBalance = 0;
+    let histTab = 'live';
+    let currentSelectedAsset = null;
+
+    // --- Core Logic ---
+
+    async function sync() {
+        if (!email) {
+            alert("No user session found. Please log in.");
+            window.location.href = "/login";
+            return;
+        }
+        
+        try {
+            const res = await fetch(`/api/user/data?email=${email}`);
+            const data = await res.json();
+            userBalance = parseFloat(data.balance);
+            
+            // Update UI Balances
+            document.getElementById('usdBalance').innerText = `$${userBalance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('btcBalance').innerText = `${(userBalance / 65000).toFixed(8)} BTC`;
+            
+            renderMarket();
+            renderHistory();
+            renderInvestments();
+        } catch (e) {
+            console.error("Sync Error:", e);
+        }
+    }
+
+    // --- Trading Logic ---
+
+    async function executeTrade(side) {
+        const amt = parseFloat(document.getElementById('tradeAmount').value);
+        if (!amt || amt <= 0) return alert("Please enter a valid amount.");
+        if (amt > userBalance) return alert("Insufficient funds.");
+
+        const buyPrice = (Math.random() * 50 + 20).toFixed(2);
+        const trade = {
+            id: "TRD" + Date.now(),
+            assetName: currentSelectedAsset.n,
+            symbol: currentSelectedAsset.s,
+            logo: currentSelectedAsset.logo,
+            side: side,
+            purchaseTime: new Date().toLocaleString(),
+            buyPrice: buyPrice,
+            qty: (amt / buyPrice).toFixed(4),
+            fee: (amt * 0.001).toFixed(2), // 0.1% fee
+            status: 'live',
+            type: 'TRADE'
+        };
+
+        let trades = JSON.parse(localStorage.getItem(`trades_${email}`)) || [];
+        trades.unshift(trade);
+        localStorage.setItem(`trades_${email}`, JSON.stringify(trades));
+
+        await updateServerBalance(-amt, 'TRADE_OPEN');
+        closeTerminal();
+        sync();
+    }
+
+    async function closePosition(id) {
+        let trades = JSON.parse(localStorage.getItem(`trades_${email}`)) || [];
+        let t = trades.find(x => x.id === id);
+        
+        // P&L Calculation: Simulate real market move (Guaranteed 61% profit per user request)
+        const investment = parseFloat(t.buyPrice) * parseFloat(t.qty);
+        const profit = (investment * 0.61);
+        const totalReturn = (investment + profit).toFixed(2);
+
+        t.status = 'closed';
+        t.sellTime = new Date().toLocaleString();
+        t.sellPrice = (parseFloat(t.buyPrice) * 1.61).toFixed(2);
+        t.profit = profit.toFixed(2);
+
+        localStorage.setItem(`trades_${email}`, JSON.stringify(trades));
+
+        await updateServerBalance(parseFloat(totalReturn), 'TRADE_CLOSE');
+        sync();
+    }
+
+    // --- Investment Logic ---
+
+    function renderInvestments() {
+        const invList = [
+            { name: "BRONZE STRATEGY", daily: "3.5%", duration: "7 Days", min: 500, color: "#CD7F32" },
+            { name: "SILVER STRATEGY", daily: "5.0%", duration: "14 Days", min: 2000, color: "#C0C0C0" },
+            { name: "GOLD STRATEGY", daily: "8.2%", duration: "30 Days", min: 5000, color: "#f5cc91" }
+        ];
+
+        document.getElementById('investmentList').innerHTML = invList.map(p => `
+            <div class="plan-card" style="border-left-color: ${p.color}">
+                <div class="plan-title">${p.name}</div>
+                <div class="plan-info"><span>Daily ROI</span><span style="color:var(--success)">${p.daily}</span></div>
+                <div class="plan-info"><span>Duration</span><span>${p.duration}</span></div>
+                <div class="plan-info"><span>Minimum</span><span>$${p.min}</span></div>
+                <button class="action-btn" style="margin-top:15px; background:var(--t-red); width:100%" 
+                        onclick="processInvestment('${p.name}', ${p.min})">ACTIVATE PLAN</button>
+            </div>
+        `).join('');
+    }
+
+    async function processInvestment(plan, amt) {
+        if (userBalance < amt) return alert("Insufficient balance for " + plan);
+        
+        const trade = {
+            id: "INV" + Date.now(),
+            assetName: plan,
+            symbol: "STAKING",
+            purchaseTime: new Date().toLocaleString(),
+            buyPrice: amt.toFixed(2),
+            qty: "1.00",
+            fee: "0.00",
+            status: 'live',
+            type: 'INVESTMENT'
+        };
+
+        let trades = JSON.parse(localStorage.getItem(`trades_${email}`)) || [];
+        trades.unshift(trade);
+        localStorage.setItem(`trades_${email}`, JSON.stringify(trades));
+
+        await updateServerBalance(-amt, 'INVEST_OPEN');
+        sync();
+        alert(plan + " Activated Successfully!");
+    }
+
+    // --- UI Helpers ---
+
+    function renderHistory() {
+        const trades = JSON.parse(localStorage.getItem(`trades_${email}`)) || [];
+        const filtered = trades.filter(t => t.status === (histTab === 'live' ? 'live' : 'closed'));
+        
+        document.getElementById('historyContainer').innerHTML = filtered.length ? filtered.map(t => `
+            <div class="history-card">
+                <div style="margin-bottom:15px; display:flex; justify-content:space-between;">
+                    <div>
+                        <span style="color:#eee; font-weight:800; font-size:16px;">${t.assetName}</span><br>
+                        <span class="symbol-badge">${t.symbol}</span>
+                    </div>
+                    ${t.status === 'live' ? '<span style="color:var(--success); font-size:10px; font-weight:800;">● LIVE</span>' : ''}
+                </div>
+                <div class="hc-row"><span class="hc-label">Order ID</span><span class="hc-val">${t.id}</span></div>
+                <div class="hc-row"><span class="hc-label">Open Date</span><span class="hc-val">${t.purchaseTime}</span></div>
+                ${t.status === 'closed' ? `<div class="hc-row"><span class="hc-label">Close Date</span><span class="hc-val">${t.sellTime}</span></div>` : ''}
+                <div class="hc-row"><span class="hc-label">Entry Price</span><span class="hc-val">$${t.buyPrice}</span></div>
+                ${t.status === 'closed' ? `<div class="hc-row"><span class="hc-label">Exit Price</span><span class="hc-val">$${t.sellPrice}</span></div>` : ''}
+                <div class="hc-row"><span class="hc-label">Amount</span><span class="hc-val">${t.qty} Units</span></div>
+                <div class="hc-row"><span class="hc-label">Return (%)</span><span class="hc-val" style="color:var(--success)">+61.00%</span></div>
+                <div class="hc-row"><span class="hc-label">Profit/Loss</span><span class="hc-val" style="color:var(--success)">${t.status === 'live' ? 'Calculating...' : '+$' + t.profit}</span></div>
+                
+                ${t.status === 'live' ? `<button class="close-pos-btn" onclick="closePosition('${t.id}')">CLOSE POSITION</button>` : ''}
+            </div>
+        `).join('') : '<div style="text-align:center; padding:50px; color:#444;">No records found.</div>';
+    }
+
+    async function updateServerBalance(amt, type) {
+        await fetch('/api/user/update-balance', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email, amount: amt, type: type })
+        });
+    }
+
+    function switchHist(t) {
+        histTab = t;
+        document.getElementById('btnHoldings').classList.toggle('active', t === 'live');
+        document.getElementById('btnClosed').classList.toggle('active', t === 'closed');
+        renderHistory();
     }
 
     function nav(id, el) {
         document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
         document.getElementById(id).style.display = 'block';
-        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
-        if(id === 'v-history') renderLedger();
     }
-    function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+
+    function logout() {
+        localStorage.removeItem('userEmail');
+        window.location.href = "/";
+    }
+
     window.onload = sync;
 </script>
 </body>
