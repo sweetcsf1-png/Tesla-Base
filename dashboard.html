@@ -352,38 +352,40 @@
     renderHistory();
     detectLocale();
 </script>
-    // CONTINUATION OF TERMINAL ENGINE
-    
-    // 1. INVESTMENT EXECUTION
-    async function startPlan(name, multiplier, inputId) {
+        async function startPlan(name, multiplier, inputId) {
         const amtInput = document.getElementById(inputId);
-        const amount = parseFloat(amtInput.value) || 150;
+        const amount = parseFloat(amtInput.value);
 
-        if (amount < 150) {
-            alert("Minimum investment is $150.");
+        if (!amount || amount < 150) {
+            alert("Minimum investment of $150 is required.");
             return;
         }
-
+        if (amount > 20000) {
+            alert("Maximum investment for this plan is $20,000.");
+            return;
+        }
         if (amount > userBalance) {
-            alert("Insufficient funds in available USD balance.");
+            alert("Insufficient available balance. Please deposit or inject funds.");
             return;
         }
 
         const expectedReturn = amount * multiplier;
-        const confirmAction = confirm(`Confirm $${amount.toLocaleString()} investment in ${name} Plan?\nExpected Return: $${expectedReturn.toLocaleString()} in 7 days.`);
+        const confirmMsg = `Confirm ${name} Plan?\nCapital: $${amount.toLocaleString()}\nReturn: $${expectedReturn.toLocaleString()}\n\nFunds will be deducted and returned in 7 days.`;
 
-        if (confirmAction) {
+        if (confirm(confirmMsg)) {
             try {
-                // Silently deduct from balance
                 const response = await fetch(`${api}/api/user/update-balance`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email, amount: -amount })
+                    body: JSON.stringify({ 
+                        email: email, 
+                        amount: -amount,
+                        type: 'INVESTMENT_DEBIT' 
+                    })
                 });
 
                 if (response.ok) {
-                    // Log to History
-                    const investmentData = {
+                    const investmentEntry = {
                         plan: name,
                         amount: amount,
                         return: expectedReturn,
@@ -392,44 +394,28 @@
                         status: 'Awaiting Investment Return'
                     };
                     
-                    saveToHistory(investmentData);
-                    alert(`Investment Successful! Your return of $${expectedReturn.toLocaleString()} will be credited in 7 days.`);
-                    sync(); // Update UI balance
+                    saveToHistory(investmentEntry);
+                    alert(`Plan Activated! Return of $${expectedReturn.toLocaleString()} scheduled for 7 days from now.`);
+                    sync();
                 }
             } catch (err) {
                 console.error("Investment Error:", err);
+                alert("Connection error. Please try again.");
             }
         }
     }
 
-    // 2. LIVE ORDER BOOK SIMULATION
-    function simulateOrderBook() {
-        const buys = document.getElementById('buyOrders');
-        const sells = document.getElementById('sellOrders');
-        if(!buys || !sells) return;
-
-        buys.innerHTML = ''; sells.innerHTML = '';
-        for(let i=0; i<5; i++) {
-            buys.innerHTML += `<div>${(Math.random()*1.5).toFixed(4)} BTC @ $${(68200 + Math.random()*100).toFixed(2)}</div>`;
-            sells.innerHTML += `<div>${(Math.random()*1.5).toFixed(4)} BTC @ $${(68300 + Math.random()*100).toFixed(2)}</div>`;
-        }
-    }
-
-    // 3. AUTO-UPDATE BTC PRICE DISPLAY
-    setInterval(() => {
-        if(document.getElementById('tradeTerminal').style.display === 'flex') {
-            simulateOrderBook();
-        }
-    }, 1500;
-
-    // INITIALIZE ALL SYSTEMS
-    window.onload = () => {
+    window.addEventListener('DOMContentLoaded', () => {
         renderAssets();
         sync();
         renderHistory();
-        setInterval(sync, 10000); // Keep balance and wallet address updated
+        setInterval(sync, 10000);
+        detectLocale();
+    });
+
+    window.onkeydown = function(event) {
+        if (event.keyCode === 27) { closeModals(); }
     };
 </script>
 </body>
-        </html>
-            
+</html>
